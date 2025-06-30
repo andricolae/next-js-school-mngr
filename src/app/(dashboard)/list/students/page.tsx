@@ -9,13 +9,18 @@ import { auth } from "@clerk/nextjs/server"
 import { Class, Prisma, Student } from "@prisma/client"
 import Image from "next/image"
 import Link from "next/link"
+import { TokenData } from "@/lib/utils";
 
 type StudentList = Student & { class: Class };
 
 const StudentListPage = async ({ searchParams }: { searchParams: { [key: string]: string | undefined } }) => {
 
-    const { userId, sessionClaims } = auth();
-    const role = (sessionClaims?.metadata as { role?: string })?.role;
+    const { userId, sessionClaims } = await auth();
+    let tokenData;
+	if (sessionClaims !== null) {
+		tokenData = sessionClaims as unknown as TokenData;
+	}
+	let role = tokenData?.userPblcMtdt?.role;
     const currentUserId = userId;
 
     const columns = [

@@ -9,6 +9,7 @@ import { ITEM_PER_PAGE } from "@/lib/settings"
 import { auth } from "@clerk/nextjs/server"
 import { Attendance, Lesson, Prisma, Student } from "@prisma/client"
 import Image from "next/image"
+import { TokenData } from "@/lib/utils";
 
 type AttendanceList = Attendance & {
     student: Student,
@@ -21,8 +22,12 @@ type AttendanceList = Attendance & {
 
 const AttendanceListPage = async ({ searchParams }: { searchParams: { [key: string]: string | undefined } }) => {
 
-    const { userId, sessionClaims } = auth();
-    const role = (sessionClaims?.metadata as { role?: string })?.role;
+    const { userId, sessionClaims } = await auth();
+    let tokenData;
+	if (sessionClaims !== null) {
+		tokenData = sessionClaims as unknown as TokenData;
+	}
+	let role = tokenData?.userPblcMtdt?.role;
     const currentUserId = userId;
 
     const columns = [
