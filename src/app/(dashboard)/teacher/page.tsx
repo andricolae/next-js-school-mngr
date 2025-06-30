@@ -3,13 +3,13 @@ import BigCalendarContainer from "@/components/BigCalendarContainer"
 import EventCalendarContainer from "@/components/EventCalendarContainer"
 import { auth } from "@clerk/nextjs/server"
 
-const TeacherPage = ({
+const TeacherPage = async ({
   searchParams
 }: {
   searchParams: { [keys: string]: string | undefined };
 }) => {
 
-  const { userId } = auth()
+  const { userId } = await auth()
 
   return (
     <div className='flex-1 p-4 flex gap-4 flex-col xl:flex-row'>

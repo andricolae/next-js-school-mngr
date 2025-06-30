@@ -8,6 +8,7 @@ import { ITEM_PER_PAGE } from "@/lib/settings"
 import { auth } from "@clerk/nextjs/server"
 import { Assignment, Class, Prisma, Subject, Teacher } from "@prisma/client"
 import Image from "next/image"
+import { TokenData } from "@/lib/utils";
 
 type AssignmentList = Assignment & {
     lesson: {
@@ -19,8 +20,12 @@ type AssignmentList = Assignment & {
 
 const AssignmentListPage = async ({ searchParams }: { searchParams: { [key: string]: string | undefined } }) => {
 
-    const { userId, sessionClaims } = auth();
-    const role = (sessionClaims?.metadata as { role?: string })?.role;
+    const { userId, sessionClaims } = await auth();
+    let tokenData;
+	if (sessionClaims !== null) {
+		tokenData = sessionClaims as unknown as TokenData;
+	}
+	let role = tokenData?.userPblcMtdt?.role;
     const currentUserId = userId;
 
     const columns = [

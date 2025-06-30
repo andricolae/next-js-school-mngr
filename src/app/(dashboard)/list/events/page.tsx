@@ -7,13 +7,18 @@ import prisma from "@/lib/prisma"
 import { ITEM_PER_PAGE } from "@/lib/settings"
 import { auth } from "@clerk/nextjs/server"
 import { Class, Event, Prisma } from "@prisma/client"
+import { TokenData } from "@/lib/utils";
 
 type EventList = Event & { class: Class };
 
 const EventListPage = async ({ searchParams }: { searchParams: { [key: string]: string | undefined } }) => {
     
-    const { userId, sessionClaims } = auth();
-    const role = (sessionClaims?.metadata as { role?: string })?.role;
+    const { userId, sessionClaims } = await auth();
+    let tokenData;
+	if (sessionClaims !== null) {
+		tokenData = sessionClaims as unknown as TokenData;
+	}
+	let role = tokenData?.userPblcMtdt?.role;
     const currentUserId = userId;
 
     const columns = [

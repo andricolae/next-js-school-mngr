@@ -8,13 +8,18 @@ import { ITEM_PER_PAGE } from "@/lib/settings"
 import { auth } from "@clerk/nextjs/server"
 import { Class, Prisma, Teacher } from "@prisma/client"
 import Image from "next/image"
+import { TokenData } from "@/lib/utils";
 
 type ClassList = Class & { supervisor: Teacher }
 
 const ClassListPage = async ({ searchParams }: { searchParams: { [key: string]: string | undefined } }) => {
 
-    const { userId, sessionClaims } = auth();
-    const role = (sessionClaims?.metadata as { role?: string })?.role;
+    const { userId, sessionClaims } = await auth();
+    let tokenData;
+	if (sessionClaims !== null) {
+		tokenData = sessionClaims as unknown as TokenData;
+	}
+	let role = tokenData?.userPblcMtdt?.role;
     const currentUserId = userId;
 
     const columns = [
