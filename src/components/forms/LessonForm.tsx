@@ -252,26 +252,38 @@ const LessonForm = ({
                 <InputField
                     label="Start Time"
                     name="startTime"
-                    defaultValue={data?.startTime ? 
-                        new Date(data.startTime).toISOString().slice(0, 16) : 
-                        undefined
+                   
+
+                    defaultValue={
+                        data?.startTime
+                        ? isRecurring
+                            ? new Date(data.startTime).toISOString().slice(11, 16) 
+                            : new Date(data.startTime).toISOString().slice(0, 16) 
+                        : undefined
                     }
                     register={register}
                     error={errors?.startTime}
-                    type="datetime-local"
+                   
+                    type={isRecurring ? "time" : "datetime-local"}
 
                 />
 
                 <InputField
                     label="End Time"
                     name="endTime"
-                    defaultValue={data?.endTime ? 
-                        new Date(data.endTime).toISOString().slice(0, 16) : 
-                        undefined
+
+
+                     defaultValue={
+                        data?.startTime
+                        ? isRecurring
+                            ? new Date(data.startTime).toISOString().slice(11, 16) 
+                            : new Date(data.startTime).toISOString().slice(0, 16) 
+                        : undefined
                     }
                     register={register}
-                    error={errors?.endTime}
-                    type="datetime-local"
+                    error={errors?.startTime}
+                  
+                    type={isRecurring ? "time" : "datetime-local"}
                 />
 
                 {data && (
