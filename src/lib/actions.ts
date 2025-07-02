@@ -1180,3 +1180,28 @@ export const deleteLesson = async (currentState: CurrentState, data: FormData) =
 		return { success: false, error: true }
 	}
 }
+
+export async function createRecurringLessons(lessonsData: LessonSchema[]) {
+    try {
+        let successCount = 0;
+        for (const lessonData of lessonsData) {
+          
+            await prisma.lesson.create({ data: {
+                name: lessonData.name,
+                day: lessonData.day,
+                startTime: lessonData.startTime, 
+                endTime: lessonData.endTime,
+                subjectId: lessonData.subjectId,
+                classId: lessonData.classId,
+                teacherId: lessonData.teacherId,
+                
+            }});
+            successCount++;
+        }
+        return { success: true, error: false, total: lessonsData.length, successCount: successCount };
+    } catch (error: any) {
+        console.error("Error creating recurring lessons:", error);
+        
+        return { success: false, error: true, message: error.message || "Failed to create recurring lessons." };
+    }
+}
