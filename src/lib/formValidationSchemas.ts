@@ -10,6 +10,28 @@ export const subjectSchema = z.object({
 
 export type SubjectSchema = z.infer<typeof subjectSchema>;
 
+export const moduleSchema = z.object({
+  id: z.number().optional(), 
+  name: z.string().min(1, "Module name is required."),
+  startDate: z.string().refine((date) => !isNaN(new Date(date).getTime()), "Invalid start date"),
+  endDate: z.string().refine((date) => !isNaN(new Date(date).getTime()), "Invalid end date"),
+  
+  holidays: z.array(z.object({
+    name: z.string().min(1, "Holiday name is required"),
+    date: z.string().refine((date) => !isNaN(new Date(date).getTime()), "Invalid date"),
+  })).default([]),
+});
+
+export type ModuleSchema = z.infer<typeof moduleSchema>;
+
+
+export const holidaySchema = z.object({
+  name: z.string().min(1, "Holiday name is required"),
+  date: z.string().refine((date) => !isNaN(new Date(date).getTime()), "Invalid date"),
+});
+
+export type HolidaySchema = z.infer<typeof holidaySchema>;
+
 export const classSchema = z.object({
     id: z.coerce.number().optional(),
     name: z
@@ -155,6 +177,8 @@ export const lessonSchema = z.object({
 });
 
 export type LessonSchema = z.infer<typeof lessonSchema>;
+
+export type GeneratedLessonData = Omit<LessonSchema, 'isRecurring' | 'moduleId' | 'id'> & {id?: number};
 
 export const parentSchema = z.object({
     id: z.string().optional(),

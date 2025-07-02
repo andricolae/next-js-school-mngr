@@ -12,6 +12,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { Suspense } from 'react'
+import { TokenData } from "@/lib/utils";
 
 const SingleStudentPage = async ({
     params: { id },
@@ -19,8 +20,12 @@ const SingleStudentPage = async ({
     params: { id: string };
 }) => {
 
-    const { sessionClaims } = auth();
-    const role = (sessionClaims?.metadata as { role?: string })?.role;
+    const { sessionClaims } = await auth();
+    let tokenData;
+	if (sessionClaims !== null) {
+		tokenData = sessionClaims as unknown as TokenData;
+	}
+	let role = tokenData?.userPblcMtdt?.role;
 
     const student: | (Student & {
         class: (Class & { _count: { lessons: number } })

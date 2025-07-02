@@ -8,6 +8,7 @@ import { Teacher } from '@prisma/client'
 import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { TokenData } from "@/lib/utils";
 
 const SingleTeacherPage = async ({
     params: { id },
@@ -15,8 +16,12 @@ const SingleTeacherPage = async ({
     params: { id: string };
 }) => {
 
-    const { sessionClaims } = auth();
-    const role = (sessionClaims?.metadata as { role?: string })?.role;
+    const { sessionClaims } = await auth();
+    let tokenData;
+	if (sessionClaims !== null) {
+		tokenData = sessionClaims as unknown as TokenData;
+	}
+	let role = tokenData?.userPblcMtdt?.role;
     
     const teacher: (Teacher & { _count: { subjects: number; lessons: number; classes: number } }) | null = await prisma.teacher.findUnique({
         where: { id },

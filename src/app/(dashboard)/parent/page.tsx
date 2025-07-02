@@ -11,7 +11,7 @@ const ParentPage = async ({
 }: {
   searchParams: { [keys: string]: string | undefined };
 }) => {
-  const { userId } = auth()
+  const { userId } = await auth()
   
   const studentsWithClasses = await prisma.student.findMany({
     where: {
