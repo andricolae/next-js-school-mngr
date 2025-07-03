@@ -25,6 +25,16 @@ const holidays = [
     { name: "National Day Test3", date: "2025-07-21" },
 ];
 
+type TeacherWithSubjects = {
+    id: string; 
+    name: string;
+    surname: string;
+    
+    subjects?: { id: number; name: string }[];
+    subjectIds?: number[]; 
+};
+
+ 
 const LessonForm = ({
     type,
     data,
@@ -37,7 +47,7 @@ const LessonForm = ({
     relatedData?: {
         subjects: any[];
         classes: any[];
-        teachers: any[];
+        teachers: TeacherWithSubjects[];
     };
 }) => {
     
@@ -65,6 +75,14 @@ const LessonForm = ({
     const [isRecurring, setIsRecurring] = useState(false);
     const [selectedModuleId, setSelectedModuleId] = useState<number | null>(null);
     const [isCreatingRecurring, setIsCreatingRecurring] = useState(false);
+    
+
+    const [selectedSubjectId, setSelectedSubjectId] = useState<string>(
+        data?.subjectId || data?.subject?.id || ""
+    );
+    const [selectedTeacherId, setSelectedTeacherId] = useState<string>(
+        data?.teacherId || data?.teacher?.id || ""
+    );
 
     const {
         register,
@@ -85,6 +103,40 @@ const LessonForm = ({
 
     const router = useRouter();
 
+   
+    const handleSubjectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const newSubjectId = e.target.value;
+        setSelectedSubjectId(newSubjectId);
+        setSelectedTeacherId("");
+        
+        // console.log("Available teachers:", relatedData?.teachers);
+        // console.log("Selected subject ID:", newSubjectId);
+        // console.log("Filtered teachers:", getFilteredTeachers());
+    };
+
+
+    const getFilteredTeachers = () => {
+    if (!selectedSubjectId || !relatedData?.teachers) {
+        return relatedData?.teachers || [];
+    }
+
+    return relatedData.teachers.filter((teacher: any) => {
+
+        console.log("Checking teacher:", relatedData);
+        
+        if (teacher.subjects && Array.isArray(teacher.subjects)) {
+            return teacher.subjects.some((subject: any) => 
+                subject.id?.toString() === selectedSubjectId.toString()
+            );
+        }
+        
+        if (teacher.subjectIds && Array.isArray(teacher.subjectIds)) {
+            return teacher.subjectIds.includes(parseInt(selectedSubjectId));
+        }
+        
+        return true;
+    });
+};
     
     const getDayOfWeek = (dayString: LessonSchema['day']): number => {
         switch (dayString) {
@@ -212,6 +264,7 @@ const LessonForm = ({
     }, [state, router, type, setOpen, isRecurring]);
 
     const { subjects, classes, teachers } = relatedData || {};
+    const filteredTeachers = getFilteredTeachers();
 
     return (
         <form className="flex flex-col gap-8" onSubmit={onSubmit}>
@@ -268,24 +321,20 @@ const LessonForm = ({
 
                 />
 
-                <InputField
+               <InputField
                     label="End Time"
                     name="endTime"
-
-
-                     defaultValue={
-                        data?.startTime
+                    defaultValue={
+                        data?.endTime 
                         ? isRecurring
-                            ? new Date(data.startTime).toISOString().slice(11, 16) 
-                            : new Date(data.startTime).toISOString().slice(0, 16) 
+                            ? new Date(data.endTime).toISOString().slice(11, 16) 
+                            : new Date(data.endTime).toISOString().slice(0, 16) 
                         : undefined
                     }
                     register={register}
-                    error={errors?.startTime}
-                  
+                    error={errors?.endTime} 
                     type={isRecurring ? "time" : "datetime-local"}
                 />
-
                 {data && (
                     <InputField
                         label="Id"
@@ -301,8 +350,10 @@ const LessonForm = ({
                     <label className="text-xs text-gray-400">Subject</label>
                     <select
                         className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
-                        defaultValue={data?.subjectId || data?.subject?.id || ""}
-                        {...register("subjectId")}
+                        value={selectedSubjectId}
+                        {...register("subjectId", {
+                            onChange: handleSubjectChange
+                        })}
                     >
                         <option value="">Select subject</option>
                         {subjects?.map(
@@ -344,14 +395,28 @@ const LessonForm = ({
                 </div>
 
                 <div className="flex flex-col gap-2 w-full md:w-1/4">
-                    <label className="text-xs text-gray-400">Teacher</label>
+                    <label className="text-xs text-gray-400">
+                        Teacher
+                        {selectedSubjectId && (
+                            <span className="text-blue-500 ml-1">
+                                (Filtered by subject)
+                            </span>
+                        )}
+                    </label>
                     <select
                         className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
-                        defaultValue={data?.teacherId || data?.teacher?.id || ""}
-                        {...register("teacherId")}
+                        value={selectedTeacherId}
+                        {...register("teacherId", {
+                            onChange: (e) => setSelectedTeacherId(e.target.value)
+                        })}
                     >
-                        <option value="">Select teacher</option>
-                        {teachers?.map(
+                        <option value="">
+                            {selectedSubjectId 
+                                ? "Select teacher for this subject" 
+                                : "Select subject first"
+                            }
+                        </option>
+                        {filteredTeachers?.map(
                             (teacher: { id: string; name: string; surname: string }) => (
                                 <option value={teacher.id} key={teacher.id}>
                                     {teacher.name} {teacher.surname}
@@ -362,6 +427,11 @@ const LessonForm = ({
                     {errors.teacherId?.message && (
                         <p className="text-xs text-red-400">
                             {errors.teacherId.message.toString()}
+                        </p>
+                    )}
+                    {selectedSubjectId && filteredTeachers?.length === 0 && (
+                        <p className="text-xs text-orange-500">
+                           This subject has no available teachers.
                         </p>
                     )}
                 </div>
