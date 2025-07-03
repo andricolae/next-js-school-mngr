@@ -11,6 +11,7 @@ import FormModal from "@/components/FormModal";
 import FormContainer from "@/components/FormContainer";
 import { TokenData } from "@/lib/utils";
 
+
 type ResultList = {
     id: number;
     title: string;
@@ -21,6 +22,7 @@ type ResultList = {
     score: number;
     className: string;
     startTime: Date;
+    subject: string;
 };
 
 const ResultListPage = async ({
@@ -43,6 +45,12 @@ const ResultListPage = async ({
             header: "Title",
             accessor: "title",
         },
+
+        {
+            header: "Subject",
+            accessor: "subject",
+        },
+
         {
             header: "Student",
             accessor: "student",
@@ -83,6 +91,7 @@ const ResultListPage = async ({
             className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-skyLight"
         >
             <td className="flex items-center gap-4 p-4">{item.title}</td>
+            <td>{item.subject}</td>
             <td>{item.studentName + " " + item.studentSurname}</td>
             <td className="hidden md:table-cell">{item.score}</td>
             <td className="hidden md:table-cell">
@@ -172,6 +181,7 @@ const ResultListPage = async ({
                             select: {
                                 class: { select: { name: true } },
                                 teacher: { select: { name: true, surname: true } },
+                                subject: { select: { name: true } } ,
                             },
                         },
                     },
@@ -182,6 +192,7 @@ const ResultListPage = async ({
                             select: {
                                 class: { select: { name: true } },
                                 teacher: { select: { name: true, surname: true } },
+                                subject: { select: { name: true } },
                             },
                         },
                     },
@@ -214,6 +225,7 @@ const ResultListPage = async ({
             studentId: item.studentId,
             examId: item.examId,
             assignmentId: item.assignmentId,
+            subject: assessment.lesson.subject.name,
         };
     }).filter(Boolean) as ResultList[];
 
