@@ -108,10 +108,7 @@ const LessonForm = ({
         const newSubjectId = e.target.value;
         setSelectedSubjectId(newSubjectId);
         setSelectedTeacherId("");
-        
-        // console.log("Available teachers:", relatedData?.teachers);
-        // console.log("Selected subject ID:", newSubjectId);
-        // console.log("Filtered teachers:", getFilteredTeachers());
+
     };
 
 

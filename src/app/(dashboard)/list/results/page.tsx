@@ -7,9 +7,10 @@ import { ITEM_PER_PAGE } from "@/lib/settings";
 import { Prisma } from "@prisma/client";
 import Image from "next/image";
 import { auth } from "@clerk/nextjs/server";
-import FormModal from "@/components/FormModal";
+import FilterForm from "@/components/forms/FilterForm";
 import FormContainer from "@/components/FormContainer";
 import { TokenData } from "@/lib/utils";
+
 
 
 type ResultList = {
@@ -25,6 +26,7 @@ type ResultList = {
     subject: string;
 };
 
+
 const ResultListPage = async ({
     searchParams,
 }: {
@@ -33,11 +35,27 @@ const ResultListPage = async ({
 
     const { userId, sessionClaims } = await auth();
     let tokenData;
-	if (sessionClaims !== null) {
-		tokenData = sessionClaims as unknown as TokenData;
-	}
-	let role = tokenData?.userPblcMtdt?.role;
+    if (sessionClaims !== null) {
+        tokenData = sessionClaims as unknown as TokenData;
+    }
+    let role = tokenData?.userPblcMtdt?.role;
     const currentUserId = userId;
+
+    const [subjectsData, classesData, studentsData, teachersData] = await Promise.all([
+        prisma.subject.findMany({ select: { id: true, name: true } }),
+        prisma.class.findMany({ select: { id: true, name: true } }),
+        prisma.student.findMany({
+            select: { id: true, name: true, surname: true }
+        }),
+        prisma.teacher.findMany({
+            select: { id: true, name: true, surname: true }
+        }),
+    ]);
+
+    const subjects = subjectsData.map(s => ({ id: String(s.id), name: s.name })); 
+    const classes = classesData.map(c => ({ id: String(c.id), name: c.name }));   
+    const formattedStudents = studentsData.map(s => ({ id: s.id, name: `${s.name} ${s.surname}` })); 
+    const formattedTeachers = teachersData.map(t => ({ id: t.id, name: `${t.name} ${t.surname}` })); 
 
 
     const columns = [
@@ -250,9 +268,19 @@ const ResultListPage = async ({
                     <TableSearch />
                     <div className="flex items-center gap-4 self-end">
                         <SortButton currentSort={sort} />
+                        <FilterForm
+                            currentFilters={searchParams}
+                            subjects={subjects}
+                            classes={classes}
+                            students={formattedStudents}
+                            teachers={formattedTeachers}
+                        />
                         {(role === "admin" || role === "teacher") && (
                             <FormContainer table="result" type="create" />
                         )}
+
+                        
+					
                     </div>
                 </div>
             </div>
