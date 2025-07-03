@@ -10,6 +10,8 @@ import { auth } from "@clerk/nextjs/server";
 import FilterForm from "@/components/forms/FilterForm";
 import FormContainer from "@/components/FormContainer";
 import { TokenData } from "@/lib/utils";
+import { GenerateResultsPDF } from "@/components/ExportPDF";
+import DownloadButton from "@/components/DownloadButton";
 
 
 
@@ -40,6 +42,15 @@ const ResultListPage = async ({
     }
     let role = tokenData?.userPblcMtdt?.role;
     const currentUserId = userId;
+
+    // const handleExportPdf = () => {
+    //     GenerateResultsPDF(
+    //         data, {
+    //         companyName: "Test School",
+    //         companyAddress: "Test Address, City, Country",
+    //    }
+    // );
+    // };
 
     const [subjectsData, classesData, studentsData, teachersData] = await Promise.all([
         prisma.subject.findMany({ select: { id: true, name: true } }),
@@ -275,6 +286,22 @@ const ResultListPage = async ({
                             students={formattedStudents}
                             teachers={formattedTeachers}
                         />
+                        
+                        <DownloadButton
+                            dataToExport={data} // Pasezi datele colectate de server
+                            headerDetails={{ // Pasezi detaliile de antet (opțional)
+                                companyName: "Numele Școlii Tale",
+                                companyAddress: "Adresa Școlii Tale, Oraș, Țară",
+                            }}
+                        />
+
+                         {/* <button 
+                            onClick={handleExportPdf} 
+                            className="w-8 h-8 flex items-center justify-center rounded-full bg-yellow">
+                            <Image src="/download.png" alt="" width={19} height={19} />
+                            
+                        </button>  */}
+
                         {(role === "admin" || role === "teacher") && (
                             <FormContainer table="result" type="create" />
                         )}

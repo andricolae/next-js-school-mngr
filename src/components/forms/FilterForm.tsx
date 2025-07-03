@@ -132,7 +132,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
                                 onClick={() => handleRemoveSelected(option.id)}
                                 className="ml-1 inline-flex items-center justify-center w-4 h-4 rounded-full hover:bg-blue-200"
                             >
-                                ×
+                                
                             </button>
                         </span>
                     ))}
