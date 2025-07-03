@@ -10,10 +10,7 @@ import { auth } from "@clerk/nextjs/server";
 import FilterForm from "@/components/forms/FilterForm";
 import FormContainer from "@/components/FormContainer";
 import { TokenData } from "@/lib/utils";
-import { GenerateResultsPDF } from "@/components/ExportPDF";
 import DownloadButton from "@/components/DownloadButton";
-
-
 
 type ResultList = {
     id: number;
@@ -28,13 +25,11 @@ type ResultList = {
     subject: string;
 };
 
-
 const ResultListPage = async ({
     searchParams,
 }: {
     searchParams: { [key: string]: string | undefined };
 }) => {
-
     const { userId, sessionClaims } = await auth();
     let tokenData;
     if (sessionClaims !== null) {
@@ -43,15 +38,7 @@ const ResultListPage = async ({
     let role = tokenData?.userPblcMtdt?.role;
     const currentUserId = userId;
 
-    // const handleExportPdf = () => {
-    //     GenerateResultsPDF(
-    //         data, {
-    //         companyName: "Test School",
-    //         companyAddress: "Test Address, City, Country",
-    //    }
-    // );
-    // };
-
+   
     const [subjectsData, classesData, studentsData, teachersData] = await Promise.all([
         prisma.subject.findMany({ select: { id: true, name: true } }),
         prisma.class.findMany({ select: { id: true, name: true } }),
@@ -68,18 +55,15 @@ const ResultListPage = async ({
     const formattedStudents = studentsData.map(s => ({ id: s.id, name: `${s.name} ${s.surname}` })); 
     const formattedTeachers = teachersData.map(t => ({ id: t.id, name: `${t.name} ${t.surname}` })); 
 
-
     const columns = [
         {
             header: "Title",
             accessor: "title",
         },
-
         {
             header: "Subject",
             accessor: "subject",
         },
-
         {
             header: "Student",
             accessor: "student",
@@ -143,25 +127,87 @@ const ResultListPage = async ({
         </tr>
     );
 
-    const { page, sort, ...queryParams } = searchParams;
 
+    const { page, sort, sortDate, sortGrade, ...queryParams } = searchParams;
     const p = page ? parseInt(page) : 1;
 
+    
     const query: Prisma.ResultWhereInput = {};
+    const andConditions: Prisma.ResultWhereInput[] = [];
 
     if (queryParams) {
         for (const [key, value] of Object.entries(queryParams)) {
-            if (value !== undefined) {
+            if (value !== undefined && value !== '') {
                 switch (key) {
                     case "studentId":
-                        query.studentId = value;
+                       
+                        const studentIds = value.split(',').filter(id => id.trim() !== '');
+                        if (studentIds.length > 0) {
+                            andConditions.push({ studentId: { in: studentIds } });
+                        }
                         break;
+                        
+                    case "teacherId":
+                        
+                        const teacherIds = value.split(',').filter(id => id.trim() !== '');
+                        if (teacherIds.length > 0) {
+                            andConditions.push({
+                                OR: [
+                                    { exam: { lesson: { teacherId: { in: teacherIds } } } },
+                                    { assignment: { lesson: { teacherId: { in: teacherIds } } } }
+                                ]
+                            });
+                        }
+                        break;
+                        
+                    case "subjectId":
+                      
+                        const subjectIds = value.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id));
+                        if (subjectIds.length > 0) {
+                            andConditions.push({
+                                OR: [
+                                    { exam: { lesson: { subjectId: { in: subjectIds } } } },
+                                    { assignment: { lesson: { subjectId: { in: subjectIds } } } }
+                                ]
+                            });
+                        }
+                        break;
+                        
+                    case "classId":
+                     
+                        const classIds = value.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id));
+                        if (classIds.length > 0) {
+                            andConditions.push({
+                                OR: [
+                                    { exam: { lesson: { classId: { in: classIds } } } },
+                                    { assignment: { lesson: { classId: { in: classIds } } } }
+                                ]
+                            });
+                        }
+                        break;
+                        
+                    case "title":
+                        
+                        andConditions.push({
+                            OR: [
+                                { exam: { title: { contains: value, mode: "insensitive" } } },
+                                { assignment: { title: { contains: value, mode: "insensitive" } } }
+                            ]
+                        });
+                        break;
+                        
                     case "search":
-                        query.OR = [
-                            { exam: { title: { contains: value, mode: "insensitive" } } },
-                            { student: { name: { contains: value, mode: "insensitive" } } },
-                        ];
+                       
+                        andConditions.push({
+                            OR: [
+                                { exam: { title: { contains: value, mode: "insensitive" } } },
+                                { assignment: { title: { contains: value, mode: "insensitive" } } },
+                                { student: { name: { contains: value, mode: "insensitive" } } },
+                                { student: { surname: { contains: value, mode: "insensitive" } } }
+                            ]
+                        });
                         break;
+                        
                     default:
                         break;
                 }
@@ -169,36 +215,67 @@ const ResultListPage = async ({
         }
     }
 
+
     switch (role) {
         case "admin":
             break;
         case "teacher":
-            query.OR = [
-                { exam: { lesson: { teacherId: currentUserId! } } },
-                { assignment: { lesson: { teacherId: currentUserId! } } },
-            ];
+            andConditions.push({
+                OR: [
+                    { exam: { lesson: { teacherId: currentUserId! } } },
+                    { assignment: { lesson: { teacherId: currentUserId! } } }
+                ]
+            });
             break;
-
         case "student":
-            query.studentId = currentUserId!;
+            andConditions.push({ studentId: currentUserId! });
             break;
-
         case "parent":
-            query.student = {
-                parentId: currentUserId!,
-            };
+            andConditions.push({
+                student: {
+                    parentId: currentUserId!,
+                }
+            });
             break;
         default:
             break;
     }
+
+
+    if (andConditions.length > 0) {
+        query.AND = andConditions;
+    }
+
 
     let orderBy: any = [
         { exam: { startTime: "desc" } },
         { assignment: { startDate: "desc" } }
     ];
 
-    const shouldSortTransformed = sort !== undefined;
 
+    if (sortDate && sortDate !== '') {
+        switch (sortDate) {
+            case 'date_asc':
+                orderBy = [
+                    { exam: { startTime: "asc" } },
+                    { assignment: { startDate: "asc" } }
+                ];
+                break;
+            case 'date_desc':
+                orderBy = [
+                    { exam: { startTime: "desc" } },
+                    { assignment: { startDate: "desc" } }
+                ];
+                break;
+        }
+    }
+
+  
+    const shouldSortByScore = sortGrade && sortGrade !== '';
+    const shouldSortByTitle = sort !== undefined;
+    const shouldSortTransformed = shouldSortByTitle || shouldSortByScore;
+
+   
     const [dataRes, count] = await prisma.$transaction([
         prisma.result.findMany({
             where: query,
@@ -210,7 +287,7 @@ const ResultListPage = async ({
                             select: {
                                 class: { select: { name: true } },
                                 teacher: { select: { name: true, surname: true } },
-                                subject: { select: { name: true } } ,
+                                subject: { select: { name: true } },
                             },
                         },
                     },
@@ -234,6 +311,7 @@ const ResultListPage = async ({
         prisma.result.count({ where: query }),
     ]);
 
+   
     let data = dataRes.map((item) => {
         const assessment = item.exam || item.assignment;
 
@@ -258,17 +336,26 @@ const ResultListPage = async ({
         };
     }).filter(Boolean) as ResultList[];
 
-    if (shouldSortTransformed && sort) {
-        data.sort((a, b) => {
-            const aValue = a.title.toLowerCase();
-            const bValue = b.title.toLowerCase();
-
-            if (sort === "asc") {
-                return aValue.localeCompare(bValue);
-            } else {
-                return bValue.localeCompare(aValue);
-            }
-        });
+ 
+    if (shouldSortTransformed) {
+        if (shouldSortByTitle && sort) {
+            
+            data.sort((a, b) => {
+                const aValue = a.title.toLowerCase();
+                const bValue = b.title.toLowerCase();
+                return sort === "asc" ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
+            });
+        } else if (shouldSortByScore) {
+            
+            data.sort((a, b) => {
+                if (sortGrade === 'score_asc') {
+                    return a.score - b.score;
+                } else if (sortGrade === 'score_desc') {
+                    return b.score - a.score;
+                }
+                return 0;
+            });
+        }
     }
 
     return (
@@ -288,26 +375,16 @@ const ResultListPage = async ({
                         />
                         
                         <DownloadButton
-                            dataToExport={data} // Pasezi datele colectate de server
-                            headerDetails={{ // Pasezi detaliile de antet (opțional)
-                                companyName: "Numele Școlii Tale",
-                                companyAddress: "Adresa Școlii Tale, Oraș, Țară",
+                            dataToExport={data}
+                            headerDetails={{
+                                companyName: "Test School",
+                                companyAddress: "Test Street 123, Test City",
                             }}
                         />
-
-                         {/* <button 
-                            onClick={handleExportPdf} 
-                            className="w-8 h-8 flex items-center justify-center rounded-full bg-yellow">
-                            <Image src="/download.png" alt="" width={19} height={19} />
-                            
-                        </button>  */}
 
                         {(role === "admin" || role === "teacher") && (
                             <FormContainer table="result" type="create" />
                         )}
-
-                        
-					
                     </div>
                 </div>
             </div>
