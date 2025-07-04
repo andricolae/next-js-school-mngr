@@ -25,6 +25,7 @@ interface PdfHeaderDetails {
   companyName?: string;
   companyAddress?: string;
   moduleName?: string;
+  isSingleStudentSelected?: boolean;
 }
 
 
@@ -233,7 +234,7 @@ function addProfessionalFooter(doc: jsPDF, pageNum: number, totalPages: number) 
   doc.text(`Page ${pageNum} of ${totalPages}`, doc.internal.pageSize.width - 20, footerY, { align: 'right' });
 }
 
-// Funcție pentru a obține toate datele (fără paginare)
+
 async function fetchAllResults(
   fetchFunction: (params: FetchAllDataParams & { page?: number; limit?: number }) => Promise<{
     results: ResultItemForPdf[];
@@ -251,7 +252,7 @@ async function fetchAllResults(
       const response = await fetchFunction({
         ...params,
         page: currentPage,
-        limit: 100 // Fetch în batch-uri de 100
+        limit: 100 
       });
       
       allResults.push(...response.results);
@@ -266,7 +267,7 @@ async function fetchAllResults(
   return allResults;
 }
 
-// Funcție principală pentru generarea PDF-ului cu toate datele
+
 export async function GenerateCompleteResultsPDF(
   fetchFunction: (params: FetchAllDataParams & { page?: number; limit?: number }) => Promise<{
     results: ResultItemForPdf[];
@@ -276,7 +277,7 @@ export async function GenerateCompleteResultsPDF(
   headerDetails?: PdfHeaderDetails,
   fetchParams?: FetchAllDataParams
 ): Promise<Blob> {
-  // Afișează indicator de loading
+  
   const loadingIndicator = document.createElement('div');
   loadingIndicator.innerHTML = `
     <div style="
@@ -313,21 +314,21 @@ export async function GenerateCompleteResultsPDF(
   document.body.appendChild(loadingIndicator);
 
   try {
-    // Actualizează progresul
+    
     const progressBar = loadingIndicator.querySelector('#progress-bar') as HTMLElement;
     if (progressBar) progressBar.style.width = '30%';
 
-    // Obține toate datele
+   
     const allResults = await fetchAllResults(fetchFunction, fetchParams);
 
     if (progressBar) progressBar.style.width = '70%';
 
-    // Generează PDF-ul
+   
     const pdfBlob = GenerateResultsPDF(allResults, headerDetails);
 
     if (progressBar) progressBar.style.width = '100%';
 
-    // Îndepărtează indicatorul de loading după o scurtă întârziere
+   
     setTimeout(() => {
       document.body.removeChild(loadingIndicator);
     }, 500);
@@ -339,7 +340,7 @@ export async function GenerateCompleteResultsPDF(
   }
 }
 
-// Funcția originală păstrată pentru compatibilitate
+
 export function GenerateResultsPDF(
   results: ResultItemForPdf[],
   headerDetails?: PdfHeaderDetails
@@ -409,7 +410,7 @@ export function GenerateResultsPDF(
 
   const finalY = doc.lastAutoTable?.finalY || 200;
 
-  if (stats.hasValidData) {
+  if (stats.hasValidData && headerDetails?.isSingleStudentSelected) {
     const statsY = finalY + 15;
 
     if (statsY > doc.internal.pageSize.height - 80) {
@@ -419,15 +420,8 @@ export function GenerateResultsPDF(
     } else {
       addEnhancedStatistics(doc, statsY, stats);
     }
-  } else {
-    doc.setFillColor(...[245, 158, 11]);
-    doc.rect(15, finalY + 15, 180, 20, 'F');
-    doc.setTextColor(...[255, 255, 255]);
-    doc.setFontSize(10);
-    doc.setFont('helvetica', 'bold');
-    doc.text('No valid scores available for statistical analysis', 20, finalY + 27);
-  }
-
+  } 
+ 
   const now = new Date();
   const timestamp = now.toISOString()
     .replace(/[:.]/g, '-')

@@ -73,7 +73,8 @@ const ResultListPage = async ({
         Object.entries(searchParams).map(([key, value]) => [key, Array.isArray(value) ? value.join(',') : value])
     );
 
-    
+    let isSingleStudentSelected = false;
+
 
     const columns = [
         {
@@ -160,9 +161,12 @@ const ResultListPage = async ({
             if (value !== undefined && value !== '') {
                 switch (key) {
                     case "studentId":
-                       
-                        const studentIds = value.split(',').filter(id => id.trim() !== '');
-                        if (studentIds.length > 0) {
+                       const studentIds = value.split(',').filter(id => id.trim() !== '');
+                        if (studentIds.length === 1) {
+                            isSingleStudentSelected = true;
+                            andConditions.push({ studentId: { in: studentIds } });
+                        } else if (studentIds.length > 1) {
+                            isSingleStudentSelected = false; 
                             andConditions.push({ studentId: { in: studentIds } });
                         }
                         break;
@@ -367,8 +371,63 @@ const ResultListPage = async ({
         prisma.result.count({ where: query }),
     ]);
 
+    const allDataForExportRes = await prisma.result.findMany({
+        where: query,
+        include: {
+            student: { select: { name: true, surname: true } },
+            exam: {
+                include: {
+                    lesson: {
+                        select: {
+                            class: { select: { name: true } },
+                            teacher: { select: { name: true, surname: true } },
+                            subject: { select: { name: true } },
+                        },
+                    },
+                },
+            },
+            assignment: {
+                include: {
+                    lesson: {
+                        select: {
+                            class: { select: { name: true } },
+                            teacher: { select: { name: true, surname: true } },
+                            subject: { select: { name: true } },
+                        },
+                    },
+                },
+            },
+        },
+        orderBy: shouldSortTransformed ? undefined : orderBy,
+    });
+
    
     let data = dataRes.map((item) => {
+        const assessment = item.exam || item.assignment;
+
+        if (!assessment) return null;
+
+        const isExam = "startTime" in assessment;
+
+        return {
+            id: item.id,
+            title: assessment.title,
+            studentName: item.student.name,
+            studentSurname: item.student.surname,
+            teacherName: assessment.lesson.teacher.name,
+            teacherSurname: assessment.lesson.teacher.surname,
+            score: item.score,
+            className: assessment.lesson.class.name,
+            startTime: isExam ? assessment.startTime : assessment.startDate,
+            studentId: item.studentId,
+            examId: item.examId,
+            assignmentId: item.assignmentId,
+            subject: assessment.lesson.subject.name,
+        };
+    }).filter(Boolean) as ResultList[];
+
+
+     let allDataTransformedForExport = allDataForExportRes.map((item) => {
         const assessment = item.exam || item.assignment;
 
         if (!assessment) return null;
@@ -431,10 +490,11 @@ const ResultListPage = async ({
                         />
                         
                         <DownloadButton
-                            dataToExport={data}
+                            dataToExport={allDataTransformedForExport}
                             headerDetails={{
                                 companyName: "Test School",
                                 companyAddress: "Test Street 123, Test City",
+                                isSingleStudentSelected: isSingleStudentSelected,
                             }}
                         />
 
@@ -445,16 +505,18 @@ const ResultListPage = async ({
                 </div>
             </div>
             <Table columns={columns} renderRow={renderRow} data={data} />
-            <COMPONENTA data={data} dataRes={dataRes} />
+            {/* <COMPONENTA data={data} dataRes={dataRes} /> */}
             <Pagination page={p} count={count} />
 
+            {isSingleStudentSelected && (
             <AverageCalculator 
-                data={data} 
+                data={allDataTransformedForExport} 
                 title="General average"
                 precision={2}
                 showCount={true}
                 containerStyle="info"
             />
+             )}
         </div>
     );
 };
