@@ -15,6 +15,14 @@ interface FilterFormProps {
     classes: FilterOption[];
     students: FilterOption[];
     teachers: FilterOption[];
+    modules: ModuleOption[];
+}
+
+interface ModuleOption {
+    id: string; 
+    name: string;
+    startDate: string; 
+    endDate: string;  
 }
 
 const SORT_DATE_OPTIONS = [
@@ -203,6 +211,7 @@ const FilterForm: React.FC<FilterFormProps> = ({
     classes,
     students,
     teachers,
+    modules,
 }) => {
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -214,10 +223,10 @@ const FilterForm: React.FC<FilterFormProps> = ({
     const [studentFilters, setStudentFilters] = useState<string[]>([]);
     const [teacherFilters, setTeacherFilters] = useState<string[]>([]);
     const [classFilters, setClassFilters] = useState<string[]>([]);
-    const [scoreMin, setScoreMin] = useState(currentFilters.scoreMin || "");
-    const [scoreMax, setScoreMax] = useState(currentFilters.scoreMax || "");
+    const [moduleFilter, setModuleFilter] = useState(currentFilters.moduleId || "");
     const [sortDateOption, setSortDateOption] = useState("");
     const [sortGradeOption, setSortGradeOption] = useState("");
+    
 
     useEffect(() => {
         setTitleFilter(currentFilters.title || "");
@@ -226,10 +235,7 @@ const FilterForm: React.FC<FilterFormProps> = ({
         setStudentFilters(currentFilters.studentId ? currentFilters.studentId.split(',') : []);
         setTeacherFilters(currentFilters.teacherId ? currentFilters.teacherId.split(',') : []);
         setClassFilters(currentFilters.classId ? currentFilters.classId.split(',') : []);
-        
-        setScoreMin(currentFilters.scoreMin || "");
-        setScoreMax(currentFilters.scoreMax || "");
-        
+        setModuleFilter(currentFilters.moduleId || "");
       
         setSortDateOption(currentFilters.sortDate || "");
         setSortGradeOption(currentFilters.sortGrade || "");
@@ -258,8 +264,7 @@ const FilterForm: React.FC<FilterFormProps> = ({
         if (studentFilters.length > 0) newSearchParams.set("studentId", studentFilters.join(','));
         if (teacherFilters.length > 0) newSearchParams.set("teacherId", teacherFilters.join(','));
         if (classFilters.length > 0) newSearchParams.set("classId", classFilters.join(','));
-        if (scoreMin) newSearchParams.set("scoreMin", scoreMin);
-        if (scoreMax) newSearchParams.set("scoreMax", scoreMax);
+        if (moduleFilter) newSearchParams.set("moduleId", moduleFilter);
         
       
         if (sortDateOption) newSearchParams.set("sortDate", sortDateOption);
@@ -284,8 +289,7 @@ const FilterForm: React.FC<FilterFormProps> = ({
         setStudentFilters([]);
         setTeacherFilters([]);
         setClassFilters([]);
-        setScoreMin("");
-        setScoreMax("");
+        setModuleFilter("");
         setSortDateOption("");
         setSortGradeOption("");
         setIsOpen(false);
@@ -297,8 +301,7 @@ const FilterForm: React.FC<FilterFormProps> = ({
         studentFilters.length +
         teacherFilters.length +
         classFilters.length +
-        (scoreMin ? 1 : 0) +
-        (scoreMax ? 1 : 0) +
+        (moduleFilter ? 1 : 0) +
         (sortDateOption ? 1 : 0) +
         (sortGradeOption ? 1 : 0);
 
@@ -388,6 +391,25 @@ const FilterForm: React.FC<FilterFormProps> = ({
                                 selectedIds={classFilters}
                                 onSelectionChange={setClassFilters}
                             />
+
+                            <div className="filter-field">
+                                <label htmlFor="moduleFilter" className="block text-sm font-medium text-gray-700 mb-1">
+                                    Module
+                                </label>
+                                <select
+                                    id="moduleFilter"
+                                    value={moduleFilter}
+                                    onChange={(e) => setModuleFilter(e.target.value)}
+                                    className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                >
+                                    <option value="">Select module</option>
+                                    {modules.map((moduleOption) => (
+                                        <option key={moduleOption.id} value={moduleOption.id}>
+                                            {moduleOption.name} (Starts: {moduleOption.startDate}, Ends: {moduleOption.endDate})
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
 
 
                             <div className="filter-field">

@@ -11,6 +11,9 @@ import FilterForm from "@/components/forms/FilterForm";
 import FormContainer from "@/components/FormContainer";
 import { TokenData } from "@/lib/utils";
 import DownloadButton from "@/components/DownloadButton";
+import AverageCalculator from "@/components/AverageCalculator";
+import { useEffect } from "react";
+import COMPONENTA from "@/components/COMPONENTA";
 
 type ResultList = {
     id: number;
@@ -25,6 +28,16 @@ type ResultList = {
     subject: string;
 };
 
+
+const fetchModules = async () => {
+   
+    return [
+        { id: "1", name: "Semester 1", startDate: "06/01/2025", endDate: "06/30/2025" },
+        { id: "2", name: "Semester 2", startDate: "07/01/2025", endDate: "07/31/2025" },
+        { id: "3", name: "Semester 3", startDate: "08/01/2025", endDate: "08/31/2025" }
+    ];
+};
+
 const ResultListPage = async ({
     searchParams,
 }: {
@@ -37,6 +50,8 @@ const ResultListPage = async ({
     }
     let role = tokenData?.userPblcMtdt?.role;
     const currentUserId = userId;
+
+    const modulesData = await fetchModules();
 
    
     const [subjectsData, classesData, studentsData, teachersData] = await Promise.all([
@@ -54,6 +69,11 @@ const ResultListPage = async ({
     const classes = classesData.map(c => ({ id: String(c.id), name: c.name }));   
     const formattedStudents = studentsData.map(s => ({ id: s.id, name: `${s.name} ${s.surname}` })); 
     const formattedTeachers = teachersData.map(t => ({ id: t.id, name: `${t.name} ${t.surname}` })); 
+    const currentFilters = Object.fromEntries(
+        Object.entries(searchParams).map(([key, value]) => [key, Array.isArray(value) ? value.join(',') : value])
+    );
+
+    
 
     const columns = [
         {
@@ -207,13 +227,49 @@ const ResultListPage = async ({
                             ]
                         });
                         break;
-                        
-                    default:
+                    
+                    case "moduleId":
+                        const selectedModuleId = value;
+                        const selectedModule = modulesData.find(mod => mod.id === selectedModuleId);
+
+                        if (selectedModule) {
+                            
+                            const [startMonth, startDay, startYear] = selectedModule.startDate.split('/');
+                            const [endMonth, endDay, endYear] = selectedModule.endDate.split('/');
+                            
+                            const moduleStartDate = new Date(parseInt(startYear), parseInt(startMonth) - 1, parseInt(startDay), 0, 0, 0, 0);
+                            const moduleEndDate = new Date(parseInt(endYear), parseInt(endMonth) - 1, parseInt(endDay), 23, 59, 59, 999);
+
+
+                            andConditions.push({
+                                        OR: [
+                                            {
+                                                exam: {
+                                                    startTime: {
+                                                        gte: moduleStartDate,
+                                                        lte: moduleEndDate,
+                                                    },
+                                                },
+                                            },
+                                            {
+                                                assignment: {
+                                                    startDate: {
+                                                        gte: moduleStartDate,
+                                                        lte: moduleEndDate,
+                                                    },
+                                                },
+                                            },
+                                        ],
+                                    });
+                        }
                         break;
-                }
-            }
-        }
-    }
+                                            
+                                        default:
+                                            break;
+                                    }
+                                }
+                            }
+                        }
 
 
     switch (role) {
@@ -335,7 +391,6 @@ const ResultListPage = async ({
             subject: assessment.lesson.subject.name,
         };
     }).filter(Boolean) as ResultList[];
-
  
     if (shouldSortTransformed) {
         if (shouldSortByTitle && sort) {
@@ -372,6 +427,7 @@ const ResultListPage = async ({
                             classes={classes}
                             students={formattedStudents}
                             teachers={formattedTeachers}
+                            modules={modulesData}
                         />
                         
                         <DownloadButton
@@ -389,7 +445,16 @@ const ResultListPage = async ({
                 </div>
             </div>
             <Table columns={columns} renderRow={renderRow} data={data} />
+            <COMPONENTA data={data} dataRes={dataRes} />
             <Pagination page={p} count={count} />
+
+            <AverageCalculator 
+                data={data} 
+                title="General average"
+                precision={2}
+                showCount={true}
+                containerStyle="info"
+            />
         </div>
     );
 };
