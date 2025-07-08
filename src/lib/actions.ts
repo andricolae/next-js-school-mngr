@@ -18,7 +18,7 @@ export const createSubject = async (currentState: CurrentState, data: SubjectSch
 		return { success: true, error: false }
 
 	} catch (e) {
-		console.log(e);
+		console.log(e); //!!!!!!!!!!!
 		return { success: false, error: true }
 	}
 }

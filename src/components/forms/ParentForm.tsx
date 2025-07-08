@@ -132,7 +132,8 @@ const ParentForm = ({
                 Note: Student assignments are managed through the student creation/update forms.
             </div>
 
-            {state.error && <span className="text-red-500">Something went wrong!</span>}
+            {state.error && <span className="text-red-500">Something went wrong!</span>}  
+            {/* iei un string si il pui aici */}
             <button className="bg-blue-500 text-white p-2 rounded-md">
                 {type === "create" ? "Create" : "Update"}
             </button>
