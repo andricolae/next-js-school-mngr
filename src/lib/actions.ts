@@ -913,10 +913,27 @@ export const createParent = async (currentState: CurrentState, data: ParentSchem
 		});
 		return { success: true, error: false }
 
-	} catch (e) {
-		console.log(e);
-		return { success: false, error: true }
-	}
+	} catch (e: unknown) { 
+        console.log(e);
+
+        
+        let errorMessage = "Something went wrong!";
+
+        
+        if (e && typeof e === 'object' && 'errors' in e && Array.isArray(e.errors) && e.errors.length > 0 && typeof e.errors[0] === 'object' && 'message' in e.errors[0]) {
+            errorMessage = (e.errors[0] as { message: string }).message;
+        }
+      
+        else if (e && typeof e === 'object' && 'code' in e && (e as { code: string }).code === 'P2002') {
+            errorMessage = "Username or email already exists!";
+        }
+        
+        else if (e instanceof Error) {
+            errorMessage = e.message;
+        }
+
+        return { success: false, error: true, message: errorMessage }
+    }
 }
 
 export const updateParent = async (currentState: CurrentState, data: ParentSchema) => {
@@ -947,10 +964,27 @@ export const updateParent = async (currentState: CurrentState, data: ParentSchem
 			}
 		});
 		return { success: true, error: false }
-	} catch (e) {
-		console.log(e);
-		return { success: false, error: true }
-	}
+	} catch (e: unknown) {
+        console.log(e);
+
+       
+        let errorMessage = "Something went wrong!";
+
+       
+        if (e && typeof e === 'object' && 'errors' in e && Array.isArray(e.errors) && e.errors.length > 0 && typeof e.errors[0] === 'object' && 'message' in e.errors[0]) {
+            errorMessage = (e.errors[0] as { message: string }).message;
+        }
+      
+        else if (e && typeof e === 'object' && 'code' in e && (e as { code: string }).code === 'P2002') {
+            errorMessage = "Username or email already exists!";
+        }
+       
+        else if (e instanceof Error) {
+            errorMessage = e.message;
+        }
+
+        return { success: false, error: true, message: errorMessage }
+    }
 }
 
 export const deleteParent = async (currentState: CurrentState, data: FormData) => {
@@ -1204,4 +1238,62 @@ export async function createRecurringLessons(lessonsData: LessonSchema[]) {
         
         return { success: false, error: true, message: error.message || "Failed to create recurring lessons." };
     }
+}
+
+
+
+export async function checkTeacherAvailability(
+  teacherId: string,
+  day: string,
+  startTime: Date,
+  endTime: Date,
+  lessonIdToExclude?: number 
+): Promise<boolean> {
+  try {
+    
+    const startHour = startTime.getHours();
+    const startMinute = startTime.getMinutes();
+    const endHour = endTime.getHours();
+    const endMinute = endTime.getMinutes();
+
+   
+    const existingLessons = await prisma.lesson.findMany({
+      where: {
+        teacherId: teacherId,
+		day: day as any,
+        
+        ...(lessonIdToExclude && { id: { not: lessonIdToExclude } }),
+      },
+    });
+
+    
+    for (const lesson of existingLessons) {
+      const existingStartTime = new Date(lesson.startTime);
+      const existingEndTime = new Date(lesson.endTime);
+
+     
+      const existingStartHour = existingStartTime.getHours();
+      const existingStartMinute = existingStartTime.getMinutes();
+      const existingEndHour = existingEndTime.getHours();
+      const existingEndMinute = existingEndTime.getMinutes();
+
+      
+      const newLessonStartInMinutes = startHour * 60 + startMinute;
+      const newLessonEndInMinutes = endHour * 60 + endMinute;
+      const existingLessonStartInMinutes = existingStartHour * 60 + existingStartMinute;
+      const existingLessonEndInMinutes = existingEndHour * 60 + existingEndMinute;
+
+      if (
+        newLessonStartInMinutes < existingLessonEndInMinutes &&
+        existingLessonStartInMinutes < newLessonEndInMinutes
+      ) {
+        return true; 
+      }
+    }
+
+    return false; 
+  } catch (error) {
+    console.error("Error checking teacher availability:", error);
+    return false;
+  }
 }

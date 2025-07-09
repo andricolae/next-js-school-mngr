@@ -51,6 +51,10 @@ const ParentForm = ({
             console.log("❌ State complet:", JSON.stringify(state, null, 2));
             console.log("❌ State keys:", Object.keys(state));
             console.log("❌ State values:", Object.values(state));
+            
+            // Afișează toast cu eroarea specifică
+            const errorMessage = state.message || "Something went wrong!";
+            toast.error(errorMessage);
         }
     }, [state, router, type, setOpen]);
 
@@ -132,8 +136,12 @@ const ParentForm = ({
                 Note: Student assignments are managed through the student creation/update forms.
             </div>
 
-            {state.error && <span className="text-red-500">Something went wrong!</span>}  
-            {/* iei un string si il pui aici */}
+            {state.error && (
+                <span className="text-red-500">
+                    {state.message || "Something went wrong!"}
+                </span>
+            )}
+            
             <button className="bg-blue-500 text-white p-2 rounded-md">
                 {type === "create" ? "Create" : "Update"}
             </button>
