@@ -1,8 +1,10 @@
+// components/forms/LessonFilterForm.tsx
 "use client";
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
+import { ModuleType } from "@/lib/modules"; // Asigură-te că acest import este corect și că fișierul lib/modules.ts există
 
 interface FilterOption {
     id: string;
@@ -14,6 +16,7 @@ interface LessonFilterFormProps {
     subjects: FilterOption[];
     classes: FilterOption[];
     teachers: FilterOption[];
+    modules: ModuleType[]; // <--- Props-ul nou pentru module
 }
 
 interface MultiSelectProps {
@@ -189,6 +192,7 @@ const LessonFilterForm: React.FC<LessonFilterFormProps> = ({
     subjects,
     classes,
     teachers,
+    modules, // <--- Destructurează props-ul modules
 }) => {
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -198,23 +202,32 @@ const LessonFilterForm: React.FC<LessonFilterFormProps> = ({
     const [subjectFilters, setSubjectFilters] = useState<string[]>([]);
     const [teacherFilters, setTeacherFilters] = useState<string[]>([]);
     const [classFilters, setClassFilters] = useState<string[]>([]);
+    const [moduleFilter, setModuleFilter] = useState<string>(""); // <--- Stare nouă pentru modul
 
     useEffect(() => {
         setSubjectFilters(currentFilters.subjectId ? currentFilters.subjectId.split(',') : []);
         setTeacherFilters(currentFilters.teacherId ? currentFilters.teacherId.split(',') : []);
         setClassFilters(currentFilters.classId ? currentFilters.classId.split(',') : []);
+        setModuleFilter(currentFilters.moduleId || ""); // <--- Inițializează starea modulului
     }, [currentFilters]);
+
+    // Funcție helper pentru a seta un singur filtru (folosită pentru modul)
+    const handleSingleFilterChange = (key: string, value: string) => {
+        if (key === "moduleId") {
+            setModuleFilter(value);
+        }
+        // Poți extinde dacă ai și alte filtre single-select
+    };
 
     const handleApplyFilters = () => {
         const newSearchParams = new URLSearchParams();
-
-       
+        
+        // Păstrează parametrii 'search' și 'sort' existenți
         const existingSearchParam = searchParams.get("search");
         if (existingSearchParam) {
             newSearchParams.set("search", existingSearchParam);
         }
 
-        
         const existingSortParam = searchParams.get("sort");
         if (existingSortParam) {
             newSearchParams.set("sort", existingSortParam);
@@ -223,8 +236,9 @@ const LessonFilterForm: React.FC<LessonFilterFormProps> = ({
         if (subjectFilters.length > 0) newSearchParams.set("subjectId", subjectFilters.join(','));
         if (teacherFilters.length > 0) newSearchParams.set("teacherId", teacherFilters.join(','));
         if (classFilters.length > 0) newSearchParams.set("classId", classFilters.join(','));
+        if (moduleFilter) newSearchParams.set("moduleId", moduleFilter); // <--- Adaugă filtrul de modul
 
-        newSearchParams.set("page", "1");
+        newSearchParams.set("page", "1"); // Resetează pagina la aplicarea filtrelor
 
         router.push(`?${newSearchParams.toString()}`);
         setIsOpen(false);
@@ -233,7 +247,7 @@ const LessonFilterForm: React.FC<LessonFilterFormProps> = ({
     const handleClearFilters = () => {
         const newSearchParams = new URLSearchParams();
         
-       
+        // Păstrează parametrii 'search' și 'sort' existenți
         const existingSearchParam = searchParams.get("search");
         if (existingSearchParam) {
             newSearchParams.set("search", existingSearchParam);
@@ -249,13 +263,15 @@ const LessonFilterForm: React.FC<LessonFilterFormProps> = ({
         setSubjectFilters([]);
         setTeacherFilters([]);
         setClassFilters([]);
+        setModuleFilter(""); // <--- Resetează filtrul de modul
         setIsOpen(false);
     };
 
     const activeFiltersCount = 
         subjectFilters.length +
         teacherFilters.length +
-        classFilters.length;
+        classFilters.length +
+        (moduleFilter ? 1 : 0); // <--- Include filtrul de modul în count
 
     return (
         <>
@@ -322,6 +338,27 @@ const LessonFilterForm: React.FC<LessonFilterFormProps> = ({
                                 selectedIds={classFilters}
                                 onSelectionChange={setClassFilters}
                             />
+
+                            {/* NOU: Filtru pentru Modul */}
+                            <div className="filter-field">
+                                <label htmlFor="moduleId" className="block text-sm font-medium text-gray-700 mb-1">
+                                    Module
+                                </label>
+                                <select
+                                    id="moduleId"
+                                    className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                    value={moduleFilter} // Folosește valoarea din stare
+                                    onChange={(e) => handleSingleFilterChange("moduleId", e.target.value)} // Folosește funcția nouă
+                                >
+                                    <option value="">All Modules</option>
+                                    {modules.map((m) => (
+                                        <option key={m.id} value={m.id}>
+                                            {m.name} ({m.startDate} - {m.endDate})
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                            {/* END NOU: Filtru pentru Modul */}
                         </div>
 
                         <div className="filter-modal-footer flex justify-end gap-2 pt-4 border-t mt-4">

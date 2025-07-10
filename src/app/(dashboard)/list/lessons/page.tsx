@@ -10,6 +10,7 @@ import { Class, Lesson, Prisma, Subject, Teacher } from "@prisma/client"
 import Image from "next/image"
 import { TokenData } from "@/lib/utils";
 import LessonFilterForm from "@/components/forms/LessonFilterForm";
+import { availableModules, ModuleType } from "@/lib/modules"; 
 
 type LessonList = Lesson & { subject: Subject } & { class: Class } & { teacher: Teacher }
 
@@ -91,9 +92,9 @@ const LessonListPage = async ({ searchParams }: { searchParams: { [key: string]:
     const queryConditions: Prisma.LessonWhereInput[] = [];
 
     
-    const hasSpecificFilters = queryParams.classId || queryParams.teacherId || queryParams.subjectId || queryParams.search;
+    const hasSpecificFilters = queryParams.classId || queryParams.teacherId || queryParams.subjectId || queryParams.search || queryParams.moduleId;
 
-   
+ 
     if (!hasSpecificFilters) {
         const now = new Date();
         const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
@@ -115,6 +116,23 @@ const LessonListPage = async ({ searchParams }: { searchParams: { [key: string]:
                         break;
                     case "subjectId":
                         queryConditions.push({ subjectId: parseInt(value) });
+                        break;
+                    case "moduleId": 
+                        const selectedModuleId = parseInt(value);
+                        const selectedModule = availableModules.find(mod => mod.id === selectedModuleId);
+                        if (selectedModule) {
+                            const moduleStartDate = new Date(selectedModule.startDate);
+                            const moduleEndDate = new Date(selectedModule.endDate);
+                           
+                            moduleEndDate.setHours(23, 59, 59, 999);
+
+                            queryConditions.push({
+                                startTime: {
+                                    gte: moduleStartDate,
+                                    lte: moduleEndDate,
+                                },
+                            });
+                        }
                         break;
                     case "search":
                         queryConditions.push({
@@ -160,6 +178,7 @@ const LessonListPage = async ({ searchParams }: { searchParams: { [key: string]:
         prisma.lesson.count({ where: query })
     ]);
 
+    
     const title = hasSpecificFilters ? "All Lessons (Filtered)" : "Lessons for Today";
 
     return (
@@ -175,6 +194,7 @@ const LessonListPage = async ({ searchParams }: { searchParams: { [key: string]:
                             classes={classes}
                             teachers={formattedTeachers}
                             subjects={subjects}
+							modules={availableModules} 
                         />
                         {role === "admin" && (
                             <FormContainer table="lesson" type="create" />

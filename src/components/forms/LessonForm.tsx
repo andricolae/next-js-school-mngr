@@ -9,14 +9,7 @@ import { createLesson, updateLesson, createRecurringLessons, checkTeacherAvailab
 import { useFormState } from "react-dom";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
-
-
-type ModuleType = {
-    id: number;
-    name: string;
-    startDate: string;
-    endDate: string;
-};
+import { availableModules, ModuleType } from "@/lib/modules"; 
 
 
 const holidays = [
@@ -51,27 +44,7 @@ const LessonForm = ({
     };
 }) => {
     
-    const availableModules: ModuleType[] = [
-        {
-            id: 1,
-            name: "Semester 1",
-            startDate: "2025-07-01",
-            endDate: "2025-07-31"
-        },
-        {
-            id: 2,
-            name: "Semester 2 ",
-            startDate: "2025-08-01",
-            endDate: "2025-08-31"
-        },
-        {
-            id: 3,
-            name: "Semester 3",
-            startDate: "2025-09-01",
-            endDate: "2025-09-30"
-        }
-    ];
-
+   
     const [isRecurring, setIsRecurring] = useState(false);
     const [selectedModuleId, setSelectedModuleId] = useState<number | null>(null);
     const [isCreatingRecurring, setIsCreatingRecurring] = useState(false);
