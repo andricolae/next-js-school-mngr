@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import InputField from "../InputField";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { lessonSchema, LessonSchema } from "@/lib/formValidationSchemas";
-import { createLesson, updateLesson, createRecurringLessons, checkTeacherAvailability } from "@/lib/actions"; // Importă noua acțiune
+import { createLesson, updateLesson, createRecurringLessons, checkTeacherAvailability } from "@/lib/actions"; 
 import { useFormState } from "react-dom";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
@@ -307,6 +307,9 @@ const LessonForm = ({
             setOpen(false);
             router.refresh();
         }
+        if (state.error) {
+            const errorMessage = state.message || "Something went wrong!";
+        }
     }, [state, router, type, setOpen, isRecurring]);
 
     const { subjects, classes, teachers } = relatedData || {};
@@ -530,7 +533,11 @@ const LessonForm = ({
                 </div>
             )}
 
-            {state.error && <span className="text-red-500">Something went wrong!</span>}
+            {state.error && (
+                <span className="text-red-500">
+                    {state.message || "Something went wrong!"}
+                </span>
+            )}
             
             <button 
                 type="submit" 

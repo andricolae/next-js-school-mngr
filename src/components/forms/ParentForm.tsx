@@ -41,20 +41,13 @@ const ParentForm = ({
    useEffect(() => {
         console.log("🔄 useEffect - state changed:", state);
         if (state.success) {
-            console.log("✅ Success! Afișez toast și închid modal");
+            
             toast(`Parent has been ${type === "create" ? "created" : "updated"} successfully!`);
             setOpen(false);
             router.refresh();
         }
         if (state.error) {
-            console.log("❌ Error detected în state!");
-            console.log("❌ State complet:", JSON.stringify(state, null, 2));
-            console.log("❌ State keys:", Object.keys(state));
-            console.log("❌ State values:", Object.values(state));
-            
-            // Afișează toast cu eroarea specifică
             const errorMessage = state.message || "Something went wrong!";
-            toast.error(errorMessage);
         }
     }, [state, router, type, setOpen]);
 

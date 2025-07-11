@@ -169,8 +169,28 @@ export const lessonSchema = z.object({
     id: z.coerce.number().optional(),
     name: z.string().min(1, { message: "Lesson name is required" }),
     day: z.enum(["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY"], { message: "Day is required" }),
-    startTime: z.coerce.date({ message: "Start time is required" }),
-    endTime: z.coerce.date({ message: "End time is required" }),
+    startTime: z.coerce.date({ message: "Start time is required" }).refine(
+    (val) => {
+      const hour = val.getHours();
+      const minute = val.getMinutes();
+      return (hour >= 8 && hour < 15) || (hour === 15 && minute === 0);
+    },
+    {
+      message: "The start time must be between 08:00 and 15:00.",
+    }
+  ),
+  endTime: z.coerce.date({ message: "End time is required" })
+    .refine(
+      (val) => {
+        const hour = val.getHours();
+        const minute = val.getMinutes();
+    
+        return (hour >= 8 && hour <= 15) || (hour === 8 && minute === 0);
+      },
+      {
+        message: "The end time must be between 08:00 and 15:00.",
+      }
+    ),
     subjectId: z.coerce.number({ message: "Subject is required" }),
     classId: z.coerce.number({ message: "Class is required" }),
     teacherId: z.string().min(1, { message: "Teacher is required" }),

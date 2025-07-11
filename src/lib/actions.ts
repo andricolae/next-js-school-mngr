@@ -4,7 +4,7 @@ import { AnnouncementSchema, AssignmentSchema, AttendanceActionData, ClassSchema
 import prisma from "./prisma";
 import { TokenData } from "@/lib/utils";
 
-type CurrentState = { success: boolean; error: boolean }
+type CurrentState = { success: boolean; error: boolean | string };
 export const createSubject = async (currentState: CurrentState, data: SubjectSchema) => {
 	try {
 		await prisma.subject.create({
@@ -17,9 +17,9 @@ export const createSubject = async (currentState: CurrentState, data: SubjectSch
 		});
 		return { success: true, error: false }
 
-	} catch (e) {
-		console.log(e); //!!!!!!!!!!!
-		return { success: false, error: true }
+	} catch (e: any) {
+		e.message = getFriendlyErrorMessage(e);
+		return {success: false, error: true, message: e.message }
 	}
 }
 
@@ -38,9 +38,9 @@ export const updateSubject = async (currentState: CurrentState, data: SubjectSch
 		});
 		return { success: true, error: false }
 
-	} catch (e) {
-		console.log(e);
-		return { success: false, error: true }
+	} catch (e: any) {
+		e.message = getFriendlyErrorMessage(e);
+		return {success: false, error: true, message: e.message }
 	}
 }
 
@@ -77,9 +77,9 @@ export const createClass = async (currentState: CurrentState, data: ClassSchema)
 		});
 		return { success: true, error: false }
 
-	} catch (e) {
-		console.log(e);
-		return { success: false, error: true }
+	} catch (e: any) {
+		e.message = getFriendlyErrorMessage(e);
+		return {success: false, error: true, message: e.message }
 	}
 }
 
@@ -92,9 +92,9 @@ export const updateClass = async (currentState: CurrentState, data: ClassSchema)
 			data
 		});
 		return { success: true, error: false }
-	} catch (e) {
-		console.log(e);
-		return { success: false, error: true }
+	} catch (e: any) {
+		e.message = getFriendlyErrorMessage(e);
+		return {success: false, error: true, message: e.message }
 	}
 }
 
@@ -144,9 +144,17 @@ export const createTeacher = async (currentState: CurrentState, data: TeacherSch
 		});
 		return { success: true, error: false }
 
-	} catch (e) {
-		console.log(e);
-		return { success: false, error: true }
+	}  catch (e: any) {
+		console.error(e);
+		let errorMessage = "An error occurred while creating the teacher.";
+
+		if (e.errors && e.errors.length > 0) {
+			errorMessage = e.errors[0].longMessage || e.errors[0].message;
+		} else if (e.message) {
+			
+			errorMessage = e.message;
+		}
+		return {success: false, error: true, message: errorMessage }
 	}
 }
 
@@ -187,9 +195,17 @@ export const updateTeacher = async (currentState: CurrentState, data: TeacherSch
 			}
 		});
 		return { success: true, error: false }
-	} catch (e) {
-		console.log(e);
-		return { success: false, error: true }
+	} catch (e: any) {
+		console.error(e);
+		let errorMessage = "An error occurred while creating the teacher.";
+
+		if (e.errors && e.errors.length > 0) {
+			errorMessage = e.errors[0].longMessage || e.errors[0].message;
+		} else if (e.message) {
+			
+			errorMessage = e.message;
+		}
+		return {success: false, error: true, message: errorMessage }
 	}
 }
 
@@ -252,10 +268,19 @@ export const createStudent = async (currentState: CurrentState, data: StudentSch
 		});
 		return { success: true, error: false }
 
-	} catch (e) {
-		console.log(e);
-		return { success: false, error: true }
+	} catch (e: any) {
+		console.error(e);
+		let errorMessage = "An error occurred while creating the student.";
+
+		if (e.errors && e.errors.length > 0) {
+			errorMessage = e.errors[0].longMessage || e.errors[0].message;
+		} else if (e.message) {
+			errorMessage = e.message;
+		}
+
+		return {success: false, error: true, message: errorMessage }
 	}
+
 }
 
 export const updateStudent = async (currentState: CurrentState, data: StudentSchema) => {
@@ -295,9 +320,17 @@ export const updateStudent = async (currentState: CurrentState, data: StudentSch
 			}
 		});
 		return { success: true, error: false }
-	} catch (e) {
-		console.log(e);
-		return { success: false, error: true }
+	} catch (e: any) {
+		console.error(e);
+		let errorMessage = "An error occurred while creating the student.";
+
+		if (e.errors && e.errors.length > 0) {
+			errorMessage = e.errors[0].longMessage || e.errors[0].message;
+		} else if (e.message) {
+			errorMessage = e.message;
+		}
+
+		return {success: false, error: true, message: errorMessage }
 	}
 }
 
@@ -350,9 +383,9 @@ export const createExam = async (currentState: CurrentState, data: ExamSchema) =
 		});
 		return { success: true, error: false }
 
-	} catch (e) {
-		console.log(e);
-		return { success: false, error: true }
+	} catch (e: any) {
+		e.message = getFriendlyErrorMessage(e);
+		return {success: false, error: true, message: e.message }
 	}
 }
 
@@ -389,9 +422,9 @@ export const updateExam = async (currentState: CurrentState, data: ExamSchema) =
 		});
 		return { success: true, error: false }
 
-	} catch (e) {
-		console.log(e);
-		return { success: false, error: true }
+	} catch (e: any) {
+		e.message = getFriendlyErrorMessage(e);
+		return {success: false, error: true, message: e.message }
 	}
 }
 
@@ -449,9 +482,9 @@ export const createAssignment = async (currentState: CurrentState, data: Assignm
 		});
 		return { success: true, error: false }
 
-	} catch (e) {
-		console.log(e);
-		return { success: false, error: true }
+	} catch (e: any) {
+		e.message = getFriendlyErrorMessage(e);
+		return {success: false, error: true, message: e.message }
 	}
 }
 
@@ -488,9 +521,9 @@ export const updateAssignment = async (currentState: CurrentState, data: Assignm
 		});
 		return { success: true, error: false }
 
-	} catch (e) {
-		console.log(e);
-		return { success: false, error: true }
+	} catch (e: any) {
+		e.message = getFriendlyErrorMessage(e);
+		return {success: false, error: true, message: e.message }
 	}
 }
 
@@ -552,9 +585,9 @@ export const createResult = async (currentState: CurrentState, data: ResultSchem
 		});
 		return { success: true, error: false }
 
-	} catch (e) {
-		console.log(e);
-		return { success: false, error: true }
+	} catch (e: any) {
+		e.message = getFriendlyErrorMessage(e);
+		return {success: false, error: true, message: e.message }
 	}
 }
 
@@ -609,9 +642,9 @@ export const updateResult = async (currentState: CurrentState, data: ResultSchem
 		});
 		return { success: true, error: false }
 
-	} catch (e) {
-		console.error("Error updating result:", e);
-		return { success: false, error: true }
+	} catch (e: any) {
+		e.message = getFriendlyErrorMessage(e);
+		return {success: false, error: true, message: e.message }
 	}
 }
 
@@ -680,9 +713,9 @@ export const createEvent = async (currentState: CurrentState, data: EventSchema)
 		});
 		return { success: true, error: false }
 
-	} catch (e) {
-		console.log(e);
-		return { success: false, error: true }
+	} catch (e: any) {
+		e.message = getFriendlyErrorMessage(e);
+		return {success: false, error: true, message: e.message }
 	}
 }
 
@@ -739,9 +772,9 @@ export const updateEvent = async (currentState: CurrentState, data: EventSchema)
 		});
 		return { success: true, error: false }
 
-	} catch (e) {
-		console.error("Error updating event:", e);
-		return { success: false, error: true }
+	}  catch (e: any) {
+		e.message = getFriendlyErrorMessage(e);
+		return {success: false, error: true, message: e.message }
 	}
 }
 
@@ -810,9 +843,9 @@ export const createAnnouncement = async (currentState: CurrentState, data: Annou
 		});
 		return { success: true, error: false }
 
-	} catch (e) {
-		console.log(e);
-		return { success: false, error: true }
+	} catch (e: any) {
+		e.message = getFriendlyErrorMessage(e);
+		return {success: false, error: true, message: e.message }
 	}
 }
 
@@ -854,9 +887,9 @@ export const updateAnnouncement = async (currentState: CurrentState, data: Annou
 		});
 		return { success: true, error: false }
 
-	} catch (e) {
-		console.log(e);
-		return { success: false, error: true }
+	} catch (e: any) {
+		e.message = getFriendlyErrorMessage(e);
+		return {success: false, error: true, message: e.message }
 	}
 }
 
@@ -1038,9 +1071,9 @@ export const createAttendance = async (currentState: CurrentState, data: Attenda
 		});
 		return { success: true, error: false }
 
-	} catch (e) {
-		console.log(e);
-		return { success: false, error: true }
+	} catch (e: any) {
+		e.message = getFriendlyErrorMessage(e);
+		return {success: false, error: true, message: e.message }
 	}
 }
 
@@ -1078,9 +1111,9 @@ export const updateAttendance = async (currentState: CurrentState, data: Attenda
 		});
 		return { success: true, error: false }
 
-	} catch (e) {
-		console.log(e);
-		return { success: false, error: true }
+	} catch (e: any) {
+		e.message = getFriendlyErrorMessage(e);
+		return {success: false, error: true, message: e.message }
 	}
 }
 
@@ -1136,9 +1169,9 @@ export const createLesson = async (currentState: CurrentState, data: LessonSchem
 		});
 		return { success: true, error: false }
 
-	} catch (e) {
-		console.log(e);
-		return { success: false, error: true }
+	} catch (e: any) {
+		e.message = getFriendlyErrorMessage(e);
+		return {success: false, error: true, message: e.message }
 	}
 }
 
@@ -1185,9 +1218,9 @@ export const updateLesson = async (currentState: CurrentState, data: LessonSchem
 		});
 		return { success: true, error: false }
 
-	} catch (e) {
-		console.error("Error updating lesson:", e);
-		return { success: false, error: true }
+	} catch (e: any) {
+		e.message = getFriendlyErrorMessage(e);
+		return {success: false, error: true, message: e.message }
 	}
 }
 
@@ -1297,3 +1330,30 @@ export async function checkTeacherAvailability(
     return false;
   }
 }
+
+
+function getFriendlyErrorMessage(e: any): string {
+    let friendlyMessage = "An unknown error occurred.";
+
+    if (e.errors && Array.isArray(e.errors) && e.errors.length > 0) {
+        friendlyMessage = e.errors[0].longMessage || e.errors[0].message;
+        if (friendlyMessage.startsWith("Validation error: ")) {
+            friendlyMessage = friendlyMessage.replace("Validation error: ", "");
+        }
+        if (friendlyMessage.includes("username is already taken")) {
+            friendlyMessage = "The username is already taken.";
+        } else if (friendlyMessage.includes("password must be at least")) {
+            friendlyMessage = "The password is too short. It must be at least 8 characters long.";
+        }
+    } else if (e.message) {
+        friendlyMessage = e.message;
+        if (e.message.includes("Unique constraint failed on the")) {
+            friendlyMessage = "This record already exists (duplicate).";
+        }
+    } else if (typeof e === 'string') {
+        friendlyMessage = e;
+    }
+
+    return friendlyMessage;
+}
+
