@@ -51,6 +51,9 @@ const EventForm = ({
             setOpen(false);
             router.refresh();
         }
+        if (state.error) {
+            const errorMessage = state.message || "Something went wrong!";
+        }
     }, [state, router, type, setOpen]);
 
     const { classes } = relatedData || {};
@@ -140,7 +143,11 @@ const EventForm = ({
                 Leave class empty to create a school-wide event visible to everyone.
             </div>
 
-            {state.error && <span className="text-red-500">Something went wrong!</span>}
+            {state.error && (
+                <span className="text-red-500">
+                    {state.message || "Something went wrong!"}
+                </span>
+            )}
             <button className="bg-blue-500 text-white p-2 rounded-md">
                 {type === "create" ? "Create" : "Update"}
             </button>

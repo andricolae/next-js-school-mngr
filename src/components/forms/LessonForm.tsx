@@ -5,18 +5,11 @@ import { useForm } from "react-hook-form";
 import InputField from "../InputField";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { lessonSchema, LessonSchema } from "@/lib/formValidationSchemas";
-import { createLesson, updateLesson,  createRecurringLessons } from "@/lib/actions";
+import { createLesson, updateLesson, createRecurringLessons, checkTeacherAvailability } from "@/lib/actions"; 
 import { useFormState } from "react-dom";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
-
-
-type ModuleType = {
-    id: number;
-    name: string;
-    startDate: string;
-    endDate: string;
-};
+import { availableModules, ModuleType } from "@/lib/modules"; 
 
 
 const holidays = [
@@ -51,31 +44,15 @@ const LessonForm = ({
     };
 }) => {
     
-    const availableModules: ModuleType[] = [
-        {
-            id: 1,
-            name: "Semester 1",
-            startDate: "2025-07-01",
-            endDate: "2025-07-31"
-        },
-        {
-            id: 2,
-            name: "Semester 2 ",
-            startDate: "2025-08-01",
-            endDate: "2025-08-31"
-        },
-        {
-            id: 3,
-            name: "Semester 3",
-            startDate: "2025-09-01",
-            endDate: "2025-09-30"
-        }
-    ];
-
+   
     const [isRecurring, setIsRecurring] = useState(false);
     const [selectedModuleId, setSelectedModuleId] = useState<number | null>(null);
     const [isCreatingRecurring, setIsCreatingRecurring] = useState(false);
     
+  
+    const [teacherOverlapWarning, setTeacherOverlapWarning] = useState<boolean>(false);
+    const [checkingAvailability, setCheckingAvailability] = useState<boolean>(false);
+
 
     const [selectedSubjectId, setSelectedSubjectId] = useState<string>(
         data?.subjectId || data?.subject?.id || ""
@@ -88,13 +65,28 @@ const LessonForm = ({
         register,
         handleSubmit,
         formState: { errors },
+        watch, 
+        setError, 
+        clearErrors 
     } = useForm<LessonSchema>({
         resolver: zodResolver(lessonSchema),
         defaultValues: {
             startTime: data?.startTime ? new Date(data.startTime) : undefined,
             endTime: data?.endTime ? new Date(data.endTime) : undefined,
+            name: data?.name || "",
+            day: data?.day || "",
+            subjectId: data?.subjectId || data?.subject?.id || "",
+            classId: data?.classId || data?.class?.id || "",
+            teacherId: data?.teacherId || data?.teacher?.id || "",
         }
     });
+
+   
+    const watchedTeacherId = watch("teacherId");
+    const watchedDay = watch("day");
+    const watchedStartTime = watch("startTime");
+    const watchedEndTime = watch("endTime");
+
 
     const [state, formAction] = useFormState(
         type === "create" ? createLesson : updateLesson, 
@@ -107,8 +99,8 @@ const LessonForm = ({
     const handleSubjectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const newSubjectId = e.target.value;
         setSelectedSubjectId(newSubjectId);
-        setSelectedTeacherId("");
-
+        setSelectedTeacherId(""); 
+        clearErrors("teacherId"); 
     };
 
 
@@ -118,9 +110,8 @@ const LessonForm = ({
     }
 
     return relatedData.teachers.filter((teacher: any) => {
-
-        console.log("Checking teacher:", relatedData);
         
+
         if (teacher.subjects && Array.isArray(teacher.subjects)) {
             return teacher.subjects.some((subject: any) => 
                 subject.id?.toString() === selectedSubjectId.toString()
@@ -156,7 +147,7 @@ const LessonForm = ({
         });
     };
 
-   
+    
     const generateRecurringLessons = async (lessonData: LessonSchema, moduleId: number) => {
         const selectedModule = availableModules.find(mod => mod.id === moduleId);
         if (!selectedModule) return { total: 0, success: 0 };
@@ -180,14 +171,14 @@ const LessonForm = ({
                 if (!isHoliday(currentDate)) {
                     const lessonDate = new Date(currentDate);
                     
-                   
+                    
                     lessonDate.setHours(baseStartTime.getHours());
                     lessonDate.setMinutes(baseStartTime.getMinutes());
                     lessonDate.setSeconds(0);
                     lessonDate.setMilliseconds(0);
                     const newLessonStartTime = new Date(lessonDate);
 
-                   
+                    
                     lessonDate.setHours(baseEndTime.getHours());
                     lessonDate.setMinutes(baseEndTime.getMinutes());
                     const newLessonEndTime = new Date(lessonDate);
@@ -195,7 +186,6 @@ const LessonForm = ({
                     const uniqueLessonName = `${lessonData.name} - ${newLessonStartTime.toLocaleDateString('ro-RO')}`;
 
                     lessonsToCreate.push({
-                        //name: lessonData.name,
                         name: uniqueLessonName,
                         day: lessonData.day,
                         startTime: newLessonStartTime,
@@ -223,6 +213,12 @@ const LessonForm = ({
     };
 
     const onSubmit = handleSubmit(async (formData) => {
+        
+        if (teacherOverlapWarning) {
+            toast.warn("Teacher has an overlapping lesson. Please resolve before submitting.");
+            return; 
+        }
+
         if (isRecurring && selectedModuleId) {
             setIsCreatingRecurring(true);
             try {
@@ -245,18 +241,74 @@ const LessonForm = ({
             const submissionData = {
                 ...formData,
                 ...(type === "update" && data?.id && { id: data.id }),
-                startTime: new Date(new Date(formData.startTime).getTime() + (3 * 60 * 60 * 1000)),
-                endTime: new Date(new Date(formData.endTime).getTime() + (3 * 60 * 60 * 1000)),
+              
+                startTime: new Date(formData.startTime),
+                endTime: new Date(formData.endTime),
             };
             formAction(submissionData);
         }
     });
+
+    
+    useEffect(() => {
+        const checkAvailability = async () => {
+            const teacherId = watchedTeacherId;
+            const day = watchedDay;
+            const startTime = watchedStartTime;
+            const endTime = watchedEndTime;
+
+           
+            if (teacherId && day && startTime && endTime) {
+                setCheckingAvailability(true);
+               
+                const startDateTime = new Date(startTime);
+                const endDateTime = new Date(endTime);
+
+               
+                const lessonIdToExclude = type === "update" && data?.id ? data.id : undefined;
+
+                const hasOverlap = await checkTeacherAvailability(
+                    teacherId,
+                    day,
+                    startDateTime,
+                    endDateTime,
+                    lessonIdToExclude
+                );
+                setTeacherOverlapWarning(hasOverlap);
+                setCheckingAvailability(false);
+
+                if (hasOverlap) {
+                    setError("teacherId", {
+                        type: "manual",
+                        message: "Teacher has an overlapping lesson at this time."
+                    });
+                } else {
+                    clearErrors("teacherId");
+                }
+            } else {
+                
+                setTeacherOverlapWarning(false);
+                clearErrors("teacherId");
+            }
+        };
+
+       
+        const debounceTimeout = setTimeout(() => {
+            checkAvailability();
+        }, 500); 
+
+        return () => clearTimeout(debounceTimeout); 
+    }, [watchedTeacherId, watchedDay, watchedStartTime, watchedEndTime, type, data?.id, setError, clearErrors]);
+
 
     useEffect(() => {
         if (state.success && !isRecurring) {
             toast(`Lesson has been ${type === "create" ? "created" : "updated"} successfully!`);
             setOpen(false);
             router.refresh();
+        }
+        if (state.error) {
+            const errorMessage = state.message || "Something went wrong!";
         }
     }, [state, router, type, setOpen, isRecurring]);
 
@@ -302,20 +354,16 @@ const LessonForm = ({
                 <InputField
                     label="Start Time"
                     name="startTime"
-                   
-
                     defaultValue={
                         data?.startTime
-                        ? isRecurring
-                            ? new Date(data.startTime).toISOString().slice(11, 16) 
-                            : new Date(data.startTime).toISOString().slice(0, 16) 
-                        : undefined
+                            ? isRecurring
+                                ? new Date(data.startTime).toISOString().slice(11, 16) 
+                                : new Date(data.startTime).toISOString().slice(0, 16) 
+                            : undefined
                     }
                     register={register}
                     error={errors?.startTime}
-                   
                     type={isRecurring ? "time" : "datetime-local"}
-
                 />
 
                <InputField
@@ -323,10 +371,10 @@ const LessonForm = ({
                     name="endTime"
                     defaultValue={
                         data?.endTime 
-                        ? isRecurring
-                            ? new Date(data.endTime).toISOString().slice(11, 16) 
-                            : new Date(data.endTime).toISOString().slice(0, 16) 
-                        : undefined
+                            ? isRecurring
+                                ? new Date(data.endTime).toISOString().slice(11, 16) 
+                                : new Date(data.endTime).toISOString().slice(0, 16) 
+                            : undefined
                     }
                     register={register}
                     error={errors?.endTime} 
@@ -421,6 +469,12 @@ const LessonForm = ({
                             )
                         )}
                     </select>
+                  
+                    {checkingAvailability && (
+                        <p className="text-xs text-blue-500">
+                            Checking teacher availability...
+                        </p>
+                    )}
                     {errors.teacherId?.message && (
                         <p className="text-xs text-red-400">
                             {errors.teacherId.message.toString()}
@@ -428,7 +482,7 @@ const LessonForm = ({
                     )}
                     {selectedSubjectId && filteredTeachers?.length === 0 && (
                         <p className="text-xs text-orange-500">
-                           This subject has no available teachers.
+                            This subject has no available teachers.
                         </p>
                     )}
                 </div>
@@ -479,14 +533,19 @@ const LessonForm = ({
                 </div>
             )}
 
-            {state.error && <span className="text-red-500">Something went wrong!</span>}
+            {state.error && (
+                <span className="text-red-500">
+                    {state.message || "Something went wrong!"}
+                </span>
+            )}
             
             <button 
                 type="submit" 
-                disabled={isCreatingRecurring}
+                disabled={isCreatingRecurring || checkingAvailability} 
                 className="bg-blue-500 text-white p-2 rounded-md disabled:bg-gray-400"
             >
                 {isCreatingRecurring ? "Creating lessons..." : 
+                 checkingAvailability ? "Checking availability..." : 
                  type === "create" ? 
                  (isRecurring ? "Create recurring lessons" : "Create") : 
                  "Update"}
