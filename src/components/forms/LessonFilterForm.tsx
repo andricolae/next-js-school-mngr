@@ -1,41 +1,23 @@
+// components/forms/LessonFilterForm.tsx
 "use client";
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
+import { ModuleType } from "@/lib/modules"; // Asigură-te că acest import este corect și că fișierul lib/modules.ts există
 
 interface FilterOption {
     id: string;
     name: string;
 }
 
-interface FilterFormProps {
+interface LessonFilterFormProps {
     currentFilters: { [key: string]: string | undefined };
     subjects: FilterOption[];
     classes: FilterOption[];
-    students: FilterOption[];
     teachers: FilterOption[];
-    modules: ModuleOption[];
+    modules: ModuleType[]; // <--- Props-ul nou pentru module
 }
-
-interface ModuleOption {
-    id: string; 
-    name: string;
-    startDate: string; 
-    endDate: string;  
-}
-
-const SORT_DATE_OPTIONS = [
-    { value: "", label: "No sorting" },
-    { value: "date_asc", label: "Ascending" },
-    { value: "date_desc", label: "Descending" },
-];
-
-const SORT_GRADE_OPTIONS = [
-    { value: "", label: "No sorting" },
-    { value: "score_asc", label: "Ascending" },
-    { value: "score_desc", label: "Descending" },
-];
 
 interface MultiSelectProps {
     id: string;
@@ -140,7 +122,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
                                 onClick={() => handleRemoveSelected(option.id)}
                                 className="ml-1 inline-flex items-center justify-center w-4 h-4 rounded-full hover:bg-blue-200"
                             >
-                                
+                                ×
                             </button>
                         </span>
                     ))}
@@ -205,72 +187,58 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
     );
 };
 
-const FilterForm: React.FC<FilterFormProps> = ({
+const LessonFilterForm: React.FC<LessonFilterFormProps> = ({
     currentFilters,
     subjects,
     classes,
-    students,
     teachers,
-    modules,
+    modules, // <--- Destructurează props-ul modules
 }) => {
     const router = useRouter();
     const searchParams = useSearchParams();
 
     const [isOpen, setIsOpen] = useState(false);
 
-    const [titleFilter, setTitleFilter] = useState(currentFilters.title || "");
     const [subjectFilters, setSubjectFilters] = useState<string[]>([]);
-    const [studentFilters, setStudentFilters] = useState<string[]>([]);
     const [teacherFilters, setTeacherFilters] = useState<string[]>([]);
     const [classFilters, setClassFilters] = useState<string[]>([]);
-    const [moduleFilter, setModuleFilter] = useState(currentFilters.moduleId || "");
-    const [sortDateOption, setSortDateOption] = useState("");
-    const [sortGradeOption, setSortGradeOption] = useState("");
-    
+    const [moduleFilter, setModuleFilter] = useState<string>(""); // <--- Stare nouă pentru modul
 
     useEffect(() => {
-        setTitleFilter(currentFilters.title || "");
-        
         setSubjectFilters(currentFilters.subjectId ? currentFilters.subjectId.split(',') : []);
-        setStudentFilters(currentFilters.studentId ? currentFilters.studentId.split(',') : []);
         setTeacherFilters(currentFilters.teacherId ? currentFilters.teacherId.split(',') : []);
         setClassFilters(currentFilters.classId ? currentFilters.classId.split(',') : []);
-        setModuleFilter(currentFilters.moduleId || "");
-      
-        setSortDateOption(currentFilters.sortDate || "");
-        setSortGradeOption(currentFilters.sortGrade || "");
-        
-      
-        if (currentFilters.sort && !currentFilters.sortDate && !currentFilters.sortGrade) {
-            const currentSort = currentFilters.sort;
-            if (currentSort === "date_asc" || currentSort === "date_desc") {
-                setSortDateOption(currentSort);
-            } else if (currentSort === "score_asc" || currentSort === "score_desc") {
-                setSortGradeOption(currentSort);
-            }
-        }
+        setModuleFilter(currentFilters.moduleId || ""); // <--- Inițializează starea modulului
     }, [currentFilters]);
+
+    // Funcție helper pentru a seta un singur filtru (folosită pentru modul)
+    const handleSingleFilterChange = (key: string, value: string) => {
+        if (key === "moduleId") {
+            setModuleFilter(value);
+        }
+        // Poți extinde dacă ai și alte filtre single-select
+    };
 
     const handleApplyFilters = () => {
         const newSearchParams = new URLSearchParams();
-
+        
+        // Păstrează parametrii 'search' și 'sort' existenți
         const existingSearchParam = searchParams.get("search");
         if (existingSearchParam) {
             newSearchParams.set("search", existingSearchParam);
         }
 
-        if (titleFilter) newSearchParams.set("title", titleFilter);
+        const existingSortParam = searchParams.get("sort");
+        if (existingSortParam) {
+            newSearchParams.set("sort", existingSortParam);
+        }
+
         if (subjectFilters.length > 0) newSearchParams.set("subjectId", subjectFilters.join(','));
-        if (studentFilters.length > 0) newSearchParams.set("studentId", studentFilters.join(','));
         if (teacherFilters.length > 0) newSearchParams.set("teacherId", teacherFilters.join(','));
         if (classFilters.length > 0) newSearchParams.set("classId", classFilters.join(','));
-        if (moduleFilter) newSearchParams.set("moduleId", moduleFilter);
-        
-      
-        if (sortDateOption) newSearchParams.set("sortDate", sortDateOption);
-        if (sortGradeOption) newSearchParams.set("sortGrade", sortGradeOption);
+        if (moduleFilter) newSearchParams.set("moduleId", moduleFilter); // <--- Adaugă filtrul de modul
 
-        newSearchParams.set("page", "1");
+        newSearchParams.set("page", "1"); // Resetează pagina la aplicarea filtrelor
 
         router.push(`?${newSearchParams.toString()}`);
         setIsOpen(false);
@@ -278,32 +246,32 @@ const FilterForm: React.FC<FilterFormProps> = ({
 
     const handleClearFilters = () => {
         const newSearchParams = new URLSearchParams();
+        
+        // Păstrează parametrii 'search' și 'sort' existenți
         const existingSearchParam = searchParams.get("search");
         if (existingSearchParam) {
             newSearchParams.set("search", existingSearchParam);
         }
+        
+        const existingSortParam = searchParams.get("sort");
+        if (existingSortParam) {
+            newSearchParams.set("sort", existingSortParam);
+        }
+        
         router.push(`${window.location.pathname}?${newSearchParams.toString()}`);
 
-        setTitleFilter("");
         setSubjectFilters([]);
-        setStudentFilters([]);
         setTeacherFilters([]);
         setClassFilters([]);
-        setModuleFilter("");
-        setSortDateOption("");
-        setSortGradeOption("");
+        setModuleFilter(""); // <--- Resetează filtrul de modul
         setIsOpen(false);
     };
 
     const activeFiltersCount = 
-        (titleFilter ? 1 : 0) +
         subjectFilters.length +
-        studentFilters.length +
         teacherFilters.length +
         classFilters.length +
-        (moduleFilter ? 1 : 0) +
-        (sortDateOption ? 1 : 0) +
-        (sortGradeOption ? 1 : 0);
+        (moduleFilter ? 1 : 0); // <--- Include filtrul de modul în count
 
     return (
         <>
@@ -324,7 +292,7 @@ const FilterForm: React.FC<FilterFormProps> = ({
                     <div className="filter-modal-content bg-white p-6 rounded-lg shadow-xl w-full max-w-2xl mx-auto relative max-h-[90vh] overflow-y-auto">
                         <div className="filter-modal-header flex justify-between items-center border-b pb-3 mb-4">
                             <h2 className="text-xl font-semibold">
-                                Filter Results
+                                Filter Lessons
                                 {activeFiltersCount > 0 && (
                                     <span className="ml-2 text-sm text-gray-500">
                                         ({activeFiltersCount} active {activeFiltersCount === 1 ? 'filter' : 'filters'})
@@ -344,18 +312,6 @@ const FilterForm: React.FC<FilterFormProps> = ({
                         </p>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                            <div className="filter-field">
-                                <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">Title</label>
-                                <input
-                                    type="text"
-                                    id="title"
-                                    value={titleFilter}
-                                    onChange={(e) => setTitleFilter(e.target.value)}
-                                    placeholder="Exam/assignment title"
-                                    className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                                />
-                            </div>
-
                             <MultiSelect
                                 id="subjects"
                                 label="Subjects"
@@ -363,15 +319,6 @@ const FilterForm: React.FC<FilterFormProps> = ({
                                 placeholder="Select subjects..."
                                 selectedIds={subjectFilters}
                                 onSelectionChange={setSubjectFilters}
-                            />
-
-                            <MultiSelect
-                                id="students"
-                                label="Students"
-                                options={students}
-                                placeholder="Search students..."
-                                selectedIds={studentFilters}
-                                onSelectionChange={setStudentFilters}
                             />
 
                             <MultiSelect
@@ -392,61 +339,26 @@ const FilterForm: React.FC<FilterFormProps> = ({
                                 onSelectionChange={setClassFilters}
                             />
 
+                            {/* NOU: Filtru pentru Modul */}
                             <div className="filter-field">
-                                <label htmlFor="moduleFilter" className="block text-sm font-medium text-gray-700 mb-1">
+                                <label htmlFor="moduleId" className="block text-sm font-medium text-gray-700 mb-1">
                                     Module
                                 </label>
                                 <select
-                                    id="moduleFilter"
-                                    value={moduleFilter}
-                                    onChange={(e) => setModuleFilter(e.target.value)}
+                                    id="moduleId"
                                     className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                    value={moduleFilter} // Folosește valoarea din stare
+                                    onChange={(e) => handleSingleFilterChange("moduleId", e.target.value)} // Folosește funcția nouă
                                 >
-                                    <option value="">Select module</option>
-                                    {modules.map((moduleOption) => (
-                                        <option key={moduleOption.id} value={moduleOption.id}>
-                                            {moduleOption.name} (Starts: {moduleOption.startDate}, Ends: {moduleOption.endDate})
+                                    <option value="">All Modules</option>
+                                    {modules.map((m) => (
+                                        <option key={m.id} value={m.id}>
+                                            {m.name} ({m.startDate} - {m.endDate})
                                         </option>
                                     ))}
                                 </select>
                             </div>
-
-
-                            <div className="filter-field">
-                                <label htmlFor="sortDateOption" className="block text-sm font-medium text-gray-700 mb-1">
-                                    Sort by Date
-                                </label>
-                                <select
-                                    id="sortDateOption"
-                                    value={sortDateOption}
-                                    onChange={(e) => setSortDateOption(e.target.value)}
-                                    className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                                >
-                                    {SORT_DATE_OPTIONS.map((option) => (
-                                        <option key={option.value} value={option.value}>
-                                            {option.label}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-
-                            <div className="filter-field">
-                                <label htmlFor="sortGradeOption" className="block text-sm font-medium text-gray-700 mb-1">
-                                    Sort by Grade
-                                </label>
-                                <select
-                                    id="sortGradeOption"
-                                    value={sortGradeOption}
-                                    onChange={(e) => setSortGradeOption(e.target.value)}
-                                    className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                                >
-                                    {SORT_GRADE_OPTIONS.map((option) => (
-                                        <option key={option.value} value={option.value}>
-                                            {option.label}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
+                            {/* END NOU: Filtru pentru Modul */}
                         </div>
 
                         <div className="filter-modal-footer flex justify-end gap-2 pt-4 border-t mt-4">
@@ -470,4 +382,4 @@ const FilterForm: React.FC<FilterFormProps> = ({
     );
 };
 
-export default FilterForm;
+export default LessonFilterForm;

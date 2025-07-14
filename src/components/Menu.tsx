@@ -1,5 +1,7 @@
-import { role } from "@/lib/data";
-import { auth, currentUser } from "@clerk/nextjs/server";
+'use client';
+
+import { useAuth } from "@clerk/nextjs";
+import { usePathname } from 'next/navigation';
 import Image from "next/image";
 import Link from "next/link";
 import { TokenData } from "@/lib/utils";
@@ -90,14 +92,25 @@ const menuItems = [
 	},
 ];
 
-const Menu = async () => {
-
-	const { userId, sessionClaims } = await auth();
+const Menu = () => {
+	const { userId, sessionClaims } = useAuth();
+	const currentPath = usePathname();
+	
 	let tokenData;
 	if (sessionClaims !== null) {
 		tokenData = sessionClaims as unknown as TokenData;
 	}
 	let role = tokenData?.userPblcMtdt?.role;
+
+	
+	const isActiveLink = (href: string) => {
+		if (!currentPath) return false;
+		
+		if (href === "/") {
+			return currentPath === "/";
+		}
+		return currentPath === href || currentPath.startsWith(href + "/");
+	};
 
 	return (
 		<div className="mt-4 text-sm">
@@ -106,10 +119,15 @@ const Menu = async () => {
 					<span className="hidden lg:block text-gray-400 font-light my-4">{i.title}</span>
 					{i.items.map((item) => {
 						if (item.visible.includes(role!)) {
+							const isActive = isActiveLink(item.href);
 							return (
 								<Link href={item.href}
 									key={item.label}
-									className="flex items-center justify-center lg:justify-start gap-4 text-gray-500 py-2 md:px-2 rounded-md hover:bg-skyLight"
+									className={`flex items-center justify-center lg:justify-start gap-4 py-2 md:px-2 rounded-md transition-colors ${
+										isActive 
+											? "bg-skyLight text-sky-600 font-medium" 
+											: "text-gray-500 hover:bg-skyLight"
+									}`}
 								>
 									<Image src={item.icon} alt="" width={20} height={20} />
 									<span className="hidden lg:block">{item.label}</span>

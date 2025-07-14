@@ -60,6 +60,9 @@ const ResultForm = ({
             setOpen(false);
             router.refresh();
         }
+        if (state.error) {
+            const errorMessage = state.message || "Something went wrong!";
+        }
     }, [state, router, type, setOpen]);
 
     const { students, exams, assignments } = relatedData;
@@ -164,7 +167,11 @@ const ResultForm = ({
                 Note: Select either an exam OR an assignment, not both.
             </div>
 
-            {state.error && <span className="text-red-500">Something went wrong!</span>}
+          {state.error && (
+                <span className="text-red-500">
+                    {state.message || "Something went wrong!"}
+                </span>
+            )}
             <button className="bg-blue-500 text-white p-2 rounded-md">
                 {type === "create" ? "Create" : "Update"}
             </button>

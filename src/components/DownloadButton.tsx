@@ -19,6 +19,8 @@ interface ResultItemForPdf {
 interface PdfHeaderDetails {
     companyName?: string;
     companyAddress?: string;
+    moduleName?: string;
+    isSingleStudentSelected?: boolean;
 }
 
 interface DownloadButtonProps {
