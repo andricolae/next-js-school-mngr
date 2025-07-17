@@ -60,10 +60,10 @@ const EventForm = ({
 
 
     return (
-        <form className="flex flex-col gap-8" onSubmit={onSubmit}>
-            <h1 className="text-cl font-semibold">{type === "create" ? "Create a new event" : "Update the event"}</h1>
+        <form className="flex flex-col gap-8 max-w-sm mx-auto" onSubmit={onSubmit}>
+            <h1 className="text-cl font-semibold text-center w-full">{type === "create" ? "Create a new event" : "Update the event"}</h1>
 
-            <div className="flex justify-between flex-wrap gap-4">
+            <div className="flex-col gap-4">
                 <InputField
                     label="Event Title"
                     name="title"
@@ -72,7 +72,7 @@ const EventForm = ({
                     error={errors?.title}
                 />
 
-                <div className="flex flex-col gap-2 w-full md:w-1/2">
+                <div className="flex flex-col gap-2 w-full mt-3">
                     <label className="text-xs text-gray-400">Description</label>
                     <textarea
                         className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full resize-vertical min-h-[80px]"
@@ -115,7 +115,7 @@ const EventForm = ({
                     />
                 )}
 
-                <div className="flex flex-col gap-2 w-full md:w-1/4">
+                <div className="flex flex-col gap-2 w-full mt-3">
                     <label className="text-xs text-gray-400">Class (Optional)</label>
                     <select
                         className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
