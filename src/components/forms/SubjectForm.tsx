@@ -62,7 +62,8 @@ const SubjectForm = ({
     return (
         <form className="flex flex-col gap-8" onSubmit={onSubmit}>
             <h1 className="text-cl font-semibold">{type === "create" ? "Create a new subject" : "Update the subject"}</h1>
-            <div className="flex justify-between flex-wrap gap-4">
+           <div className="flex flex-col gap-4 w-full">
+
                 <InputField
                     label="Subject Name"
                     name="name"
@@ -80,7 +81,7 @@ const SubjectForm = ({
                     hidden
                     />
                 )}
-                <div className="flex flex-col gap-2 w-full md:w-1/4">
+                <div className="flex flex-col gap-2 w-full ">
                     <label className="text-xs text-gray-400">Teachers</label>
                     <select
                         multiple
@@ -108,7 +109,12 @@ const SubjectForm = ({
                     {state.message || "Something went wrong!"}
                 </span>
             )}
-            <button className="bg-blue-500 text-white p-2 rounded-md">{type === "create" ? "Create" : "Update"}</button>
+<div className="flex justify-center">
+  <button className="bg-blue-500 text-white px-4 py-1 rounded-md text-sm">
+    {type === "create" ? "Create" : "Update"}
+  </button>
+</div>
+
         </form>
     )
 };
