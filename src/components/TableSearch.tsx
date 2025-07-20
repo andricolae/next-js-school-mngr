@@ -1,26 +1,41 @@
-"use client"
+'use client';
 
-import Image from 'next/image'
-import { useRouter } from 'next/navigation'
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react'; //linie noua 
 
 const TableSearch = () => {
   const router = useRouter();
+  const [search, setSearch] = useState('');
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  useEffect(() => {
+    const delayDebounce = setTimeout(() => {
+      const params = new URLSearchParams(window.location.search);
 
-    const value = (e.currentTarget[0] as HTMLInputElement).value;
-    const params = new URLSearchParams(window.location.search);
-    params.set("search", value);
-    router.push(`${window.location.pathname}?${params}`);
-  }
+      if (search.trim() === '') {
+        params.delete('search');
+      } else {
+        params.set('search', search.trim());
+      }
+
+      router.push(`${window.location.pathname}?${params.toString()}`);
+    }, 300); // debounce 300ms
+
+    return () => clearTimeout(delayDebounce);
+  }, [search]);
 
   return (
-    <form onSubmit={handleSubmit} className="w-full md:w-auto flex items-center gap-2 text-xs rounded-full ring-[1.5px] ring-gray-300 px-2">
+    <form onSubmit={(e) => e.preventDefault()} className="w-full md:w-auto flex items-center gap-2 text-xs rounded-full ring-[1.5px] ring-gray-300 px-2">
       <Image src="/search.png" alt="" width={14} height={14} />
-      <input type="text" placeholder="Search..." className="w-[200px] p-2 bg-transparent outline-none" />
+      <input
+        type="text"
+        placeholder="Search..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        className="w-[200px] p-2 bg-transparent outline-none"
+      />
     </form>
-  )
-}
+  );
+};
 
-export default TableSearch
+export default TableSearch;
