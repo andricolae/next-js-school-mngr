@@ -37,6 +37,7 @@ const BulkAttendanceMarker = ({
         if (selectedLesson) {
             fetchClassStudents(selectedLesson);
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedLesson]);
 
     const fetchClassStudents = async (lessonId: number) => {

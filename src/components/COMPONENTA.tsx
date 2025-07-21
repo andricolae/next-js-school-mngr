@@ -6,6 +6,7 @@ const COMPONENTA = (props: any) => {
     useEffect(() => {
             console.log(props.data)
             console.log(props.dataRes)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         }, [])
 
     return (
