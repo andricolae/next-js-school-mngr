@@ -316,241 +316,243 @@ const LessonForm = ({
     const filteredTeachers = getFilteredTeachers();
 
     return (
-        <form className="flex flex-col gap-8" onSubmit={onSubmit}>
-            <h1 className="text-xl font-semibold">
-                {type === "create" ? "Create a new lesson" : "Update the lesson"}
-            </h1>
-            
-            <div className="flex justify-between flex-wrap gap-4">
-                <InputField
-                    label="Lesson Name"
-                    name="name"
-                    defaultValue={data?.name}
-                    register={register}
-                    error={errors?.name}
-                />
+     <form
+  className="flex flex-col gap-4 max-w-sm mx-auto p-4 max-h-[90vh] overflow-auto border rounded-md bg-white"
+  onSubmit={onSubmit}
+>
+  <div className="flex justify-between items-center mb-4">
+    <h1 className="text-lg font-semibold">
+      {type === "create" ? "Create a new lesson" : "Update the lesson"}
+    </h1>
+    <button
+      type="button"
+      onClick={() => setOpen(false)}  // presupun că ai props setOpen pentru închidere
+      className="text-gray-500 hover:text-gray-700 font-bold text-xl leading-none"
+      aria-label="Close form"
+    >
+      &times;
+    </button>
+  </div>
 
-                <div className="flex flex-col gap-2 w-full md:w-1/4">
-                    <label className="text-xs text-gray-400">Day</label>
-                    <select
-                        className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
-                        defaultValue={data?.day || ""}
-                        {...register("day")}
-                    >
-                        <option value="">Select day</option>
-                        <option value="MONDAY">Monday</option>
-                        <option value="TUESDAY">Tuesday</option>
-                        <option value="WEDNESDAY">Wednesday</option>
-                        <option value="THURSDAY">Thursday</option>
-                        <option value="FRIDAY">Friday</option>
-                    </select>
-                    {errors.day?.message && (
-                        <p className="text-xs text-red-400">
-                            {errors.day.message.toString()}
-                        </p>
-                    )}
-                </div>
+  <InputField
+    label="Lesson Name"
+    name="name"
+    defaultValue={data?.name}
+    register={register}
+    error={errors?.name}
+  />
 
-                <InputField
-                    label="Start Time"
-                    name="startTime"
-                    defaultValue={
-                        data?.startTime
-                            ? isRecurring
-                                ? new Date(data.startTime).toISOString().slice(11, 16) 
-                                : new Date(data.startTime).toISOString().slice(0, 16) 
-                            : undefined
-                    }
-                    register={register}
-                    error={errors?.startTime}
-                    type={isRecurring ? "time" : "datetime-local"}
-                />
+  <div className="flex flex-col gap-2 w-full">
+    <label className="text-xs text-gray-400">Day</label>
+    <select
+      className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
+      defaultValue={data?.day || ""}
+      {...register("day")}
+    >
+      <option value="">Select day</option>
+      <option value="MONDAY">Monday</option>
+      <option value="TUESDAY">Tuesday</option>
+      <option value="WEDNESDAY">Wednesday</option>
+      <option value="THURSDAY">Thursday</option>
+      <option value="FRIDAY">Friday</option>
+    </select>
+    {errors.day?.message && (
+      <p className="text-xs text-red-400">{errors.day.message.toString()}</p>
+    )}
+  </div>
 
-               <InputField
-                    label="End Time"
-                    name="endTime"
-                    defaultValue={
-                        data?.endTime 
-                            ? isRecurring
-                                ? new Date(data.endTime).toISOString().slice(11, 16) 
-                                : new Date(data.endTime).toISOString().slice(0, 16) 
-                            : undefined
-                    }
-                    register={register}
-                    error={errors?.endTime} 
-                    type={isRecurring ? "time" : "datetime-local"}
-                />
-                {data && (
-                    <InputField
-                        label="Id"
-                        name="id"
-                        defaultValue={data?.id}
-                        register={register}
-                        error={errors?.id}
-                        hidden
-                    />
-                )}
+  <InputField
+    label="Start Time"
+    name="startTime"
+    defaultValue={
+      data?.startTime
+        ? isRecurring
+          ? new Date(data.startTime).toISOString().slice(11, 16)
+          : new Date(data.startTime).toISOString().slice(0, 16)
+        : undefined
+    }
+    register={register}
+    error={errors?.startTime}
+    type={isRecurring ? "time" : "datetime-local"}
+  />
 
-                <div className="flex flex-col gap-2 w-full md:w-1/4">
-                    <label className="text-xs text-gray-400">Subject</label>
-                    <select
-                        className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
-                        value={selectedSubjectId}
-                        {...register("subjectId", {
-                            onChange: handleSubjectChange
-                        })}
-                    >
-                        <option value="">Select subject</option>
-                        {subjects?.map(
-                            (subject: { id: number; name: string }) => (
-                                <option value={subject.id} key={subject.id}>
-                                    {subject.name}
-                                </option>
-                            )
-                        )}
-                    </select>
-                    {errors.subjectId?.message && (
-                        <p className="text-xs text-red-400">
-                            {errors.subjectId.message.toString()}
-                        </p>
-                    )}
-                </div>
+  <InputField
+    label="End Time"
+    name="endTime"
+    defaultValue={
+      data?.endTime
+        ? isRecurring
+          ? new Date(data.endTime).toISOString().slice(11, 16)
+          : new Date(data.endTime).toISOString().slice(0, 16)
+        : undefined
+    }
+    register={register}
+    error={errors?.endTime}
+    type={isRecurring ? "time" : "datetime-local"}
+  />
 
-                <div className="flex flex-col gap-2 w-full md:w-1/4">
-                    <label className="text-xs text-gray-400">Class</label>
-                    <select
-                        className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
-                        defaultValue={data?.classId || data?.class?.id || ""}
-                        {...register("classId")}
-                    >
-                        <option value="">Select class</option>
-                        {classes?.map(
-                            (classItem: { id: number; name: string; grade: { level: number } }) => (
-                                <option value={classItem.id} key={classItem.id}>
-                                    {classItem.name} - Grade {classItem.grade.level}
-                                </option>
-                            )
-                        )}
-                    </select>
-                    {errors.classId?.message && (
-                        <p className="text-xs text-red-400">
-                            {errors.classId.message.toString()}
-                        </p>
-                    )}
-                </div>
+  {data && (
+    <InputField
+      label="Id"
+      name="id"
+      defaultValue={data?.id}
+      register={register}
+      error={errors?.id}
+      hidden
+    />
+  )}
 
-                <div className="flex flex-col gap-2 w-full md:w-1/4">
-                    <label className="text-xs text-gray-400">
-                        Teacher
-                        {selectedSubjectId && (
-                            <span className="text-blue-500 ml-1">
-                                (Filtered by subject)
-                            </span>
-                        )}
-                    </label>
-                    <select
-                        className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
-                        value={selectedTeacherId}
-                        {...register("teacherId", {
-                            onChange: (e) => setSelectedTeacherId(e.target.value)
-                        })}
-                    >
-                        <option value="">
-                            {selectedSubjectId 
-                                ? "Select teacher for this subject" 
-                                : "Select subject first"
-                            }
-                        </option>
-                        {filteredTeachers?.map(
-                            (teacher: { id: string; name: string; surname: string }) => (
-                                <option value={teacher.id} key={teacher.id}>
-                                    {teacher.name} {teacher.surname}
-                                </option>
-                            )
-                        )}
-                    </select>
-                  
-                    {checkingAvailability && (
-                        <p className="text-xs text-blue-500">
-                            Checking teacher availability...
-                        </p>
-                    )}
-                    {errors.teacherId?.message && (
-                        <p className="text-xs text-red-400">
-                            {errors.teacherId.message.toString()}
-                        </p>
-                    )}
-                    {selectedSubjectId && filteredTeachers?.length === 0 && (
-                        <p className="text-xs text-orange-500">
-                            This subject has no available teachers.
-                        </p>
-                    )}
-                </div>
+  <div className="flex flex-col gap-2 w-full">
+    <label className="text-xs text-gray-400">Subject</label>
+    <select
+      className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
+      value={selectedSubjectId}
+      {...register("subjectId", {
+        onChange: handleSubjectChange,
+      })}
+    >
+      <option value="">Select subject</option>
+      {subjects?.map((subject: { id: number; name: string }) => (
+        <option value={subject.id} key={subject.id}>
+          {subject.name}
+        </option>
+      ))}
+    </select>
+    {errors.subjectId?.message && (
+      <p className="text-xs text-red-400">{errors.subjectId.message.toString()}</p>
+    )}
+  </div>
+
+  <div className="flex flex-col gap-2 w-full">
+    <label className="text-xs text-gray-400">Class</label>
+    <select
+      className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
+      defaultValue={data?.classId || data?.class?.id || ""}
+      {...register("classId")}
+    >
+      <option value="">Select class</option>
+      {classes?.map(
+        (classItem: { id: string; name: string; grade: { level: number } }) => (
+          <option value={classItem.id} key={classItem.id}>
+            {classItem.name} - Grade {classItem.grade.level}
+          </option>
+        )
+      )}
+    </select>
+    {errors.classId?.message && (
+      <p className="text-xs text-red-400">{errors.classId.message.toString()}</p>
+    )}
+  </div>
+
+  <div className="flex flex-col gap-2 w-full">
+    <label className="text-xs text-gray-400">
+      Teacher
+      {selectedSubjectId && (
+        <span className="text-blue-500 ml-1">(Filtered by subject)</span>
+      )}
+    </label>
+    <select
+      className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
+      value={selectedTeacherId}
+      {...register("teacherId", {
+        onChange: (e) => setSelectedTeacherId(e.target.value),
+      })}
+    >
+      <option value="">
+        {selectedSubjectId
+          ? "Select teacher for this subject"
+          : "Select subject first"}
+      </option>
+      {filteredTeachers?.map(
+        (teacher: { id: string; name: string; surname: string }) => (
+          <option value={teacher.id} key={teacher.id}>
+            {teacher.name} {teacher.surname}
+          </option>
+        )
+      )}
+    </select>
+
+    {checkingAvailability && (
+      <p className="text-xs text-blue-500">Checking teacher availability...</p>
+    )}
+
+    {errors.teacherId?.message && (
+      <p className="text-xs text-red-400">{errors.teacherId.message.toString()}</p>
+    )}
+
+    {selectedSubjectId && filteredTeachers?.length === 0 && (
+      <p className="text-xs text-orange-500">This subject has no available teachers.</p>
+    )}
+  </div>
+
+  {type === "create" && (
+    <div className="flex flex-col gap-4 p-4 border rounded-md bg-gray-50">
+      <div className="flex items-center gap-2">
+        <input
+          type="checkbox"
+          id="isRecurring"
+          checked={isRecurring}
+          onChange={(e) => setIsRecurring(e.target.checked)}
+          className="w-4 h-4"
+        />
+        <label htmlFor="isRecurring" className="text-sm font-medium">
+          Create recurring lessons
+        </label>
+      </div>
+
+      {isRecurring && (
+        <div className="flex flex-col gap-2">
+          <label className="text-xs text-gray-400">
+            Select module for recurring lessons
+          </label>
+          <select
+            className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
+            value={selectedModuleId || ""}
+            onChange={(e) => setSelectedModuleId(Number(e.target.value) || null)}
+          >
+            <option value="">Select module</option>
+            {availableModules.map((module) => (
+              <option key={module.id} value={module.id}>
+                {module.name}
+              </option>
+            ))}
+          </select>
+
+          {selectedModuleId && (
+            <div className="mt-2 p-2 bg-blue-50 rounded text-xs">
+              <p>
+                <strong>Selected Module:</strong>{" "}
+                {availableModules.find((m) => m.id === selectedModuleId)?.name}
+              </p>
+              <p>
+                <strong>Period:</strong>{" "}
+                {availableModules.find((m) => m.id === selectedModuleId)?.startDate} -{" "}
+                {availableModules.find((m) => m.id === selectedModuleId)?.endDate}
+              </p>
+              <p>
+                <strong>Note:</strong> Lessons will be created for each selected day
+                within this period, excluding holidays.
+              </p>
             </div>
+          )}
+        </div>
+      )}
+    </div>
+  )}
 
-            {type === "create" && (
-                <div className="flex flex-col gap-4 p-4 border rounded-md bg-gray-50">
-                    <div className="flex items-center gap-2">
-                        <input
-                            type="checkbox"
-                            id="isRecurring"
-                            checked={isRecurring}
-                            onChange={(e) => setIsRecurring(e.target.checked)}
-                            className="w-4 h-4"
-                        />
-                        <label htmlFor="isRecurring" className="text-sm font-medium">
-                            Create recurring lessons
-                        </label>
-                    </div>
+  {state.error && (
+    <span className="text-red-500">{state.message || "Something went wrong!"}</span>
+  )}
 
-                    {isRecurring && (
-                        <div className="flex flex-col gap-2">
-                            <label className="text-xs text-gray-400">
-                                Select module for recurring lessons
-                            </label>
-                            <select
-                                className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
-                                value={selectedModuleId || ""}
-                                onChange={(e) => setSelectedModuleId(Number(e.target.value) || null)}
-                            >
-                                <option value="">Select module</option>
-                                {availableModules.map((module) => (
-                                    <option key={module.id} value={module.id}>
-                                        {module.name}
-                                    </option>
-                                ))}
-                            </select>
-                            
-                            {selectedModuleId && (
-                                <div className="mt-2 p-2 bg-blue-50 rounded text-xs">
-                                    <p><strong>Selected Module:</strong> {availableModules.find(m => m.id === selectedModuleId)?.name}</p>
-                                    <p><strong>Period:</strong> {availableModules.find(m => m.id === selectedModuleId)?.startDate} - {availableModules.find(m => m.id === selectedModuleId)?.endDate}</p>
-                                    <p><strong>Note:</strong> Lessons will be created for each selected day within this period, excluding holidays.</p>
-                                </div>
-                            )}
-                        </div>
-                    )}
-                </div>
-            )}
+  <div className="flex justify-center mt-6">
+    <button className="bg-blue-500 text-white px-6 py-2 rounded-md text-sm w-max">
+      {type === "create" ? "Create" : "Update"}
+    </button>
+  </div>
+</form>
 
-            {state.error && (
-                <span className="text-red-500">
-                    {state.message || "Something went wrong!"}
-                </span>
-            )}
-            
-            <button 
-                type="submit" 
-                disabled={isCreatingRecurring || checkingAvailability} 
-                className="bg-blue-500 text-white p-2 rounded-md disabled:bg-gray-400"
-            >
-                {isCreatingRecurring ? "Creating lessons..." : 
-                 checkingAvailability ? "Checking availability..." : 
-                 type === "create" ? 
-                 (isRecurring ? "Create recurring lessons" : "Create") : 
-                 "Update"}
-            </button>
-        </form>
+
+
     );
 };
 

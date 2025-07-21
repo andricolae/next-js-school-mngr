@@ -53,67 +53,85 @@ const ExamForm = ({
     const { lessons } = relatedData;
 
     return (
-        <form className="flex flex-col gap-8" onSubmit={onSubmit}>
-            <h1 className="text-cl font-semibold">{type === "create" ? "Create a new exam" : "Update the exam"}</h1>
-            <div className="flex justify-between flex-wrap gap-4">
-                <InputField
-                    label="Exam Title"
-                    name="title"
-                    defaultValue={data?.title}
-                    register={register}
-                    error={errors?.title}
-                />
-                <InputField
-                    label="Start Time"
-                    name="startTime"
-                    defaultValue={data?.startTime ? new Date(data.startTime).toISOString().slice(0, 16) : undefined}
-                    register={register}
-                    error={errors?.startTime}
-                    type="datetime-local"
-                />
-                <InputField
-                    label="End Time"
-                    name="endTime"
-                    defaultValue={data?.endTime ? new Date(data.endTime).toISOString().slice(0, 16) : undefined}
-                    register={register}
-                    error={errors?.endTime}
-                    type="datetime-local"
-                />
-                {data && (
-                    <InputField
-                        label="Id"
-                        name="id"
-                        defaultValue={data?.id}
-                        register={register}
-                        error={errors?.id}
-                        hidden
-                    />
-                )}
-                <div className="flex flex-col gap-2 w-full md:w-1/4">
-                    <label className="text-xs text-gray-400">Lesson</label>
-                    <select
-                        className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
-                        {...register("lessonId")}
-                        defaultValue={data?.lessons}
-                    >
-                        {lessons.map(
-                            (lesson: { id: number; name: string; }) => (
-                                <option value={lesson.id} key={lesson.id}>
-                                    {lesson.name}
-                                </option>
-                            )
-                        )}
-                    </select>
-                    {errors.lessonId?.message &&
-                        <p className="text-xs text-red-400">
-                            {errors.lessonId.message.toString()}
-                        </p>
-                    }
-                </div>
-            </div>
-           {state.error && <span className="text-red-500">{state.error}</span>}
-            <button className="bg-blue-500 text-white p-2 rounded-md">{type === "create" ? "Create" : "Update"}</button>
-        </form>
+      <form className="flex flex-col gap-8 max-w-md mx-auto" onSubmit={onSubmit}>
+  <h1 className="text-xl font-semibold text-center mb-6">
+    {type === "create" ? "Create a new exam" : "Update the exam"}
+  </h1>
+
+  <div className="flex flex-col gap-6 w-full">
+    <InputField
+      label="Exam Title"
+      name="title"
+      defaultValue={data?.title}
+      register={register}
+      error={errors?.title}
+    />
+
+    <InputField
+      label="Start Time"
+      name="startTime"
+      defaultValue={data?.startTime ? new Date(data.startTime).toISOString().slice(0, 16) : undefined}
+      register={register}
+      error={errors?.startTime}
+      type="datetime-local"
+    />
+
+    <InputField
+      label="End Time"
+      name="endTime"
+      defaultValue={data?.endTime ? new Date(data.endTime).toISOString().slice(0, 16) : undefined}
+      register={register}
+      error={errors?.endTime}
+      type="datetime-local"
+    />
+
+    {data && (
+      <InputField
+        label="Id"
+        name="id"
+        defaultValue={data?.id}
+        register={register}
+        error={errors?.id}
+        hidden
+      />
+    )}
+
+    <div className="flex flex-col gap-1 w-full">
+      <label className="text-xs text-gray-400">Lesson</label>
+      <select
+        className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
+        {...register("lessonId")}
+        defaultValue={data?.lessonId || ""}
+      >
+        <option value="">Select lesson</option>
+        {lessons.map((lesson: { id: number; name: string }) => (
+          <option value={lesson.id} key={lesson.id}>
+            {lesson.name}
+          </option>
+        ))}
+      </select>
+      {errors.lessonId?.message && (
+        <p className="text-xs text-red-400">{errors.lessonId.message.toString()}</p>
+      )}
+    </div>
+  </div>
+
+  {state.error && (
+    <span className="text-red-500 text-center">
+      {state.error}
+    </span>
+  )}
+
+  <div className="flex justify-center mt-6">
+    <button
+      type="submit"
+      className="bg-blue-500 text-white px-8 py-2 rounded-md text-sm w-max"
+    >
+      {type === "create" ? "Create" : "Update"}
+    </button>
+  </div>
+</form>
+
     )
 };
 
