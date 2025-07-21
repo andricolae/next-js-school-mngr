@@ -125,7 +125,9 @@ const FormModal = ({ table, type, data, id, relatedData }: FormContainerProps & 
         </button>
         {open && (
             <div className="w-screen h-screen absolute left-0 top-0 bg-black bg-opacity-60 z-50 flex items-center justify-center">
-                <div className="bg-white p-4 rounded-md relative w-[90%] sm:w-[450px] max-w-full">
+                <div className="bg-white p-4 rounded-md relative w-[50%] md:w-[10%] lg:w-[10%] xl:w-[10%] 2xl:w-[30%]"> 
+                {/*<div className="bg-white p-4 rounded-md relative w-[90%] sm:w-[450px] max-w-full">*/}
+
                     <Form />
                     <div className="absolute top-4 right-4 cursor-pointer" onClick={() => setOpen(false)}>
                         <Image src="/close.png" alt="" width={14} height={14} />
@@ -135,5 +137,4 @@ const FormModal = ({ table, type, data, id, relatedData }: FormContainerProps & 
         )}
     </>;
 }
-
 export default FormModal

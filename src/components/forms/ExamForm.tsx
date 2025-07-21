@@ -54,8 +54,8 @@ const ExamForm = ({
 
     return (
         <form className="flex flex-col gap-8" onSubmit={onSubmit}>
-            <h1 className="text-cl font-semibold">{type === "create" ? "Create a new exam" : "Update the exam"}</h1>
-            <div className="flex justify-between flex-wrap gap-4">
+            <h1 className="text-cl font-semibold text-center w-full">{type === "create" ? "Create a new exam" : "Update the exam"}</h1>
+            <div className="flex flex-col gap-4 w-full items-center">
                 <InputField
                     label="Exam Title"
                     name="title"
@@ -89,7 +89,7 @@ const ExamForm = ({
                         hidden
                     />
                 )}
-                <div className="flex flex-col gap-2 w-full md:w-1/4">
+                <div className="flex flex-col gap-2 w-full">
                     <label className="text-xs text-gray-400">Lesson</label>
                     <select
                         className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
