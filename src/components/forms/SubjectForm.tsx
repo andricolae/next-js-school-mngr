@@ -33,8 +33,10 @@ const SubjectForm = ({
             id: data?.id,
             name: data?.name
         } : {}
+    
     });
 
+    
     const [state, formAction] = useFormState(type === "create"
         ? createSubject : updateSubject, { success: false, error: false })
 
