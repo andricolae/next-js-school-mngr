@@ -71,7 +71,7 @@ const ResultForm = ({
         <form className="flex flex-col gap-8" onSubmit={onSubmit}>
             <h1 className="text-cl font-semibold">{type === "create" ? "Create a new result" : "Update the result"}</h1>
 
-            <div className="flex justify-between flex-wrap gap-4">
+            <div className="flex flex-col gap-4">
                 <InputField
                     label="Score"
                     name="score"
@@ -93,7 +93,7 @@ const ResultForm = ({
                     />
                 )}
 
-                <div className="flex flex-col gap-2 w-full md:w-1/4">
+                <div className="flex flex-col gap-2 w-full">
                     <label className="text-xs text-gray-400">Student</label>
                     <select
                         className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
@@ -116,7 +116,7 @@ const ResultForm = ({
                     )}
                 </div>
 
-                <div className="flex flex-col gap-2 w-full md:w-1/4">
+                <div className="flex flex-col gap-2 w-full">
                     <label className="text-xs text-gray-400">Exam (Optional)</label>
                     <select
                         className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
@@ -139,7 +139,7 @@ const ResultForm = ({
                     )}
                 </div>
 
-                <div className="flex flex-col gap-2 w-full md:w-1/4">
+                <div className="flex flex-col gap-2 w-full">
                     <label className="text-xs text-gray-400">Assignment (Optional)</label>
                     <select
                         className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
@@ -172,7 +172,7 @@ const ResultForm = ({
                     {state.message || "Something went wrong!"}
                 </span>
             )}
-            <button className="bg-blue-500 text-white p-2 rounded-md">
+            <button className="bg-blue-500 text-white px-4 py-2 rounded-md mx-auto hover:bg-blue-600 transition">
                 {type === "create" ? "Create" : "Update"}
             </button>
         </form>

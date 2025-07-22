@@ -119,13 +119,13 @@ const FormModal = ({ table, type, data, id, relatedData }: FormContainerProps & 
     return <>
         <button
             className={`${size} flex items-center justify-center rounded-full ${bgColor}`}
-            onClick={() => setOpen(true)}
+            onClick={() => {setOpen(true); }}
         >
             <Image src={`/${type}.png`} alt="" width={16} height={16} />
         </button>
         {open && (
             <div className="w-screen h-screen absolute left-0 top-0 bg-black bg-opacity-60 z-50 flex items-center justify-center">
-                <div className="bg-white p-4 rounded-md relative w-[50%] md:w-[10%] lg:w-[10%] xl:w-[10%] 2xl:w-[30%]"> 
+                <div className="bg-white p-4 rounded-md relative w-[50%] md:w-[50%] lg:w-[50%] xl:w-[50%] 2xl:w-[30%] h-[80%] overflow-y-auto"> 
                 {/*<div className="bg-white p-4 rounded-md relative w-[90%] sm:w-[450px] max-w-full">*/}
 
                     <Form />

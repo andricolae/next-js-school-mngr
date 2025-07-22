@@ -25,7 +25,7 @@ const InputField = ({
 }: InputFieldProps) => {
     return (
         /*<div className={hidden ? "hidden" : "flex flex-col gap-2 w-full"}>*/
-        <div className={`${hidden ? "hidden" : "flex flex-col gap-2"} ${className}`}>
+        <div className={`${hidden ? "hidden" : "flex flex-col gap-2 pt-2"} ${className}`}>
             <label className="text-xs text-gray-400">{label}</label>
             <input 
                 type={type} 
