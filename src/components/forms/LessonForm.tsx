@@ -317,21 +317,14 @@ const LessonForm = ({
 
     return (
      <form
-  className="flex flex-col gap-4 max-w-sm mx-auto p-4 max-h-[90vh] overflow-auto border rounded-md bg-white"
+  className="flex flex-col gap-4  mx-auto p-4 max-h-[90vh] overflow-auto "
   onSubmit={onSubmit}
 >
-  <div className="flex justify-between items-center mb-4">
+  <div className="flex justify-center items-center mb-4">
     <h1 className="text-lg font-semibold">
       {type === "create" ? "Create a new lesson" : "Update the lesson"}
     </h1>
-    <button
-      type="button"
-      onClick={() => setOpen(false)}  // presupun că ai props setOpen pentru închidere
-      className="text-gray-500 hover:text-gray-700 font-bold text-xl leading-none"
-      aria-label="Close form"
-    >
-      &times;
-    </button>
+  
   </div>
 
   <InputField
