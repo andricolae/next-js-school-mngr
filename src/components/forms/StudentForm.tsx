@@ -63,13 +63,13 @@ const StudentForm = ({
   let openUploadWidget: () => void = () => {};
 
   return (
-    <form className="flex flex-col gap-3" onSubmit={onSubmit}>
+    <form className="flex flex-col gap-1" onSubmit={onSubmit}>
       <h1 className="text-cl font-semibold">
         {type === "create" ? "Create a new student" : "Update the student"}
       </h1>
 
       {/* --- Authentication Information --- */}
-      <span className="text-xs text-gray-400 font-medium mb-2 mt-4">
+      <span className="text-xs text-gray-400 font-medium mb-3 mt-5">
         Authentication Information
       </span>
 
@@ -128,7 +128,7 @@ const StudentForm = ({
       </div>
 
       {/* --- Personal Information --- */}
-      <span className="text-xs text-gray-400 font-medium mb-2 mt-4">
+      <span className="text-xs text-gray-400 font-medium mb-3 mt-5">
         Personal Information
       </span>
 
@@ -177,6 +177,7 @@ const StudentForm = ({
           }
           register={register}
           error={errors?.birthday}
+      
         />
         <div className="flex flex-col gap-2">
           <label className="text-xs text-gray-400 font-medium">Gender</label>
