@@ -165,24 +165,18 @@ const LessonForm = ({
         let currentDate = new Date(moduleStartDate);
         const lessonsToCreate = [];
 
-      
         while (currentDate.getTime() <= moduleEndDate.getTime()) {
             if (currentDate.getDay() === lessonDayOfWeek) {
                 if (!isHoliday(currentDate)) {
                     const lessonDate = new Date(currentDate);
-                    
-                    
                     lessonDate.setHours(baseStartTime.getHours());
                     lessonDate.setMinutes(baseStartTime.getMinutes());
                     lessonDate.setSeconds(0);
                     lessonDate.setMilliseconds(0);
                     const newLessonStartTime = new Date(lessonDate);
-
-                    
                     lessonDate.setHours(baseEndTime.getHours());
                     lessonDate.setMinutes(baseEndTime.getMinutes());
                     const newLessonEndTime = new Date(lessonDate);
-
                     const uniqueLessonName = `${lessonData.name} - ${newLessonStartTime.toLocaleDateString('ro-RO')}`;
 
                     lessonsToCreate.push({
@@ -321,7 +315,7 @@ const LessonForm = ({
                 {type === "create" ? "Create a new lesson" : "Update the lesson"}
             </h1>
             
-            <div className="flex justify-between flex-wrap gap-4">
+            <div className="flex justify-between flex-wrap gap-4" >
                 <InputField
                     label="Lesson Name"
                     name="name"
@@ -330,7 +324,7 @@ const LessonForm = ({
                     error={errors?.name}
                 />
 
-                <div className="flex flex-col gap-2 w-full md:w-1/4">
+                <div className="flex flex-col gap-2 w-full">
                     <label className="text-xs text-gray-400">Day</label>
                     <select
                         className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
@@ -391,7 +385,7 @@ const LessonForm = ({
                     />
                 )}
 
-                <div className="flex flex-col gap-2 w-full md:w-1/4">
+                <div className="flex flex-col gap-2 w-full">
                     <label className="text-xs text-gray-400">Subject</label>
                     <select
                         className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
@@ -416,7 +410,7 @@ const LessonForm = ({
                     )}
                 </div>
 
-                <div className="flex flex-col gap-2 w-full md:w-1/4">
+                <div className="flex flex-col gap-2 w-full">
                     <label className="text-xs text-gray-400">Class</label>
                     <select
                         className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
@@ -439,7 +433,7 @@ const LessonForm = ({
                     )}
                 </div>
 
-                <div className="flex flex-col gap-2 w-full md:w-1/4">
+                <div className="flex flex-col gap-2 w-full">
                     <label className="text-xs text-gray-400">
                         Teacher
                         {selectedSubjectId && (
@@ -542,7 +536,7 @@ const LessonForm = ({
             <button 
                 type="submit" 
                 disabled={isCreatingRecurring || checkingAvailability} 
-                className="bg-blue-500 text-white p-2 rounded-md disabled:bg-gray-400"
+                className="bg-blue-500 text-white p-2 rounded-md disabled:bg-gray-400 md:w-1/4 mx-auto"
             >
                 {isCreatingRecurring ? "Creating lessons..." : 
                  checkingAvailability ? "Checking availability..." : 

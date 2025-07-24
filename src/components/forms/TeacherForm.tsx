@@ -73,7 +73,7 @@ const TeacherForm = ({
         <form className="flex flex-col gap-8" onSubmit={onSubmit}>
             <h1 className="text-cl font-semibold">{type === "create" ? "Create a new teacher" : "Update the teacher"}</h1>
             <span className="text-xs text-gray-400 font-medium">Authentication Information</span>
-            <div className="flex justify-between flex-wrap gap-4">
+            <div className="flex justify-between gap-4">
                 <InputField
                     label="Username"
                     name="username"
@@ -128,6 +128,7 @@ const TeacherForm = ({
                     register={register}
                     error={errors?.address}
                 />
+                <div className="flex flex-col gap-2 w-full md:w-1/4">
                 <InputField
                     label="Blood Type"
                     name="bloodType"
@@ -135,6 +136,8 @@ const TeacherForm = ({
                     register={register}
                     error={errors?.bloodType}
                 />
+                </div>
+                <div className="flex flex-col gap-2 w-full md:w-1/4">
                 <InputField
                     label="Birthday"
                     name="birthday"
@@ -143,6 +146,7 @@ const TeacherForm = ({
                     register={register}
                     error={errors?.birthday}
                 />
+                </div>
                 {data && (
                     <InputField
                         label="Id"

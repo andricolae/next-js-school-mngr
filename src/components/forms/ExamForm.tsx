@@ -89,7 +89,7 @@ const ExamForm = ({
                         hidden
                     />
                 )}
-                <div className="flex flex-col gap-2 w-full md:w-1/4">
+                <div className="flex flex-col gap-2 w-full">
                     <label className="text-xs text-gray-400">Lesson</label>
                     <select
                         className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
@@ -112,7 +112,7 @@ const ExamForm = ({
                 </div>
             </div>
            {state.error && <span className="text-red-500">{state.error}</span>}
-            <button className="bg-blue-500 text-white p-2 rounded-md">{type === "create" ? "Create" : "Update"}</button>
+            <button className="bg-blue-500 text-white p-2 rounded-md md:w-1/4 mx-auto">{type === "create" ? "Create" : "Update"}</button>
         </form>
     )
 };

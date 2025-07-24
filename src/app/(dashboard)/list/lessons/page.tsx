@@ -10,7 +10,7 @@ import { Class, Lesson, Prisma, Subject, Teacher } from "@prisma/client"
 import Image from "next/image"
 import { TokenData } from "@/lib/utils";
 import LessonFilterForm from "@/components/forms/LessonFilterForm";
-import { availableModules, ModuleType } from "@/lib/modules"; 
+import { availableModules, ModuleType } from "@/lib/modules";
 
 type LessonList = Lesson & { subject: Subject } & { class: Class } & { teacher: Teacher }
 
@@ -96,12 +96,12 @@ const LessonListPage = async ({ searchParams }: { searchParams: { [key: string]:
 
  
     if (!hasSpecificFilters) {
-        const now = new Date();
+        /*const now = new Date();
         const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
         const startOfTomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0);
 
         queryConditions.push({ startTime: { gte: startOfToday } });
-        queryConditions.push({ startTime: { lt: startOfTomorrow } });
+        queryConditions.push({ startTime: { lt: startOfTomorrow } });*/
     }
    
     if (queryParams) {
