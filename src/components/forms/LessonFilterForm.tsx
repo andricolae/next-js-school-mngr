@@ -371,7 +371,7 @@ const LessonFilterForm: React.FC<LessonFilterFormProps> = ({
                                 Clear All Filters
                             </button>
                             <button
-                                className="filter-button-apply px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-opacity-50"
+                                className="filter-button-apply px-8 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-opacity-50"
                                 onClick={handleApplyFilters}
                             >
                                 Apply Filters ({activeFiltersCount})

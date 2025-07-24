@@ -33,8 +33,10 @@ const SubjectForm = ({
             id: data?.id,
             name: data?.name
         } : {}
+    
     });
 
+    
     const [state, formAction] = useFormState(type === "create"
         ? createSubject : updateSubject, { success: false, error: false })
 
@@ -60,8 +62,8 @@ const SubjectForm = ({
     const { teachers } = relatedData;
 
     return (
-      <form className="flex flex-col gap-8 max-w-md mx-auto" onSubmit={onSubmit}>
-            <h1 className="text-cl font-semibold text-center mb-6">
+      <form className="flex flex-col gap-8 mx-auto" onSubmit={onSubmit}>
+            <h1 className="text-cl font-semibold text-left mb-6">
                 {type === "create" ? "Create a new subject" : "Update the subject"}
             </h1>
 
