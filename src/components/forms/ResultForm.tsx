@@ -68,10 +68,14 @@ const ResultForm = ({
     const { students, exams, assignments } = relatedData;
 
     return (
-        <form className="flex flex-col gap-8" onSubmit={onSubmit}>
+        <form className="flex flex-col gap-6" onSubmit={onSubmit}>
             <h1 className="text-cl font-semibold">{type === "create" ? "Create a new result" : "Update the result"}</h1>
 
-            <div className="flex flex-col gap-4">
+            <div className="text-xs text-gray-500">
+                Note: Select either an exam OR an assignment, not both.
+            </div>
+
+            <div className="flex flex-col gap-2">
                 <InputField
                     label="Score"
                     name="score"
@@ -161,10 +165,6 @@ const ResultForm = ({
                         </p>
                     )}
                 </div>
-            </div>
-
-            <div className="text-xs text-gray-500">
-                Note: Select either an exam OR an assignment, not both.
             </div>
 
           {state.error && (
