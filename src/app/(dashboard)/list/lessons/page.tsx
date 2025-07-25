@@ -102,7 +102,7 @@ const LessonListPage = async ({ searchParams }: { searchParams: { [key: string]:
 
         queryConditions.push({ startTime: { gte: startOfToday } });
         queryConditions.push({ startTime: { lt: startOfTomorrow } });
-    }
+    } 
    
     if (queryParams) {
         for (const [key, value] of Object.entries(queryParams)) {

@@ -127,10 +127,18 @@ export const assignmentSchema = z.object({
     title: z
         .string()
         .min(1, { message: 'Subject name is required' }),
-    startDate: z.coerce.date({ message: "Start date is required!" }),
+    startDate: z.coerce.date({ message: "Start date is required!" }).min(new Date(new Date().toDateString()), { message: "Start date cannot be in the past!" }),
     dueDate: z.coerce.date({ message: "Due date is required!" }),
     lessonId: z.coerce.number({ message: "Lesson is required!" }),
-});
+})
+
+.refine(
+  data => data.dueDate >= data.startDate,
+  {
+    message: "Due date must be after or equal to start date!",
+    path: ["dueDate"]
+  }
+);
 
 export type AssignmentSchema = z.infer<typeof assignmentSchema>;
 
@@ -151,7 +159,29 @@ export const eventSchema = z.object({
     startTime: z.coerce.date({ message: "Start time is required" }),
     endTime: z.coerce.date({ message: "End time is required" }),
     classId: z.coerce.number().optional(),
-});
+})
+
+.refine(
+  data => data.startTime >= new Date(), 
+  {
+    message: "Start time cannot be in the past!",
+    path: ["startTime"],
+  })
+
+.refine(
+  data => data.endTime > data.startTime, 
+  {
+    message: "Event must be at least 15 minutes long!",
+    path: ["endTime"],
+  })
+
+.refine(
+  data => (data.endTime.getTime() - data.startTime.getTime()) >= 15 * 60 * 1000,
+  {
+    message: "Event must be at least 15 minutes long!",
+    path: ["endTime"],
+  }
+);
 
 export type EventSchema = z.infer<typeof eventSchema>;
 
@@ -159,7 +189,7 @@ export const announcementSchema = z.object({
     id: z.coerce.number().optional(),
     title: z.string().min(1, { message: "Announcement title is required" }),
     description: z.string().min(1, { message: "Description is required" }),
-    date: z.coerce.date({ message: "Date is required" }),
+    date: z.coerce.date({ message: "Date is required" }).min(new Date(new Date().toDateString()), { message: "Start date cannot be in the past!" }),
     classId: z.coerce.number().optional(),
 });
 

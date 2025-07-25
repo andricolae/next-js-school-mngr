@@ -9,13 +9,23 @@ type InputFieldProps = {
     error?: FieldError;
     inputProps?: React.InputHTMLAttributes<HTMLInputElement>;
     hidden?: boolean;
+    className?: string;
 }
 
 const InputField = ({
-    label, type = "text", register, name, defaultValue, error, inputProps, hidden }: InputFieldProps
-) => {
+    label,
+    type = "text",
+    register,
+    name,
+    defaultValue,
+    error,
+    inputProps,
+    hidden,
+    className = ""
+}: InputFieldProps) => {
     return (
-        <div className={hidden ? "hidden" : "flex flex-col gap-2 w-full md:w-1/4"}>
+        /*<div className={hidden ? "hidden" : "flex flex-col gap-2 w-full"}>*/
+        <div className={`${hidden ? "hidden" : "flex flex-col gap-2 pt-2"} ${className}`}>
             <label className="text-xs text-gray-400">{label}</label>
             <input 
                 type={type} 
@@ -24,9 +34,11 @@ const InputField = ({
                 {...inputProps}
                 defaultValue={defaultValue}
             />
-            {error?.message && <p className="text-xs text-red-400">{error.message.toString()}</p>}
+            {error?.message && (
+                <p className="text-xs text-red-400">{error.message.toString()}</p>
+            )}
         </div>
     );
 }
 
-export default InputField
+export default InputField;
