@@ -62,7 +62,7 @@ const AssignmentForm = ({
     return (
         <form className="flex flex-col gap-8" onSubmit={onSubmit}>
             <h1 className="text-cl font-semibold">{type === "create" ? "Create a new assignment" : "Update the assignment"}</h1>
-            <div className="flex justify-between flex-wrap gap-4">
+            <div className="flex-col gap-4">
                 <InputField
                     label="Assignment Title"
                     name="title"
