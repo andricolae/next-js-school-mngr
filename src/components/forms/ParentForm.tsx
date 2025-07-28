@@ -53,21 +53,22 @@ const ParentForm = ({
     }, [state, router, type, setOpen]);
 
     return (
-        <form className="flex flex-col gap-8 mx-auto" onSubmit={onSubmit}>
-            <h1 className="text-cl font-semibold">
+  <form className="flex flex-col gap-8 mx-auto " onSubmit={onSubmit}>
+
+            <h1 className="text-xl font-semibold">
                 {type === "create" ? "Create a new parent" : "Update the parent"}
             </h1>
 
-            {/* Titlurile coloanelor pe o linie */}
+        
             <div className="flex gap-8">
                 <span className="text-xs text-gray-400 font-medium flex-1">Authentication Information</span>
                 <span className="text-xs text-gray-400 font-medium flex-1">Personal Information</span>
             </div>
 
-            {/* Coloanele cu inputuri */}
+          
             <div className="flex gap-8">
                 {/* Coloana 1 */}
-                <div className="flex flex-col gap-4 flex-1">
+                <div className="flex flex-col gap-2 flex-1">
                     <InputField
                         label="Username"
                         name="username"
@@ -94,7 +95,7 @@ const ParentForm = ({
                 </div>
 
                 {/* Coloana 2 */}
-                <div className="flex flex-col gap-4 flex-1">
+                <div className="flex flex-col gap-2 flex-1">
                     <InputField
                         label="First Name"
                         name="name"
@@ -119,7 +120,7 @@ const ParentForm = ({
                 </div>
             </div>
 
-            {/* Address separat */}
+ 
             <InputField
                 label="Address"
                 name="address"
@@ -138,7 +139,7 @@ const ParentForm = ({
                 </span>
             )}
 
-         <div className="flex justify-center mt-6">
+         <div className="flex justify-center mt-2">
         <button className="bg-blue-500 text-white px-8 py-2 rounded-md text-sm w-max">
           {type === "create" ? "Create" : "Update"}
         </button>

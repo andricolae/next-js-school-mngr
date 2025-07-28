@@ -59,10 +59,11 @@ const AttendanceForm = ({
     const { students, lessons } = relatedData || {};
 
     return (
-        <form className="flex flex-col gap-8" onSubmit={onSubmit}>
+        
+        <form className="flex flex-col gap-14" onSubmit={onSubmit}>
             <h1 className="text-cl font-semibold">{type === "create" ? "Create attendance record" : "Update attendance record"}</h1>
 
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-6 w-full">
                 <InputField
                     label="Date"
                     name="date"
@@ -152,9 +153,14 @@ const AttendanceForm = ({
                     {state.message || "Something went wrong!"}
                 </span>
             )}
-            <button className="bg-blue-500 text-white px-4 py-2 rounded-md mx-auto hover:bg-blue-600 transition">
-                {type === "create" ? "Create" : "Update"}
-            </button>
+             <div className="flex justify-center mt-6">
+    <button
+      type="submit"
+      className="bg-blue-500 text-white px-8 py-2 rounded-md text-sm w-max"
+    >
+      {type === "create" ? "Create" : "Update"}
+    </button>
+  </div>
         </form>
     )
 };

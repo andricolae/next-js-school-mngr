@@ -54,7 +54,7 @@ const ExamForm = ({
 
     return (
       <form className="flex flex-col gap-8 mx-auto" onSubmit={onSubmit}>
-  <h1 className="text-xl font-semibold text-center mb-6">
+  <h1 className="text-xl font-semibold ">
     {type === "create" ? "Create a new exam" : "Update the exam"}
   </h1>
 
