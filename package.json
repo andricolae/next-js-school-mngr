@@ -15,6 +15,7 @@
     "@clerk/shared": "^3.10.0",
     "@hookform/resolvers": "^5.0.1",
     "@prisma/client": "^6.7.0",
+    "@supabase/supabase-js": "^2.51.0",
     "@types/react-big-calendar": "^1.16.1",
     "clsx": "^2.1.1",
     "jspdf": "^3.0.1",
