@@ -122,7 +122,7 @@ export const createTeacher = async (currentState: CurrentState, data: TeacherSch
 			password: data.password,
 			firstName: data.name,
 			lastName: data.surname,
-			publicMetadata: { role: "teacher" },
+			publicMetadata: { role: "teacher", name: `${data.name} ${data.surname}` }
 		})
 		await prisma.teacher.create({
 			data: {

@@ -207,6 +207,7 @@ const TeacherForm = ({
 <div className="flex flex-col gap-2 w-full">
   <label className="text-xs text-gray-400">Subject</label>
   <select
+  multiple
     className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
     {...register("subjects")}
     defaultValue={data?.subjects?.[0]?.id.toString() || ""}
