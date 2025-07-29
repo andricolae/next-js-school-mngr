@@ -13,7 +13,6 @@ import { TokenData } from "@/lib/utils";
 import DownloadButton from "@/components/DownloadButton";
 import AverageCalculator from "@/components/AverageCalculator";
 import { useEffect } from "react";
-import COMPONENTA from "@/components/COMPONENTA";
 
 type ResultList = {
     id: number;
