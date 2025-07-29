@@ -64,7 +64,7 @@ const StudentForm = ({
 
   return (
     <form className="flex flex-col gap-1" onSubmit={onSubmit}>
-      <h1 className="text-cl font-semibold">
+      <h1 className="text-xl font-semibold">
         {type === "create" ? "Create a new student" : "Update the student"}
       </h1>
 
