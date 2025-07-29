@@ -148,9 +148,11 @@ const EventForm = ({
                     {state.message || "Something went wrong!"}
                 </span>
             )}
-            <button className="bg-blue-500 text-white px-4 py-2 rounded-md mx-auto hover:bg-blue-600 transition">
-                {type === "create" ? "Create" : "Update"}
-            </button>
+            <div className="flex justify-center mt-6">
+        <button className="bg-blue-500 text-white px-8 py-2 rounded-md text-sm w-max">
+          {type === "create" ? "Create" : "Update"}
+        </button>
+      </div>
         </form>
     )
 };
