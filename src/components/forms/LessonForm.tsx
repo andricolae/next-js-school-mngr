@@ -316,107 +316,143 @@ const LessonForm = ({
     const filteredTeachers = getFilteredTeachers();
 
     return (
-        <form className="flex flex-col gap-8" onSubmit={onSubmit}>
-            <h1 className="text-xl font-semibold">
-                {type === "create" ? "Create a new lesson" : "Update the lesson"}
-            </h1>
-            
-            <div className="flex justify-between flex-wrap gap-4">
-                <InputField
-                    label="Lesson Name"
-                    name="name"
-                    defaultValue={data?.name}
-                    register={register}
-                    error={errors?.name}
-                />
+      <form className="flex flex-col gap-8 mx-auto" onSubmit={handleSubmit(async () => {
+        onSubmit
+      })}>
+  <h1 className="text-xl font-semibold">
+    {type === "create" ? "Create a new lesson" : "Update the lesson"}
+  </h1>
 
-                <div className="flex flex-col gap-2 w-full md:w-1/4">
-                    <label className="text-xs text-gray-400">Day</label>
-                    <select
-                        className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
-                        defaultValue={data?.day || ""}
-                        {...register("day")}
-                    >
-                        <option value="">Select day</option>
-                        <option value="MONDAY">Monday</option>
-                        <option value="TUESDAY">Tuesday</option>
-                        <option value="WEDNESDAY">Wednesday</option>
-                        <option value="THURSDAY">Thursday</option>
-                        <option value="FRIDAY">Friday</option>
-                    </select>
-                    {errors.day?.message && (
-                        <p className="text-xs text-red-400">
-                            {errors.day.message.toString()}
-                        </p>
-                    )}
-                </div>
+  <div className="grid grid-cols-2 gap-4 mt-6">
+    {/* Lesson Name */}
+    <InputField
+      label="Lesson Name"
+      name="name"
+      defaultValue={data?.name}
+      register={register}
+      error={errors?.name}
+    />
 
-                <InputField
-                    label="Start Time"
-                    name="startTime"
-                    defaultValue={
-                        data?.startTime
-                            ? isRecurring
-                                ? new Date(data.startTime).toISOString().slice(11, 16) 
-                                : new Date(data.startTime).toISOString().slice(0, 16) 
-                            : undefined
-                    }
-                    register={register}
-                    error={errors?.startTime}
-                    type={isRecurring ? "time" : "datetime-local"}
-                />
+    {/* Start Time */}
+    <InputField
+      label="Start Time"
+      name="startTime"
+      defaultValue={
+        data?.startTime
+          ? isRecurring
+            ? new Date(data.startTime).toISOString().slice(11, 16)
+            : new Date(data.startTime).toISOString().slice(0, 16)
+          : undefined
+      }
+      register={register}
+      error={errors?.startTime}
+      type={isRecurring ? "time" : "datetime-local"}
+    />
 
-               <InputField
-                    label="End Time"
-                    name="endTime"
-                    defaultValue={
-                        data?.endTime 
-                            ? isRecurring
-                                ? new Date(data.endTime).toISOString().slice(11, 16) 
-                                : new Date(data.endTime).toISOString().slice(0, 16) 
-                            : undefined
-                    }
-                    register={register}
-                    error={errors?.endTime} 
-                    type={isRecurring ? "time" : "datetime-local"}
-                />
-                {data && (
-                    <InputField
-                        label="Id"
-                        name="id"
-                        defaultValue={data?.id}
-                        register={register}
-                        error={errors?.id}
-                        hidden
-                    />
-                )}
+    {/* Day */}
+    <div className="flex flex-col gap-2">
+      <label className="text-xs text-gray-400 font-medium">Day</label>
+      <select
+        className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm"
+        defaultValue={data?.day || ""}
+        {...register("day")}
+      >
+        <option value="">Select day</option>
+        <option value="MONDAY">Monday</option>
+        <option value="TUESDAY">Tuesday</option>
+        <option value="WEDNESDAY">Wednesday</option>
+        <option value="THURSDAY">Thursday</option>
+        <option value="FRIDAY">Friday</option>
+      </select>
+      {errors.day?.message && (
+        <p className="text-xs text-red-400">{errors.day.message.toString()}</p>
+      )}
+    </div>
 
-                <div className="flex flex-col gap-2 w-full md:w-1/4">
-                    <label className="text-xs text-gray-400">Subject</label>
-                    <select
-                        className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
-                        value={selectedSubjectId}
-                        {...register("subjectId", {
-                            onChange: handleSubjectChange
-                        })}
-                    >
-                        <option value="">Select subject</option>
-                        {subjects?.map(
-                            (subject: { id: number; name: string }) => (
-                                <option value={subject.id} key={subject.id}>
-                                    {subject.name}
-                                </option>
-                            )
-                        )}
-                    </select>
-                    {errors.subjectId?.message && (
-                        <p className="text-xs text-red-400">
-                            {errors.subjectId.message.toString()}
-                        </p>
-                    )}
-                </div>
+    {/* End Time */}
+    <InputField
+      label="End Time"
+      name="endTime"
+      defaultValue={
+        data?.endTime
+          ? isRecurring
+            ? new Date(data.endTime).toISOString().slice(11, 16)
+            : new Date(data.endTime).toISOString().slice(0, 16)
+          : undefined
+      }
+      register={register}
+      error={errors?.endTime}
+      type={isRecurring ? "time" : "datetime-local"}
+        className="mt-[-10px]"
+    />
 
-                <div className="flex flex-col gap-2 w-full md:w-1/4">
+    {/* Teacher */}
+    <div className="flex flex-col gap-2">
+      <label className="text-xs text-gray-400 font-medium">
+        Teacher
+        {selectedSubjectId && (
+          <span className="text-blue-500 ml-1">(Filtered by subject)</span>
+        )}
+      </label>
+      <select
+        className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm"
+        value={selectedTeacherId}
+        {...register("teacherId", {
+          onChange: (e) => setSelectedTeacherId(e.target.value),
+        })}
+      >
+        <option value="">
+          {selectedSubjectId
+            ? "Select teacher for this subject"
+            : "Select subject first"}
+        </option>
+        {filteredTeachers?.map((teacher) => (
+          <option value={teacher.id} key={teacher.id}>
+            {teacher.name} {teacher.surname}
+          </option>
+        ))}
+      </select>
+      {checkingAvailability && (
+        <p className="text-xs text-blue-500">Checking teacher availability...</p>
+      )}
+      {errors.teacherId?.message && (
+        <p className="text-xs text-red-400">
+          {errors.teacherId.message.toString()}
+        </p>
+      )}
+      {selectedSubjectId && filteredTeachers?.length === 0 && (
+        <p className="text-xs text-orange-500">
+          This subject has no available teachers.
+        </p>
+      )}
+    </div>
+
+    {/* Subject */}
+    <div className="flex flex-col gap-2">
+      <label className="text-xs text-gray-400 font-medium">Subject</label>
+      <select
+        className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm"
+        value={selectedSubjectId}
+        {...register("subjectId", {
+          onChange: handleSubjectChange,
+        })}
+      >
+        <option value="">Select subject</option>
+        {subjects?.map((subject) => (
+          <option value={subject.id} key={subject.id}>
+            {subject.name}
+          </option>
+        ))}
+      </select>
+      {errors.subjectId?.message && (
+        <p className="text-xs text-red-400">
+          {errors.subjectId.message.toString()}
+        </p>
+      )}
+    </div>
+  </div>
+<div className="grid grid-cols-2 gap-4">
+   <div className="flex flex-col gap-2 w-full ">
                     <label className="text-xs text-gray-400">Class</label>
                     <select
                         className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
@@ -438,58 +474,11 @@ const LessonForm = ({
                         </p>
                     )}
                 </div>
+                 {type === "create" && (
+               <div className=" mt-1 flex flex-col gap-4 p-4 border rounded-md bg-gray-50 w-full h-full">
+  
 
-                <div className="flex flex-col gap-2 w-full md:w-1/4">
-                    <label className="text-xs text-gray-400">
-                        Teacher
-                        {selectedSubjectId && (
-                            <span className="text-blue-500 ml-1">
-                                (Filtered by subject)
-                            </span>
-                        )}
-                    </label>
-                    <select
-                        className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
-                        value={selectedTeacherId}
-                        {...register("teacherId", {
-                            onChange: (e) => setSelectedTeacherId(e.target.value)
-                        })}
-                    >
-                        <option value="">
-                            {selectedSubjectId 
-                                ? "Select teacher for this subject" 
-                                : "Select subject first"
-                            }
-                        </option>
-                        {filteredTeachers?.map(
-                            (teacher: { id: string; name: string; surname: string }) => (
-                                <option value={teacher.id} key={teacher.id}>
-                                    {teacher.name} {teacher.surname}
-                                </option>
-                            )
-                        )}
-                    </select>
-                  
-                    {checkingAvailability && (
-                        <p className="text-xs text-blue-500">
-                            Checking teacher availability...
-                        </p>
-                    )}
-                    {errors.teacherId?.message && (
-                        <p className="text-xs text-red-400">
-                            {errors.teacherId.message.toString()}
-                        </p>
-                    )}
-                    {selectedSubjectId && filteredTeachers?.length === 0 && (
-                        <p className="text-xs text-orange-500">
-                            This subject has no available teachers.
-                        </p>
-                    )}
-                </div>
-            </div>
 
-            {type === "create" && (
-                <div className="flex flex-col gap-4 p-4 border rounded-md bg-gray-50">
                     <div className="flex items-center gap-2">
                         <input
                             type="checkbox"
@@ -538,19 +527,14 @@ const LessonForm = ({
                     {state.message || "Something went wrong!"}
                 </span>
             )}
-            
-            <button 
-                type="submit" 
-                disabled={isCreatingRecurring || checkingAvailability} 
-                className="bg-blue-500 text-white p-2 rounded-md disabled:bg-gray-400"
-            >
-                {isCreatingRecurring ? "Creating lessons..." : 
-                 checkingAvailability ? "Checking availability..." : 
-                 type === "create" ? 
-                 (isRecurring ? "Create recurring lessons" : "Create") : 
-                 "Update"}
-            </button>
-        </form>
+            </div>
+  <div className="flex justify-center mt-6">
+    <button className="bg-blue-500 text-white px-8 py-2 rounded-md text-sm w-max">
+      {type === "create" ? "Create" : "Update"}
+    </button>
+  </div>
+</form>
+
     );
 };
 

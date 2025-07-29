@@ -33,8 +33,10 @@ const SubjectForm = ({
             id: data?.id,
             name: data?.name
         } : {}
+    
     });
 
+    
     const [state, formAction] = useFormState(type === "create"
         ? createSubject : updateSubject, { success: false, error: false })
 
@@ -60,9 +62,12 @@ const SubjectForm = ({
     const { teachers } = relatedData;
 
     return (
-        <form className="flex flex-col gap-8" onSubmit={onSubmit}>
-            <h1 className="text-cl font-semibold">{type === "create" ? "Create a new subject" : "Update the subject"}</h1>
-            <div className="flex justify-between flex-wrap gap-4">
+      <form className="flex flex-col gap-8 mx-auto" onSubmit={onSubmit}>
+            <h1 className="text-xl font-semibold text-left mb-6">
+                {type === "create" ? "Create a new subject" : "Update the subject"}
+            </h1>
+
+            <div className="flex flex-col gap-6 w-full">
                 <InputField
                     label="Subject Name"
                     name="name"
@@ -72,44 +77,51 @@ const SubjectForm = ({
                 />
                 {data && (
                     <InputField
-                    label="Id"
-                    name="id"
-                    defaultValue={data?.id}
-                    register={register}
-                    error={errors?.id}
-                    hidden
+                        label="Id"
+                        name="id"
+                        defaultValue={data?.id}
+                        register={register}
+                        error={errors?.id}
+                        hidden
                     />
                 )}
-                <div className="flex flex-col gap-2 w-full md:w-1/4">
+
+                {/* Teachers multi-select */}
+                <div className="flex flex-col gap-1 w-full">
                     <label className="text-xs text-gray-400">Teachers</label>
                     <select
                         multiple
-                        className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
+                        className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full h-60"
                         {...register("teachers")}
-                        defaultValue={data?.teachers}
+                        defaultValue={data?.teachers || []}
                     >
-                        {teachers.map(
-                            (teacher: { id: string; name: string, surname: string }) => (
-                                <option value={teacher.id} key={teacher.id}>
-                                    {teacher.name + " " + teacher.surname}
+                        {teachers?.map(
+                            (teacher: { id: string; name: string; surname: string }) => (
+                                <option key={teacher.id} value={teacher.id}>
+                                    {teacher.name} {teacher.surname}
                                 </option>
                             )
                         )}
                     </select>
-                    {errors.teachers?.message &&
-                        <p className="text-xs text-red-400">
-                            {errors.teachers.message.toString()}
-                        </p>
-                    }
+                    {errors.teachers?.message && (
+                        <p className="text-xs text-red-400">{errors.teachers.message.toString()}</p>
+                    )}
                 </div>
             </div>
-          {state.error && (
-                <span className="text-red-500">
+
+            {state.error && (
+                <span className="text-red-500 text-center">
                     {state.message || "Something went wrong!"}
                 </span>
             )}
-            <button className="bg-blue-500 text-white p-2 rounded-md">{type === "create" ? "Create" : "Update"}</button>
+
+            <div className="flex justify-center mt-6">
+                <button className="bg-blue-500 text-white px-8 py-2 rounded-md text-sm w-max">
+                    {type === "create" ? "Create" : "Update"}
+                </button>
+            </div>
         </form>
+
     )
 };
 

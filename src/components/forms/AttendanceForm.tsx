@@ -59,10 +59,11 @@ const AttendanceForm = ({
     const { students, lessons } = relatedData || {};
 
     return (
-        <form className="flex flex-col gap-8" onSubmit={onSubmit}>
+        
+        <form className="flex flex-col gap-14" onSubmit={onSubmit}>
             <h1 className="text-cl font-semibold">{type === "create" ? "Create attendance record" : "Update attendance record"}</h1>
 
-            <div className="flex justify-between flex-wrap gap-4">
+            <div className="flex flex-col gap-6 w-full">
                 <InputField
                     label="Date"
                     name="date"
@@ -72,7 +73,7 @@ const AttendanceForm = ({
                     error={errors?.date}
                 />
 
-                <div className="flex flex-col gap-2 w-full md:w-1/4">
+                <div className="flex flex-col gap-2 w-full">
                     <label className="text-xs text-gray-400">Status</label>
                     <select
                         className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
@@ -100,7 +101,7 @@ const AttendanceForm = ({
                     />
                 )}
 
-                <div className="flex flex-col gap-2 w-full md:w-1/4">
+                <div className="flex flex-col gap-2 w-full">
                     <label className="text-xs text-gray-400">Student</label>
                     <select
                         className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
@@ -123,7 +124,7 @@ const AttendanceForm = ({
                     )}
                 </div>
 
-                <div className="flex flex-col gap-2 w-full md:w-1/4">
+                <div className="flex flex-col gap-2 w-full">
                     <label className="text-xs text-gray-400">Lesson</label>
                     <select
                         className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
@@ -152,9 +153,14 @@ const AttendanceForm = ({
                     {state.message || "Something went wrong!"}
                 </span>
             )}
-            <button className="bg-blue-500 text-white p-2 rounded-md">
-                {type === "create" ? "Create" : "Update"}
-            </button>
+             <div className="flex justify-center mt-6">
+    <button
+      type="submit"
+      className="bg-blue-500 text-white px-8 py-2 rounded-md text-sm w-max"
+    >
+      {type === "create" ? "Create" : "Update"}
+    </button>
+  </div>
         </form>
     )
 };

@@ -29,101 +29,105 @@ const ParentForm = ({
         resolver: zodResolver(parentSchema),
     });
 
-    const [state, formAction] = useFormState(type === "create"
-        ? createParent : updateParent, { success: false, error: false })
+    const [state, formAction] = useFormState(
+        type === "create" ? createParent : updateParent,
+        { success: false, error: false }
+    );
 
     const onSubmit = handleSubmit(data => {
         formAction(data);
-    })
+    });
 
     const router = useRouter();
 
-   useEffect(() => {
-        console.log("🔄 useEffect - state changed:", state);
+    useEffect(() => {
         if (state.success) {
-            
             toast(`Parent has been ${type === "create" ? "created" : "updated"} successfully!`);
             setOpen(false);
             router.refresh();
         }
         if (state.error) {
             const errorMessage = state.message || "Something went wrong!";
+            console.error(errorMessage);
         }
     }, [state, router, type, setOpen]);
 
-
     return (
-        <form className="flex flex-col gap-8" onSubmit={onSubmit}>
-            <h1 className="text-cl font-semibold">{type === "create" ? "Create a new parent" : "Update the parent"}</h1>
-            
-            <span className="text-xs text-gray-400 font-medium">Authentication Information</span>
-            <div className="flex justify-between flex-wrap gap-4">
-                <InputField
-                    label="Username"
-                    name="username"
-                    defaultValue={data?.username}
-                    register={register}
-                    error={errors?.username}
-                />
-                <InputField
-                    label="Email"
-                    name="email"
-                    type="email"
-                    defaultValue={data?.email}
-                    register={register}
-                    error={errors?.email}
-                />
-                <InputField
-                    label="Password"
-                    name="password"
-                    type="password"
-                    defaultValue={data?.password}
-                    register={register}
-                    error={errors?.password}
-                />
+  <form className="flex flex-col gap-8 mx-auto " onSubmit={onSubmit}>
+
+            <h1 className="text-xl font-semibold">
+                {type === "create" ? "Create a new parent" : "Update the parent"}
+            </h1>
+
+        
+            <div className="flex gap-8">
+                <span className="text-xs text-gray-400 font-medium flex-1">Authentication Information</span>
+                <span className="text-xs text-gray-400 font-medium flex-1">Personal Information</span>
             </div>
 
-            <span className="text-xs text-gray-400 font-medium">Personal Information</span>
-            <div className="flex justify-between flex-wrap gap-4">
-                <InputField
-                    label="First Name"
-                    name="name"
-                    defaultValue={data?.name}
-                    register={register}
-                    error={errors?.name}
-                />
-                <InputField
-                    label="Last Name"
-                    name="surname"
-                    defaultValue={data?.surname}
-                    register={register}
-                    error={errors?.surname}
-                />
-                <InputField
-                    label="Phone"
-                    name="phone"
-                    defaultValue={data?.phone}
-                    register={register}
-                    error={errors?.phone}
-                />
-                <InputField
-                    label="Address"
-                    name="address"
-                    defaultValue={data?.address}
-                    register={register}
-                    error={errors?.address}
-                />
-                {data && (
+          
+            <div className="flex gap-8">
+                {/* Coloana 1 */}
+                <div className="flex flex-col gap-2 flex-1">
                     <InputField
-                        label="Id"
-                        name="id"
-                        defaultValue={data?.id}
+                        label="Username"
+                        name="username"
+                        defaultValue={data?.username}
                         register={register}
-                        error={errors?.id}
-                        hidden
+                        error={errors?.username}
                     />
-                )}
+                    <InputField
+                        label="Email"
+                        name="email"
+                        type="email"
+                        defaultValue={data?.email}
+                        register={register}
+                        error={errors?.email}
+                    />
+                    <InputField
+                        label="Password"
+                        name="password"
+                        type="password"
+                        defaultValue={data?.password}
+                        register={register}
+                        error={errors?.password}
+                    />
+                </div>
+
+                {/* Coloana 2 */}
+                <div className="flex flex-col gap-2 flex-1">
+                    <InputField
+                        label="First Name"
+                        name="name"
+                        defaultValue={data?.name}
+                        register={register}
+                        error={errors?.name}
+                    />
+                    <InputField
+                        label="Last Name"
+                        name="surname"
+                        defaultValue={data?.surname}
+                        register={register}
+                        error={errors?.surname}
+                    />
+                    <InputField
+                        label="Phone"
+                        name="phone"
+                        defaultValue={data?.phone}
+                        register={register}
+                        error={errors?.phone}
+                    />
+                </div>
             </div>
+
+ 
+            <InputField
+                label="Address"
+                name="address"
+                defaultValue={data?.address}
+                register={register}
+                error={errors?.address}
+            />
 
             <div className="text-xs text-gray-500">
                 Note: Student assignments are managed through the student creation/update forms.
@@ -134,12 +138,14 @@ const ParentForm = ({
                     {state.message || "Something went wrong!"}
                 </span>
             )}
-            
-            <button className="bg-blue-500 text-white p-2 rounded-md">
-                {type === "create" ? "Create" : "Update"}
-            </button>
+
+         <div className="flex justify-center mt-2">
+        <button className="bg-blue-500 text-white px-8 py-2 rounded-md text-sm w-max">
+          {type === "create" ? "Create" : "Update"}
+        </button>
+      </div>
         </form>
-    )
+    );
 };
 
-export default ParentForm
+export default ParentForm;
