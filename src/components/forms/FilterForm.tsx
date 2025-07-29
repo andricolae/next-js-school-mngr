@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 
-export interface FilterOption {
+interface FilterOption {
     id: string;
     name: string;
 }
@@ -46,7 +46,7 @@ interface MultiSelectProps {
     onSelectionChange: (ids: string[]) => void;
 }
 
-export const MultiSelect: React.FC<MultiSelectProps> = ({
+const MultiSelect: React.FC<MultiSelectProps> = ({
     id,
     label,
     options,
@@ -140,7 +140,7 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
                                 onClick={() => handleRemoveSelected(option.id)}
                                 className="ml-1 inline-flex items-center justify-center w-4 h-4 rounded-full hover:bg-blue-200"
                             >
-                                x
+                                
                             </button>
                         </span>
                     ))}
@@ -197,7 +197,7 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
                     className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg"
                 >
                     <div className="px-3 py-2 text-gray-500">
-                        No results found for "{searchText}"
+                        No results found for &quot;{searchText}&quot;
                     </div>
                 </div>
             )}
