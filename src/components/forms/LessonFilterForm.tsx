@@ -311,7 +311,7 @@ const LessonFilterForm: React.FC<LessonFilterFormProps> = ({
                             You can select multiple options for each filter. Filters will be applied cumulatively.
                         </p>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                        <div className="flex flex-col gap-4 mb-6">
                             <MultiSelect
                                 id="subjects"
                                 label="Subjects"
@@ -361,7 +361,7 @@ const LessonFilterForm: React.FC<LessonFilterFormProps> = ({
                             {/* END NOU: Filtru pentru Modul */}
                         </div>
 
-                        <div className="filter-modal-footer flex justify-end gap-2 pt-4 border-t mt-4">
+                        <div className="filter-modal-footer flex justify-center gap-4 pt-4 border-t mt-4">
                             <button
                                 className="filter-button-clear px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50"
                                 onClick={handleClearFilters}
@@ -369,7 +369,7 @@ const LessonFilterForm: React.FC<LessonFilterFormProps> = ({
                                 Clear All Filters
                             </button>
                             <button
-                                className="filter-button-apply px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-opacity-50"
+                                className="filter-button-apply px-8 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-opacity-50"
                                 onClick={handleApplyFilters}
                             >
                                 Apply Filters ({activeFiltersCount})
