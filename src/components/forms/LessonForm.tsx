@@ -221,13 +221,15 @@ const LessonForm = ({
 			<div className="h-fit w-full">
 				<div className="w-full flex">
 					<div className="flex flex-col flex-1 mx-1 mt-7">
-						<InputField
-							label="Lesson Name"
-							name="name"
-							defaultValue={data?.name}
-							register={register}
-							error={errors?.name}
-						/>
+						<div className="mt-1">
+							<InputField
+								label="Lesson Name"
+								name="name"
+								defaultValue={data?.name}
+								register={register}
+								error={errors?.name}
+							/>
+						</div>
 
 						<div className="flex flex-col gap-2 w-full mt-4">
 							<label className="text-xs text-gray-400">Day</label>
@@ -250,7 +252,7 @@ const LessonForm = ({
 							)}
 						</div>
 
-						<div className="flex flex-col gap-2 w-full mt-4">
+						<div className="flex flex-col gap-2 w-full mt-3">
 							<label className="text-xs text-gray-400">Teacher</label>
 							<select
 								className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
