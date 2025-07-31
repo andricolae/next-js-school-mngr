@@ -50,8 +50,11 @@ const TeacherForm = ({
     const [state, formAction] = useFormState(type === "create"
         ? createTeacher : updateTeacher, { success: false, error: false })
 
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
     const onSubmit = handleSubmit(data => {
         formAction({ ...data, img: img?.secure_url });
+        setIsSubmitting(true);
     })
 
     const router = useRouter();
@@ -64,6 +67,7 @@ const TeacherForm = ({
         }
         if (state.error) {
             const errorMessage = state.message || "Something went wrong!";
+            setIsSubmitting(false);
         }
     }, [state, router, type, setOpen]);
 
@@ -233,7 +237,10 @@ const TeacherForm = ({
                 </span>
             )}
          <div className="flex justify-center mt-2">
-        <button className="bg-blue-500 text-white px-8 py-2 rounded-md text-sm w-max">
+        <button
+        className={`bg-blue-500 text-white px-4 py-2 rounded-md mx-auto hover:bg-blue-600 transition ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
+        disabled={isSubmitting}
+        >
           {type === "create" ? "Create" : "Update"}
         </button>
       </div>

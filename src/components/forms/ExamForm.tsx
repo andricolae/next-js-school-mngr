@@ -1,13 +1,13 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { set, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import InputField from "../InputField";
 import Image from "next/image";
-import { examSchema, ExamSchema, subjectSchema, SubjectSchema } from "@/lib/formValidationSchemas";
-import { createExam, createSubject, updateExam, updateSubject } from "@/lib/actions";
+import { examSchema, ExamSchema } from "@/lib/formValidationSchemas";
+import { createExam, updateExam } from "@/lib/actions";
 import { useFormState } from "react-dom";
-import { Dispatch, SetStateAction, useEffect } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 
@@ -32,13 +32,16 @@ const ExamForm = ({
     });
 
     const [state, formAction] = useFormState(type === "create"
-        ? createExam : updateExam, { success: false, error: false })
+        ? createExam : updateExam, { success: false, error: false });
+
+    const [isSubmitting, setIsSubmitting] = useState(false); // Track button state in order to avoid multiple submitions
 
     const onSubmit = handleSubmit(data => {
+        setIsSubmitting(true); // Disable the button
         data.startTime = new Date(new Date(data.startTime).getTime() + (3 * 60 * 60 * 1000));
         data.endTime = new Date(new Date(data.endTime).getTime() + (3 * 60 * 60 * 1000));
         formAction(data);
-    })
+    });
 
     const router = useRouter();
 
@@ -47,91 +50,94 @@ const ExamForm = ({
             toast(`Exam has been ${type === "create" ? "created" : "updated"} successfully!`);
             setOpen(false);
             router.refresh();
+        } else {
+            setIsSubmitting(false); // Re-enable if error occurred
         }
     }, [state, router, type, setOpen]);
 
     const { lessons } = relatedData;
 
     return (
-      <form className="flex flex-col gap-8 mx-auto" onSubmit={onSubmit}>
-  <h1 className="text-xl font-semibold ">
-    {type === "create" ? "Create a new exam" : "Update the exam"}
-  </h1>
+        <form className="flex flex-col gap-8 mx-auto" onSubmit={onSubmit}>
+            <h1 className="text-xl font-semibold ">
+                {type === "create" ? "Create a new exam" : "Update the exam"}
+            </h1>
 
-  <div className="flex flex-col gap-6 w-full">
-    <InputField
-      label="Exam Title"
-      name="title"
-      defaultValue={data?.title}
-      register={register}
-      error={errors?.title}
-    />
+            <div className="flex flex-col gap-6 w-full">
+                <InputField
+                    label="Exam Title"
+                    name="title"
+                    defaultValue={data?.title}
+                    register={register}
+                    error={errors?.title}
+                />
 
-    <InputField
-      label="Start Time"
-      name="startTime"
-      defaultValue={data?.startTime ? new Date(data.startTime).toISOString().slice(0, 16) : undefined}
-      register={register}
-      error={errors?.startTime}
-      type="datetime-local"
-    />
+                <InputField
+                    label="Start Time"
+                    name="startTime"
+                    defaultValue={data?.startTime ? new Date(data.startTime).toISOString().slice(0, 16) : undefined}
+                    register={register}
+                    error={errors?.startTime}
+                    type="datetime-local"
+                />
 
-    <InputField
-      label="End Time"
-      name="endTime"
-      defaultValue={data?.endTime ? new Date(data.endTime).toISOString().slice(0, 16) : undefined}
-      register={register}
-      error={errors?.endTime}
-      type="datetime-local"
-    />
+                <InputField
+                    label="End Time"
+                    name="endTime"
+                    defaultValue={data?.endTime ? new Date(data.endTime).toISOString().slice(0, 16) : undefined}
+                    register={register}
+                    error={errors?.endTime}
+                    type="datetime-local"
+                />
 
-    {data && (
-      <InputField
-        label="Id"
-        name="id"
-        defaultValue={data?.id}
-        register={register}
-        error={errors?.id}
-        hidden
-      />
-    )}
+                {data && (
+                    <InputField
+                        label="Id"
+                        name="id"
+                        defaultValue={data?.id}
+                        register={register}
+                        error={errors?.id}
+                        hidden
+                    />
+                )}
 
-    <div className="flex flex-col gap-1 w-full">
-      <label className="text-xs text-gray-400">Lesson</label>
-      <select
-        className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
-        {...register("lessonId")}
-        defaultValue={data?.lessonId || ""}
-      >
-        <option value="">Select lesson</option>
-        {lessons.map((lesson: { id: number; name: string }) => (
-          <option value={lesson.id} key={lesson.id}>
-            {lesson.name}
-          </option>
-        ))}
-      </select>
-      {errors.lessonId?.message && (
-        <p className="text-xs text-red-400">{errors.lessonId.message.toString()}</p>
-      )}
-    </div>
-  </div>
+                <div className="flex flex-col gap-1 w-full">
+                    <label className="text-xs text-gray-400">Lesson</label>
+                    <select
+                        className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
+                        {...register("lessonId")}
+                        defaultValue={data?.lessonId || ""}
+                    >
+                        <option value="">Select lesson</option>
+                        {lessons.map((lesson: { id: number; name: string }) => (
+                            <option value={lesson.id} key={lesson.id}>
+                                {lesson.name}
+                            </option>
+                        ))}
+                    </select>
+                    {errors.lessonId?.message && (
+                        <p className="text-xs text-red-400">{errors.lessonId.message.toString()}</p>
+                    )}
+                </div>
+            </div>
 
-  {state.error && (
-    <span className="text-red-500 text-center">
-      {state.error}
-    </span>
-  )}
+            {state.error && (
+                <span className="text-red-500 text-center">
+                    {state.error}
+                </span>
+            )}
 
-  <div className="flex justify-center mt-6">
-    <button
-      type="submit"
-      className="bg-blue-500 text-white px-8 py-2 rounded-md text-sm w-max"
-    >
-      {type === "create" ? "Create" : "Update"}
-    </button>
-  </div>
-</form>
-    )
+            <div className="flex justify-center mt-6">
+                <button
+                    type="submit"
+                    className={`bg-blue-500 text-white px-8 py-2 rounded-md text-sm w-max ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
+                    disabled={isSubmitting}
+                >
+                    {type === "create" ? "Create" : "Update"}
+                </button>
+            </div>
+        </form>
+    );
 };
 
-export default ExamForm
+export default ExamForm;

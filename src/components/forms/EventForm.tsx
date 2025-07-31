@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import InputField from "../InputField";
 import Image from "next/image";
 import { eventSchema, EventSchema } from "@/lib/formValidationSchemas";
-import { Dispatch, SetStateAction, useEffect } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react"; // added useState
 import { useFormState } from "react-dom";
 import { useRouter } from "next/navigation";
 import { createEvent, updateEvent } from "@/lib/actions";
@@ -33,7 +33,10 @@ const EventForm = ({
     const [state, formAction] = useFormState(type === "create"
         ? createEvent : updateEvent, { success: false, error: false })
 
+    const [isSubmitting, setIsSubmitting] = useState(false); // added this line
+
     const onSubmit = handleSubmit(formData => {
+        setIsSubmitting(true); // added this line
         const submissionData = {
             ...formData,
             ...(type === "update" && data?.id && { id: data.id }),
@@ -53,6 +56,7 @@ const EventForm = ({
         }
         if (state.error) {
             const errorMessage = state.message || "Something went wrong!";
+            setIsSubmitting(false);
         }
     }, [state, router, type, setOpen]);
 
@@ -148,11 +152,15 @@ const EventForm = ({
                     {state.message || "Something went wrong!"}
                 </span>
             )}
-            <button className="bg-blue-500 text-white px-4 py-2 rounded-md mx-auto hover:bg-blue-600 transition">
+            <button
+                type="submit"
+                className={`bg-blue-500 text-white px-4 py-2 rounded-md mx-auto hover:bg-blue-600 transition ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
+                disabled={isSubmitting} // added this line
+            >
                 {type === "create" ? "Create" : "Update"}
             </button>
         </form>
     )
 };
 
-export default EventForm
+export default EventForm;
