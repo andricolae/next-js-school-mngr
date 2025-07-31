@@ -5,7 +5,8 @@ export const subjectSchema = z.object({
     name: z
         .string()
         .min(1, { message: 'Subject name is required' }),
-    teachers: z.array(z.string()),
+    teachers: z.array(z.string({message: "Professor is required"}))
+				.min(1, { message: "At least one teacher must be selected" }),
 });
 
 export type SubjectSchema = z.infer<typeof subjectSchema>;
