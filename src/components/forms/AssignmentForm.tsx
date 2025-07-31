@@ -104,6 +104,7 @@ const AssignmentForm = ({
                         {...register("lessonId")}
                         defaultValue={data?.lessonId}
                     >
+                         <option value="">Select lesson</option>
                         {lessons.map(
                             (lesson: { id: number; name: string; }) => (
                                 <option value={lesson.id} key={lesson.id}>
