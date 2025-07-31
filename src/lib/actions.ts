@@ -134,7 +134,7 @@ export const createTeacher = async (currentState: CurrentState, data: TeacherSch
 				phone: data.phone,
 				address: data.address,
 				img: data.img,
-				bloodType: data.bloodType,
+				bloodType: data.bloodType ?? "",
 				gender: data.gender,
 				birthday: data.birthday,
 				subjects: {
@@ -258,7 +258,7 @@ export const createStudent = async (currentState: CurrentState, data: StudentSch
 				phone: data.phone,
 				address: data.address,
 				img: data.img,
-				bloodType: data.bloodType,
+				bloodType: data.bloodType ?? "",
 				gender: data.gender,
 				birthday: data.birthday,
 				gradeId: data.gradeId,

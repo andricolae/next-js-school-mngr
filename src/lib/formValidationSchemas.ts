@@ -74,7 +74,8 @@ email: z.string().min(1, { message: "Email is required!" }).email({ message: "In
   bloodType: z.string().optional(),
     birthday: z.coerce.date({ message: "Birthday is required!" }),
     gender: z.enum(["FEMALE", "MALE", "OTHER"], { message: "Gender is required!" }),
-   subjects: z.string().min(1, { message: "Subject is required!" })
+subjects: z.array(z.string().min(1, { message: "Subject is required!" }))
+
 
 });
 
