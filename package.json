@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+	"postinstall": "prisma generate"
   },
   "dependencies": {
     "@clerk/backend": "^2.3.0",
@@ -15,6 +16,7 @@
     "@clerk/shared": "^3.10.0",
     "@hookform/resolvers": "^5.0.1",
     "@prisma/client": "^6.7.0",
+    "@supabase/supabase-js": "^2.51.0",
     "@types/react-big-calendar": "^1.16.1",
     "clsx": "^2.1.1",
     "jspdf": "^3.0.1",

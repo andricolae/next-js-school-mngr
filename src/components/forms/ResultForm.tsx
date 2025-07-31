@@ -127,6 +127,10 @@ const ResultForm = ({
                         className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
                         defaultValue={data?.examId || ""}
                         {...register("examId")}
+                        onChange={(e) => {
+                        setValue("examId", parseInt(e.target.value));
+                        setValue("assignmentId", undefined);
+                        }}
                     >
                         <option value="">Select an exam</option>
                         {exams?.map(
@@ -150,6 +154,10 @@ const ResultForm = ({
                         className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
                         defaultValue={data?.assignmentId || ""}
                         {...register("assignmentId")}
+                        onChange={(e) => {
+                        setValue("assignmentId", parseInt(e.target.value));
+                        setValue("examId", undefined);
+                        }}
                     >
                         <option value="">Select an assignment</option>
                         {assignments?.map(
