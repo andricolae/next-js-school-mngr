@@ -54,7 +54,11 @@ const EventListPage = async ({ searchParams }: { searchParams: { [key: string]: 
     const renderRow = (item: EventList) => (
         <tr key={item.id} className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-skyLight">
             <td className="flex items-center gap-4 p-4">{item.title}</td>
-            <td>{item.class?.name || "-"}</td>
+            <td>
+                {item.classId === null
+                ? "School-wide event"
+                : item.class?.name || "-"}
+            </td>
             <td className="hidden md:table-cell">{new Intl.DateTimeFormat("en-UK").format(item.startTime)}</td>
             <td className="hidden md:table-cell">{item.startTime.toLocaleTimeString("en-UK", {
                 hour: "2-digit",
@@ -68,7 +72,7 @@ const EventListPage = async ({ searchParams }: { searchParams: { [key: string]: 
             })}</td>
             <td>
                 <div className="flex items-center gap-2">
-                    {role === "admin" && (
+                    {(role === "admin" || role === "teacher") && (
                         <>
                             <FormContainer table="event" type="delete" id={item.id} />
                             <FormContainer table="event" type="update" data={item} />
@@ -137,7 +141,7 @@ const EventListPage = async ({ searchParams }: { searchParams: { [key: string]: 
                     <TableSearch />
                     <div className='flex items-center gap-4 self-end'>
                         <SortButton currentSort={sort} />
-                        {role === "admin" && (
+                        {(role === "admin" || role === "teacher") && (
                             <FormContainer table="event" type="create" />
                         )}
                     </div>
