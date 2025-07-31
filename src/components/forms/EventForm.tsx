@@ -119,7 +119,7 @@ const EventForm = ({
                     <label className="text-xs text-gray-400">Class (Optional)</label>
                     <select
                         className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
-                        defaultChecked={data?.classId}
+                        defaultValue={data?.classId ?? ""}
                         {...register("classId")}
                     >
                         <option value="">School-wide event</option>

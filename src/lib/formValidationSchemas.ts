@@ -168,7 +168,7 @@ export const eventSchema = z.object({
     description: z.string().min(1, { message: "Description is required" }),
     startTime: z.coerce.date({ message: "Start time is required" }),
     endTime: z.coerce.date({ message: "End time is required" }),
-    classId: z.coerce.number().optional(),
+    classId: z.union([z.coerce.number(), z.null()]).optional()
 })
 
 .refine(

@@ -757,6 +757,9 @@ export const updateEvent = async (currentState: CurrentState, data: EventSchema)
 				return { success: false, error: true };
 			}
 		}
+		if (data.classId === 0) {
+			data.classId = null
+		}
 
 		await prisma.event.update({
 			where: {
