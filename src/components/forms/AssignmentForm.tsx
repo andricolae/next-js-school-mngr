@@ -60,7 +60,7 @@ const AssignmentForm = ({
     const { lessons } = relatedData;
 
     return (
-        <form className="flex flex-col gap-8 max-auto" onSubmit={onSubmit}>
+        <form className="flex flex-col gap-4 max-auto" onSubmit={onSubmit}>
             <h1 className="text-xl font-semibold">{type === "create" ? "Create a new assignment" : "Update the assignment"}</h1>
        
             <div className="flex flex-col gap-6">
@@ -125,7 +125,7 @@ const AssignmentForm = ({
                     {state.message || "Something went wrong!"}
                 </span>
             )}
-          <div className="flex justify-center mt-6">
+          <div className="flex justify-center mt-4">
         <button className="bg-blue-500 text-white px-8 py-2 rounded-md text-sm w-max">
           {type === "create" ? "Create" : "Update"}
         </button>

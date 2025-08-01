@@ -31,11 +31,16 @@ const FormContainer = async ({ table, type, data, id }: FormContainerProps) => {
 
 	const { userId, sessionClaims } = await auth();
 
+	
+	console.log(" userId from auth():", userId);
+	console.log(" sessionClaims:", sessionClaims);
 	let tokenData;
 	if (sessionClaims !== null) {
 		tokenData = sessionClaims as unknown as TokenData;
 	}
 	let role = tokenData?.userPblcMtdt?.role;
+
+	console.log("role detected:", role);
 
 	// const role = (sessionClaims?.metadata as {
 	// 	role?: "admin" | "teacher" | "student" | "parent";

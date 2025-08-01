@@ -214,13 +214,13 @@ const LessonForm = ({
 	const { subjects, classes, teachers } = relatedData || {};
 
 	return (
-		<form className="flex flex-col gap-8" onSubmit={onSubmit}>
+		<form className="flex flex-col gap-6" onSubmit={onSubmit}>
 			<h1 className="text-xl font-semibold">
 				{type === "create" ? "Create a new lesson" : "Update the lesson"}
 			</h1>
 			<div className="h-fit w-full">
 				<div className="w-full flex">
-					<div className="flex flex-col flex-1 mx-1 mt-7">
+					<div className="flex flex-col flex-1 mx-1 mt-7 gap-4">
 						<div className="mt-1">
 							<InputField
 								label="Lesson Name"
@@ -299,7 +299,7 @@ const LessonForm = ({
 						</div>
 
 					</div>
-					<div className="flex flex-col flex-1 mx-1 mt-7">
+					<div className="flex flex-col flex-1 mx-1 mt-7 gap-4">
 						<div className="mt-1">
 							<InputField
 								label="Start Time"
@@ -396,13 +396,13 @@ const LessonForm = ({
 					</div>
 				</div>
 
-				<div className="w-full h-fit flex items-center justify-center mt-9">
+				<div className="w-full h-fit flex items-center justify-center mt-12">
 					{state.error && <span className="text-red-500">Something went wrong!</span>}
 
 					<button
 						type="submit"
 						disabled={isCreatingRecurring}
-						className="bg-blue-500 text-white py-2 px-10 rounded-md disabled:bg-gray-400 w-fit"
+						className="bg-blue-500 text-white py-2 px-8 rounded-md disabled:bg-gray-400 w-fit"
 					>
 						{isCreatingRecurring ? "Creating lessons..." :
 							type === "create" ?

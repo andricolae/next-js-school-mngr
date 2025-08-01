@@ -59,7 +59,7 @@ const AnnouncementForm = ({
 
     return (
         <form className="flex flex-col gap-8" onSubmit={onSubmit}>
-            <h1 className="text-cl font-semibold">{type === "create" ? "Create a new announcement" : "Update the announcement"}</h1>
+            <h1 className="text-xl font-semibold">{type === "create" ? "Create a new announcement" : "Update the announcement"}</h1>
 
 <div className="flex flex-col gap-4 w-full">
 
@@ -140,10 +140,14 @@ const AnnouncementForm = ({
                     {state.message || "Something went wrong!"}
                 </span>
             )}
-<button className="bg-blue-500 text-white px-4 py-2 rounded-md mx-auto hover:bg-blue-600 transition">
-
-                {type === "create" ? "Create" : "Update"}
-            </button>
+         <div className="flex justify-center mt-2">
+    <button
+      type="submit"
+      className="bg-blue-500 text-white px-8 py-2 rounded-md text-sm w-max"
+    >
+      {type === "create" ? "Create" : "Update"}
+    </button>
+  </div>
         </form>
     )
 };

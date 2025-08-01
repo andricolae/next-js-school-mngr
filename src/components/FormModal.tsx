@@ -88,6 +88,15 @@ const FormModal = ({ table, type, data, id, relatedData }: FormContainerProps & 
 
     const [open, setOpen] = useState(false);
 
+const modalWidthClass = table === "subject"
+  ? "w-[30%] p-5 h-[50%]"
+  : ["exam", "assignment", "result", "attendance"].includes(table)
+    ? "w-[40%] p-6 h-[70%]"   
+    : [ "announcement", "event", "lesson", "class", "teacher", "student", "parent"].includes(table)
+      ? "w-[40%] p-3 h-[80%]"
+      : "w-[50%] p-4 h-[80%]";
+
+
     const Form = () => {
 
         const [state, formAction] = useFormState(deleteActionMap[table], {
@@ -125,7 +134,8 @@ const FormModal = ({ table, type, data, id, relatedData }: FormContainerProps & 
         </button>
         {open && (
             <div className="w-screen h-screen absolute left-0 top-0 bg-black bg-opacity-60 z-50 flex items-center justify-center">
-                <div className="bg-white p-4 rounded-md relative w-[50%] md:w-[50%] lg:w-[50%] xl:w-[50%] 2xl:w-[30%] h-[80%] overflow-y-auto"> 
+              <div className={`bg-white rounded-md relative ${modalWidthClass} overflow-y-auto`}>
+
                 {/*<div className="bg-white p-4 rounded-md relative w-[90%] sm:w-[450px] max-w-full">*/}
 
                     <Form />

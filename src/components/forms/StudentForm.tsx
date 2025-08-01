@@ -102,7 +102,7 @@ const StudentForm = ({
           error={errors?.password}
         />
         <div
-          className="flex flex-col gap-1 cursor-pointer justify-center items-start  mt-4 ml-32"
+          className="flex flex-col gap-1 cursor-pointer justify-center items-start  mt-6 ml-24"
           onClick={() => openUploadWidget()}
         >
           <label className="text-sm font-medium text-gray-700 cursor-pointer select-none">
