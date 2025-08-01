@@ -201,7 +201,7 @@ export const announcementSchema = z.object({
     title: z.string().min(1, { message: "Announcement title is required" }),
     description: z.string().min(1, { message: "Description is required" }),
     date: z.coerce.date({ message: "Date is required" }).min(new Date(new Date().toDateString()), { message: "Start date cannot be in the past!" }),
-    classId: z.coerce.number().optional(),
+    classId: z.union([z.coerce.number(), z.null()]).optional()
 });
 
 export type AnnouncementSchema = z.infer<typeof announcementSchema>;

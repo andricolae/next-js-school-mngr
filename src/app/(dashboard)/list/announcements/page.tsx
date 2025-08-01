@@ -24,8 +24,6 @@ const AnnouncementListPage = async ({
 	let role = tokenData?.userPblcMtdt?.role;
 	const currentUserId = userId;
 
-
-
 	const columns = [
 		{
 			header: "Title",
@@ -63,7 +61,7 @@ const AnnouncementListPage = async ({
 			<td>{item.description}</td>
 			<td>
 				{item.classId === null
-				  ? "School-wide event"
+				  ? "School-wide announcement"
 				  : item.class?.name || "-"}
 			</td>
 			<td className="hidden md:table-cell">
