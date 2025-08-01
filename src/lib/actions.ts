@@ -770,7 +770,9 @@ export const updateEvent = async (currentState: CurrentState, data: EventSchema)
 				description: data.description,
 				startTime: data.startTime,
 				endTime: data.endTime,
-				...(data.classId && { classId: data.classId }),
+				...(typeof data.classId === 'number' || data.classId === null
+					? { classId: data.classId }
+					: {}),
 			},
 		});
 		return { success: true, error: false }
