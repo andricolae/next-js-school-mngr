@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import InputField from "../InputField";
 import Image from "next/image";
-import { Dispatch, SetStateAction, useEffect } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { assignmentSchema, AssignmentSchema } from "@/lib/formValidationSchemas";
 import { createAssignment, updateAssignment } from "@/lib/actions";
 import { useFormState } from "react-dom";
@@ -34,7 +34,10 @@ const AssignmentForm = ({
     const [state, formAction] = useFormState(type === "create"
         ? createAssignment : updateAssignment, { success: false, error: false })
 
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
     const onSubmit = handleSubmit(data => {
+        setIsSubmitting(true);
         const formattedData = {
             ...data,
             startDate: new Date(data.startDate),
@@ -54,6 +57,7 @@ const AssignmentForm = ({
 
         if (state.error) {
             const errorMessage = state.message || "Something went wrong!";
+            setIsSubmitting(true);
         }
     }, [state, router, type, setOpen]);
 
@@ -126,7 +130,11 @@ const AssignmentForm = ({
                 </span>
             )}
           <div className="flex justify-center mt-4">
-        <button className="bg-blue-500 text-white px-8 py-2 rounded-md text-sm w-max">
+         <button
+            type="submit"
+            className={`bg-blue-500 text-white px-8 py-2 rounded-md text-sm w-max mx-auto hover:bg-blue-600 transition ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
+            disabled={isSubmitting}
+         >
           {type === "create" ? "Create" : "Update"}
         </button>
       </div>
