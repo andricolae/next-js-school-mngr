@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import InputField from "../InputField";
-import { Dispatch, SetStateAction, useEffect } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { AttendanceActionData, AttendanceFormData, attendanceSchema } from "@/lib/formValidationSchemas";
 import { createAttendance, updateAttendance } from "@/lib/actions";
 import { useFormState } from "react-dom";
@@ -32,7 +32,10 @@ const AttendanceForm = ({
     const [state, formAction] = useFormState(type === "create"
         ? createAttendance : updateAttendance, { success: false, error: false })
 
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
     const onSubmit = handleSubmit((formData) => {
+        setIsSubmitting(true);
         const actionData = {
             id: formData.id,
             date: formData.date,
@@ -53,6 +56,7 @@ const AttendanceForm = ({
         }
         if (state.error) {
             const errorMessage = state.message || "Something went wrong!";
+            setIsSubmitting(true);
         }
     }, [state, router, type, setOpen]);
 
@@ -154,13 +158,14 @@ const AttendanceForm = ({
                 </span>
             )}
              <div className="flex justify-center mt-6">
-    <button
-      type="submit"
-      className="bg-blue-500 text-white px-8 py-2 rounded-md text-sm w-max"
-    >
-      {type === "create" ? "Create" : "Update"}
-    </button>
-  </div>
+                <button
+                type="submit"
+                className={`bg-blue-500 text-white px-4 py-2 rounded-md mx-auto hover:bg-blue-600 transition ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
+                disabled={isSubmitting}
+                >
+                {type === "create" ? "Create" : "Update"}
+                </button>
+            </div>
         </form>
     )
 };
