@@ -56,7 +56,7 @@ const ExamForm = ({
     }, [state, router, type, setOpen]);
 
     const { lessons } = relatedData;
-
+console.log("lessons",lessons) 
     return (
         <form className="flex flex-col gap-8 mx-auto" onSubmit={onSubmit}>
             <h1 className="text-xl font-semibold ">
