@@ -393,8 +393,6 @@ const TeacherForm = ({
       />
 </div>
       </div>
-
-     
        <div className="flex justify-center mt-2">
     <button
       type="submit"
