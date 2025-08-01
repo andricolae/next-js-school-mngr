@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import InputField from "../InputField";
 import Image from "next/image";
 import { eventSchema, EventSchema } from "@/lib/formValidationSchemas";
-import { Dispatch, SetStateAction, useEffect } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react"; // added useState
 import { useFormState } from "react-dom";
 import { useRouter } from "next/navigation";
 import { createEvent, updateEvent } from "@/lib/actions";
@@ -33,7 +33,10 @@ const EventForm = ({
     const [state, formAction] = useFormState(type === "create"
         ? createEvent : updateEvent, { success: false, error: false })
 
+    const [isSubmitting, setIsSubmitting] = useState(false); // added this line
+
     const onSubmit = handleSubmit(formData => {
+        setIsSubmitting(true); // added this line
         const submissionData = {
             ...formData,
             ...(type === "update" && data?.id && { id: data.id }),
@@ -53,6 +56,7 @@ const EventForm = ({
         }
         if (state.error) {
             const errorMessage = state.message || "Something went wrong!";
+            setIsSubmitting(false);
         }
     }, [state, router, type, setOpen]);
 
@@ -61,7 +65,7 @@ const EventForm = ({
 
     return (
         <form className="flex flex-col gap-8" onSubmit={onSubmit}>
-            <h1 className="text-cl font-semibold">{type === "create" ? "Create a new event" : "Update the event"}</h1>
+            <h1 className="text-xl font-semibold">{type === "create" ? "Create a new event" : "Update the event"}</h1>
 
             <div className="flex-col gap-4">
                 <InputField
@@ -119,7 +123,7 @@ const EventForm = ({
                     <label className="text-xs text-gray-400">Class (Optional)</label>
                     <select
                         className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
-                        defaultChecked={data?.classId}
+                        defaultValue={data?.classId ?? ""}
                         {...register("classId")}
                     >
                         <option value="">School-wide event</option>
@@ -148,11 +152,16 @@ const EventForm = ({
                     {state.message || "Something went wrong!"}
                 </span>
             )}
-            <button className="bg-blue-500 text-white px-4 py-2 rounded-md mx-auto hover:bg-blue-600 transition">
-                {type === "create" ? "Create" : "Update"}
-            </button>
+                        <div className="flex justify-center mt-6s">
+    <button
+      type="submit"
+      className="bg-blue-500 text-white px-8 py-2 rounded-md text-sm w-max"
+    >
+      {type === "create" ? "Create" : "Update"}
+    </button>
+  </div>
         </form>
     )
 };
 
-export default EventForm
+export default EventForm;

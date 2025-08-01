@@ -51,9 +51,9 @@ const ExamForm = ({
     }, [state, router, type, setOpen]);
 
     const { lessons } = relatedData;
-
+console.log("lessons" ,lessons) 
     return (
-      <form className="flex flex-col gap-8 mx-auto" onSubmit={onSubmit}>
+      <form className="flex flex-col gap-6 " onSubmit={onSubmit}>
   <h1 className="text-xl font-semibold ">
     {type === "create" ? "Create a new exam" : "Update the exam"}
   </h1>
@@ -122,7 +122,7 @@ const ExamForm = ({
     </span>
   )}
 
-  <div className="flex justify-center mt-6">
+  <div className="flex justify-center mt-4">
     <button
       type="submit"
       className="bg-blue-500 text-white px-8 py-2 rounded-md text-sm w-max"

@@ -122,7 +122,7 @@ export const createTeacher = async (currentState: CurrentState, data: TeacherSch
 			password: data.password,
 			firstName: data.name,
 			lastName: data.surname,
-			publicMetadata: { role: "teacher" },
+			publicMetadata: { role: "teacher", name: `${data.name} ${data.surname}` }
 		})
 		await prisma.teacher.create({
 			data: {
@@ -134,7 +134,7 @@ export const createTeacher = async (currentState: CurrentState, data: TeacherSch
 				phone: data.phone,
 				address: data.address,
 				img: data.img,
-				bloodType: data.bloodType,
+				bloodType: data.bloodType ?? "",
 				gender: data.gender,
 				birthday: data.birthday,
 				subjects: {
@@ -258,7 +258,7 @@ export const createStudent = async (currentState: CurrentState, data: StudentSch
 				phone: data.phone,
 				address: data.address,
 				img: data.img,
-				bloodType: data.bloodType,
+				bloodType: data.bloodType ?? "",
 				gender: data.gender,
 				birthday: data.birthday,
 				gradeId: data.gradeId,
@@ -757,6 +757,9 @@ export const updateEvent = async (currentState: CurrentState, data: EventSchema)
 				return { success: false, error: true };
 			}
 		}
+		if (data.classId === 0) {
+			data.classId = null
+		}
 
 		await prisma.event.update({
 			where: {
@@ -767,7 +770,9 @@ export const updateEvent = async (currentState: CurrentState, data: EventSchema)
 				description: data.description,
 				startTime: data.startTime,
 				endTime: data.endTime,
-				...(data.classId && { classId: data.classId }),
+				...(typeof data.classId === 'number' || data.classId === null
+					? { classId: data.classId }
+					: {}),
 			},
 		});
 		return { success: true, error: false }
@@ -874,6 +879,10 @@ export const updateAnnouncement = async (currentState: CurrentState, data: Annou
 			}
 		}
 
+		if (data.classId === 0) {
+			data.classId = null
+		}
+		
 		await prisma.announcement.update({
 			where: {
 				id: data.id,
@@ -882,7 +891,9 @@ export const updateAnnouncement = async (currentState: CurrentState, data: Annou
 				title: data.title,
 				description: data.description,
 				date: data.date,
-				...(data.classId && { classId: data.classId }),
+				...(typeof data.classId === 'number' || data.classId === null
+					? { classId: data.classId }
+					: {}),
 			},
 		});
 		return { success: true, error: false }

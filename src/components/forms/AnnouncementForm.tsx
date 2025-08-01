@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import InputField from "../InputField";
 import Image from "next/image";
-import { Dispatch, SetStateAction, useEffect } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { AnnouncementSchema, announcementSchema } from "@/lib/formValidationSchemas";
 import { useFormState } from "react-dom";
 import { createAnnouncement, updateAnnouncement } from "@/lib/actions";
@@ -34,7 +34,10 @@ const AnnouncementForm = ({
     const [state, formAction] = useFormState(type === "create"
         ? createAnnouncement : updateAnnouncement, { success: false, error: false })
 
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
     const onSubmit = handleSubmit(data => {
+        setIsSubmitting(true);
         const formattedData = {
             ...data,
             date: new Date(data.date)
@@ -52,6 +55,7 @@ const AnnouncementForm = ({
         }
         if (state.error) {
             const errorMessage = state.message || "Something went wrong!";
+            setIsSubmitting(true);
         }
     }, [state, router, type, setOpen]);
 
@@ -59,7 +63,7 @@ const AnnouncementForm = ({
 
     return (
         <form className="flex flex-col gap-8" onSubmit={onSubmit}>
-            <h1 className="text-cl font-semibold">{type === "create" ? "Create a new announcement" : "Update the announcement"}</h1>
+            <h1 className="text-xl font-semibold">{type === "create" ? "Create a new announcement" : "Update the announcement"}</h1>
 
 <div className="flex flex-col gap-4 w-full">
 
@@ -140,10 +144,15 @@ const AnnouncementForm = ({
                     {state.message || "Something went wrong!"}
                 </span>
             )}
-<button className="bg-blue-500 text-white px-4 py-2 rounded-md mx-auto hover:bg-blue-600 transition">
-
-                {type === "create" ? "Create" : "Update"}
-            </button>
+         <div className="flex justify-center mt-2">
+    <button
+      type="submit"
+      className={`bg-blue-500 text-white px-8 py-2 rounded-md text-sm w-max mx-auto hover:bg-blue-600 transition ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
+      disabled={isSubmitting}
+    >
+      {type === "create" ? "Create" : "Update"}
+    </button>
+  </div>
         </form>
     )
 };

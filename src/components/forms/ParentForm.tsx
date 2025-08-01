@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import InputField from "../InputField";
-import { Dispatch, SetStateAction, useEffect } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { parentSchema, ParentSchema } from "@/lib/formValidationSchemas";
 import { createParent, updateParent } from "@/lib/actions";
 import { useFormState } from "react-dom";
@@ -34,8 +34,11 @@ const ParentForm = ({
         { success: false, error: false }
     );
 
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
     const onSubmit = handleSubmit(data => {
         formAction(data);
+        setIsSubmitting(true);
     });
 
     const router = useRouter();
@@ -49,6 +52,7 @@ const ParentForm = ({
         if (state.error) {
             const errorMessage = state.message || "Something went wrong!";
             console.error(errorMessage);
+            setIsSubmitting(false);
         }
     }, [state, router, type, setOpen]);
 
@@ -138,9 +142,11 @@ const ParentForm = ({
                     {state.message || "Something went wrong!"}
                 </span>
             )}
-
-         <div className="flex justify-center mt-2">
-        <button className="bg-blue-500 text-white px-8 py-2 rounded-md text-sm w-max">
+   <div className="flex justify-center mt-1">
+        <button
+        className={`bg-blue-500 text-white px-8 py-2 rounded-md text-sm w-max ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
+        disabled={isSubmitting}
+        >
           {type === "create" ? "Create" : "Update"}
         </button>
       </div>

@@ -6,7 +6,7 @@ import InputField from "../InputField";
 import { classSchema, ClassSchema } from "@/lib/formValidationSchemas";
 import { createClass, updateClass } from "@/lib/actions";
 import { useFormState } from "react-dom";
-import { Dispatch, SetStateAction, useEffect } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 
@@ -40,7 +40,10 @@ const ClassForm = ({
         { success: false, error: false }
     );
 
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
     const onSubmit = handleSubmit(data => {
+        setIsSubmitting(true);
         formAction(data);
     });
 
@@ -54,6 +57,7 @@ const ClassForm = ({
         }
 
         if (state.error) {
+            setIsSubmitting(false);
             // poți trata eroarea aici dacă vrei
         }
     }, [state, router, type, setOpen]);
@@ -62,7 +66,7 @@ const ClassForm = ({
 
     return (
         <form className="flex flex-col gap-8 mx-auto" onSubmit={onSubmit}>
-            <h1 className="text-cl font-semibold text-left mb-6">
+            <h1 className="text-xl font-semibold text-left mb-6">
                 {type === "create" ? "Create a new class" : "Update the class"}
             </h1>
 
@@ -145,7 +149,10 @@ const ClassForm = ({
             )}
 
             <div className="flex justify-center mt-6">
-                <button className="bg-blue-500 text-white px-8 py-2 rounded-md text-sm w-max">
+                <button
+                className={`bg-blue-500 text-white px-4 py-2 rounded-md mx-auto hover:bg-blue-600 transition ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
+                disabled={isSubmitting}
+                >
                     {type === "create" ? "Create" : "Update"}
                 </button>
             </div>

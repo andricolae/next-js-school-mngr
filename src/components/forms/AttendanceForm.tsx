@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import InputField from "../InputField";
-import { Dispatch, SetStateAction, useEffect } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { AttendanceActionData, AttendanceFormData, attendanceSchema } from "@/lib/formValidationSchemas";
 import { createAttendance, updateAttendance } from "@/lib/actions";
 import { useFormState } from "react-dom";
@@ -32,7 +32,10 @@ const AttendanceForm = ({
     const [state, formAction] = useFormState(type === "create"
         ? createAttendance : updateAttendance, { success: false, error: false })
 
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
     const onSubmit = handleSubmit((formData) => {
+        setIsSubmitting(true);
         const actionData = {
             id: formData.id,
             date: formData.date,
@@ -53,6 +56,7 @@ const AttendanceForm = ({
         }
         if (state.error) {
             const errorMessage = state.message || "Something went wrong!";
+            setIsSubmitting(true);
         }
     }, [state, router, type, setOpen]);
 
@@ -60,10 +64,14 @@ const AttendanceForm = ({
 
     return (
         
-        <form className="flex flex-col gap-14" onSubmit={onSubmit}>
-            <h1 className="text-cl font-semibold">{type === "create" ? "Create attendance record" : "Update attendance record"}</h1>
+      <form
+  className="flex flex-col gap-6 w-full "
+  onSubmit={onSubmit}
+>
 
-            <div className="flex flex-col gap-6 w-full">
+            <h1 className="text-xl font-semibold">{type === "create" ? "Create attendance record" : "Update attendance record"}</h1>
+
+            <div className="flex flex-col gap-4 w-full">
                 <InputField
                     label="Date"
                     name="date"
@@ -73,7 +81,7 @@ const AttendanceForm = ({
                     error={errors?.date}
                 />
 
-                <div className="flex flex-col gap-2 w-full">
+                <div className="flex flex-col gap-4 w-full">
                     <label className="text-xs text-gray-400">Status</label>
                     <select
                         className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
@@ -153,10 +161,11 @@ const AttendanceForm = ({
                     {state.message || "Something went wrong!"}
                 </span>
             )}
-             <div className="flex justify-center mt-6">
-    <button
+             <div className="flex justify-center mt-4">
+     <button
       type="submit"
-      className="bg-blue-500 text-white px-8 py-2 rounded-md text-sm w-max"
+      className={`bg-blue-500 text-white px-8 py-2 rounded-md text-sm w-max mx-auto hover:bg-blue-600 transition ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
+      disabled={isSubmitting}
     >
       {type === "create" ? "Create" : "Update"}
     </button>

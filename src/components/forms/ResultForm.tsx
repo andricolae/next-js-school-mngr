@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import InputField from "../InputField";
 import Image from "next/image";
-import { Dispatch, SetStateAction, useEffect } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { resultSchema, ResultSchema } from "@/lib/formValidationSchemas";
 import { useFormState } from "react-dom";
 import { createResult, updateResult } from "@/lib/actions";
@@ -44,7 +44,10 @@ const ResultForm = ({
     const [state, formAction] = useFormState(type === "create"
         ? createResult : updateResult, { success: false, error: false })
 
+    const [isSubmitting, setIsSubmitting] = useState(false); // added to avoid multiple submitions
+
     const onSubmit = handleSubmit(formData => {
+        setIsSubmitting(true); // added to avoid multiple submitions
         const submissionData = {
             ...formData,
             ...(type === "update" && data?.id && { id: data.id }),
@@ -62,21 +65,22 @@ const ResultForm = ({
         }
         if (state.error) {
             const errorMessage = state.message || "Something went wrong!";
+            setIsSubmitting(true); // added to re-enable button if error happens
         }
     }, [state, router, type, setOpen]);
 
     const { students, exams, assignments } = relatedData;
 
     return (
-        <form className="flex flex-col gap-8 mx-auto" onSubmit={onSubmit}>
+        <form className="flex flex-col gap-6 mx-auto" onSubmit={onSubmit}>
             <h1 className="text-xl font-semibold">
                 {type === "create" ? "Create a new result" : "Update the result"}</h1>
  
-            <div className=" mt-6 text-xs text-gray-500">
+            <div className=" mt-2 text-xs text-gray-500">
                 Note: Select either an exam OR an assignment, not both.
             </div>
 
-            <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-4">
                 <InputField
                     label="Score"
                     name="score"
@@ -181,11 +185,16 @@ const ResultForm = ({
                     {state.message || "Something went wrong!"}
                 </span>
             )}
-             <div className="flex justify-center mt-6">
-    <button className="bg-blue-500 text-white px-8 py-2 rounded-md text-sm w-max">
+             <div className="flex justify-center mt-2">
+     <button
+      type="submit"
+      className={`bg-blue-500 text-white px-8 py-2 rounded-md text-sm w-max mx-auto hover:bg-blue-600 transition ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
+      disabled={isSubmitting}
+    >
       {type === "create" ? "Create" : "Update"}
     </button>
   </div>
+
         </form>
     )
 };
