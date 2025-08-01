@@ -770,7 +770,9 @@ export const updateEvent = async (currentState: CurrentState, data: EventSchema)
 				description: data.description,
 				startTime: data.startTime,
 				endTime: data.endTime,
-				...(data.classId && { classId: data.classId }),
+				...(typeof data.classId === 'number' || data.classId === null
+					? { classId: data.classId }
+					: {}),
 			},
 		});
 		return { success: true, error: false }
@@ -877,6 +879,10 @@ export const updateAnnouncement = async (currentState: CurrentState, data: Annou
 			}
 		}
 
+		if (data.classId === 0) {
+			data.classId = null
+		}
+		
 		await prisma.announcement.update({
 			where: {
 				id: data.id,
@@ -885,7 +891,9 @@ export const updateAnnouncement = async (currentState: CurrentState, data: Annou
 				title: data.title,
 				description: data.description,
 				date: data.date,
-				...(data.classId && { classId: data.classId }),
+				...(typeof data.classId === 'number' || data.classId === null
+					? { classId: data.classId }
+					: {}),
 			},
 		});
 		return { success: true, error: false }

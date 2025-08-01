@@ -24,8 +24,6 @@ const AnnouncementListPage = async ({
 	let role = tokenData?.userPblcMtdt?.role;
 	const currentUserId = userId;
 
-
-
 	const columns = [
 		{
 			header: "Title",
@@ -61,7 +59,11 @@ const AnnouncementListPage = async ({
 		>
 			<td className="flex items-center gap-4 p-4">{item.title}</td>
 			<td>{item.description}</td>
-			<td>{item.class?.name || "-"}</td>
+			<td>
+				{item.classId === null
+				  ? "School-wide announcement"
+				  : item.class?.name || "-"}
+			</td>
 			<td className="hidden md:table-cell">
 				{new Intl.DateTimeFormat("en-US").format(item.date)}
 			</td>
