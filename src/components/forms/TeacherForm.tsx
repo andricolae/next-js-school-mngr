@@ -247,11 +247,29 @@ const TeacherForm = ({
     setIsSubmitting(true);
   });
 
-  function openUploadWidget(): void {
-    // Implement your upload logic here
-    // For now just a stub
-    throw new Error("Function not implemented.");
+ function openUploadWidget() {
+  // @ts-ignore
+  const cloudinary = (window as any).cloudinary;
+  if (!cloudinary) {
+    alert("Cloudinary widget is not loaded");
+    return;
   }
+
+  const widget = cloudinary.createUploadWidget(
+    {
+      cloudName: "YOUR_CLOUD_NAME",     
+      uploadPreset: "YOUR_UPLOAD_PRESET", 
+    },
+    (error: any, result: any) => {
+      if (!error && result && result.event === "success") {
+        setImg(result.info); 
+      }
+    }
+  );
+
+  widget.open();
+}
+
 
   return (
     <form className="flex flex-col gap-8" onSubmit={onSubmit}>
@@ -393,6 +411,7 @@ const TeacherForm = ({
       />
 </div>
       </div>
+
        <div className="flex justify-center mt-2">
     <button
       type="submit"
