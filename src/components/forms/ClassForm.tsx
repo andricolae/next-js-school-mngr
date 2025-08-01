@@ -66,7 +66,7 @@ const ClassForm = ({
 
     return (
         <form className="flex flex-col gap-8 mx-auto" onSubmit={onSubmit}>
-            <h1 className="text-cl font-semibold text-left mb-6">
+            <h1 className="text-xl font-semibold text-left mb-6">
                 {type === "create" ? "Create a new class" : "Update the class"}
             </h1>
 

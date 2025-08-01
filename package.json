@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-	"postinstall": "prisma generate"
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@clerk/backend": "^2.3.0",
@@ -30,6 +30,7 @@
     "react-calendar": "^5.1.0",
     "react-dom": "^18",
     "react-hook-form": "^7.60.0",
+    "react-select": "^5.10.2",
     "react-toastify": "^11.0.5",
     "recharts": "^2.15.1",
     "ts-node": "^10.9.2",
