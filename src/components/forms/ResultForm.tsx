@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import InputField from "../InputField";
 import Image from "next/image";
-import { Dispatch, SetStateAction, useEffect } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { resultSchema, ResultSchema } from "@/lib/formValidationSchemas";
 import { useFormState } from "react-dom";
 import { createResult, updateResult } from "@/lib/actions";
@@ -44,7 +44,10 @@ const ResultForm = ({
     const [state, formAction] = useFormState(type === "create"
         ? createResult : updateResult, { success: false, error: false })
 
+    const [isSubmitting, setIsSubmitting] = useState(false); // added to avoid multiple submitions
+
     const onSubmit = handleSubmit(formData => {
+        setIsSubmitting(true); // added to avoid multiple submitions
         const submissionData = {
             ...formData,
             ...(type === "update" && data?.id && { id: data.id }),
@@ -62,6 +65,7 @@ const ResultForm = ({
         }
         if (state.error) {
             const errorMessage = state.message || "Something went wrong!";
+            setIsSubmitting(true); // added to re-enable button if error happens
         }
     }, [state, router, type, setOpen]);
 
@@ -182,10 +186,13 @@ const ResultForm = ({
                 </span>
             )}
              <div className="flex justify-center mt-6">
-    <button className="bg-blue-500 text-white px-8 py-2 rounded-md text-sm w-max">
-      {type === "create" ? "Create" : "Update"}
-    </button>
-  </div>
+                <button
+                    className={`bg-blue-500 text-white px-4 py-2 rounded-md mx-auto hover:bg-blue-600 transition ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
+                    disabled={isSubmitting}
+                >
+                {type === "create" ? "Create" : "Update"}
+                </button>
+            </div>
         </form>
     )
 };
