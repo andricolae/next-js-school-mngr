@@ -7,7 +7,7 @@ import Image from "next/image";
 import { subjectSchema, SubjectSchema } from "@/lib/formValidationSchemas";
 import { createSubject, updateSubject } from "@/lib/actions";
 import { useFormState } from "react-dom";
-import { Dispatch, SetStateAction, useEffect } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 
@@ -40,7 +40,10 @@ const SubjectForm = ({
     const [state, formAction] = useFormState(type === "create"
         ? createSubject : updateSubject, { success: false, error: false })
 
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
     const onSubmit = handleSubmit(data => {
+        setIsSubmitting(true);
         formAction(data);
     })
 
@@ -55,6 +58,7 @@ const SubjectForm = ({
 
          if (state.error) {
             const errorMessage = state.message || "Something went wrong!";
+            setIsSubmitting(false);
         }
         
     }, [state, router, type, setOpen]);
@@ -116,7 +120,10 @@ const SubjectForm = ({
             )}
 
             <div className="flex justify-center mt-6">
-                <button className="bg-blue-500 text-white px-8 py-2 rounded-md text-sm w-max">
+                <button
+                className={`bg-blue-500 text-white px-8 py-2 rounded-md text-sm w-max ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
+                disabled={isSubmitting}
+                >
                     {type === "create" ? "Create" : "Update"}
                 </button>
             </div>

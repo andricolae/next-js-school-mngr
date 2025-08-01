@@ -38,8 +38,11 @@ const StudentForm = ({
     { success: false, error: false }
   );
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const onSubmit = handleSubmit((data) => {
     formAction({ ...data, img: img?.secure_url });
+    setIsSubmitting(true);
   });
 
   const router = useRouter();
@@ -52,6 +55,7 @@ const StudentForm = ({
       setOpen(false);
       router.refresh();
     }
+    else setIsSubmitting(false);
   }, [state, router, type, setOpen]);
 
   const { grades, classes, parents } = relatedData || {
@@ -277,7 +281,10 @@ const StudentForm = ({
       )}
 
       <div className="flex justify-center mt-6">
-        <button className="bg-blue-500 text-white px-8 py-2 rounded-md text-sm w-max">
+        <button
+        className={`bg-blue-500 text-white px-8 py-2 rounded-md text-sm w-max ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
+        disabled={isSubmitting}
+        >
           {type === "create" ? "Create" : "Update"}
         </button>
       </div>
