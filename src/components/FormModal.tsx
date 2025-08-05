@@ -62,23 +62,23 @@ const AnnouncementForm = dynamic(() => import("./forms/AnnouncementForm"), {
 });
 
 const forms: {
-    [key: string]: (setOpen: Dispatch<SetStateAction<boolean>>, type: "create" | "update", data?: any, relatedData?:any) => JSX.Element;
+    [key: string]: (setOpen: Dispatch<SetStateAction<boolean>>, type: "create" | "update", data?: any, relatedData?: any) => JSX.Element;
 } = {
     teacher: (setOpen, type, data, relatedData) => <TeacherForm type={type} data={data} setOpen={setOpen} relatedData={relatedData} />,
-    student: (setOpen, type, data, relatedData) => <StudentForm type={type} data={data} setOpen={setOpen} relatedData={relatedData}  />,
-    parent: (setOpen, type, data, relatedData) => <ParentForm type={type} data={data} setOpen={setOpen} relatedData={relatedData}  />,
-    subject: (setOpen, type, data, relatedData) => <SubjectForm type={type} data={data} setOpen={setOpen} relatedData={relatedData}  />,
-    class: (setOpen, type, data, relatedData) => <ClassForm type={type} data={data} setOpen={setOpen} relatedData={relatedData}  />,
-    lesson: (setOpen, type, data, relatedData) => <LessonForm type={type} data={data} setOpen={setOpen} relatedData={relatedData}  />,
-    exam: (setOpen, type, data, relatedData) => <ExamForm type={type} data={data} setOpen={setOpen} relatedData={relatedData}  />,
-    assignment: (setOpen, type, data, relatedData) => <AssignmentForm type={type} data={data} setOpen={setOpen} relatedData={relatedData}  />,
-    result: (setOpen, type, data, relatedData) => <ResultForm type={type} data={data} setOpen={setOpen} relatedData={relatedData}  />,
-    attendance: (setOpen, type, data, relatedData) => <AttendanceForm type={type} data={data} setOpen={setOpen} relatedData={relatedData}  />,
-    event: (setOpen, type, data, relatedData) => <EventForm type={type} data={data} setOpen={setOpen} relatedData={relatedData}  />,
-    announcement: (setOpen, type, data, relatedData) => <AnnouncementForm type={type} data={data} setOpen={setOpen} relatedData={relatedData}  />,
+    student: (setOpen, type, data, relatedData) => <StudentForm type={type} data={data} setOpen={setOpen} relatedData={relatedData} />,
+    parent: (setOpen, type, data, relatedData) => <ParentForm type={type} data={data} setOpen={setOpen} relatedData={relatedData} />,
+    subject: (setOpen, type, data, relatedData) => <SubjectForm type={type} data={data} setOpen={setOpen} relatedData={relatedData} />,
+    class: (setOpen, type, data, relatedData) => <ClassForm type={type} data={data} setOpen={setOpen} relatedData={relatedData} />,
+    lesson: (setOpen, type, data, relatedData) => <LessonForm type={type} data={data} setOpen={setOpen} relatedData={relatedData} />,
+    exam: (setOpen, type, data, relatedData) => <ExamForm type={type} data={data} setOpen={setOpen} relatedData={relatedData} />,
+    assignment: (setOpen, type, data, relatedData) => <AssignmentForm type={type} data={data} setOpen={setOpen} relatedData={relatedData} />,
+    result: (setOpen, type, data, relatedData) => <ResultForm type={type} data={data} setOpen={setOpen} relatedData={relatedData} />,
+    attendance: (setOpen, type, data, relatedData) => <AttendanceForm type={type} data={data} setOpen={setOpen} relatedData={relatedData} />,
+    event: (setOpen, type, data, relatedData) => <EventForm type={type} data={data} setOpen={setOpen} relatedData={relatedData} />,
+    announcement: (setOpen, type, data, relatedData) => <AnnouncementForm type={type} data={data} setOpen={setOpen} relatedData={relatedData} />,
 };
 
-const FormModal = ({ table, type, data, id, relatedData }: FormContainerProps & {relatedData?: any}) => {
+const FormModal = ({ table, type, data, id, relatedData }: FormContainerProps & { relatedData?: any }) => {
     const size = type === "create" ? "w-8 h-8" : "w-7 h-7"
     const bgColor =
         type === "create" ? "bg-yellow"
@@ -88,13 +88,13 @@ const FormModal = ({ table, type, data, id, relatedData }: FormContainerProps & 
 
     const [open, setOpen] = useState(false);
 
-const modalWidthClass = table === "subject"
-  ? "w-[30%] p-5 h-[50%]"
-  : ["exam", "assignment", "result", "attendance"].includes(table)
-    ? "w-[40%] p-6 h-[70%]"   
-    : [ "announcement", "event", "lesson", "class", "teacher", "student", "parent"].includes(table)
-      ? "w-[40%] p-3 h-[80%]"
-      : "w-[50%] p-4 h-[80%]";
+    const modalWidthClass = table === "subject"
+        ? "w-[30%] p-5 h-fit"
+        : ["exam", "assignment", "result", "attendance"].includes(table)
+            ? "w-[40%] p-6 h-fit"
+            : ["announcement", "event", "lesson", "class", "teacher", "student", "parent"].includes(table)
+                ? "w-[40%] p-3 h-fit"
+                : "w-[50%] p-4 h-fit";
 
 
     const Form = () => {
@@ -128,15 +128,15 @@ const modalWidthClass = table === "subject"
     return <>
         <button
             className={`${size} flex items-center justify-center rounded-full ${bgColor}`}
-            onClick={() => {setOpen(true); }}
+            onClick={() => { setOpen(true); }}
         >
             <Image src={`/${type}.png`} alt="" width={16} height={16} />
         </button>
         {open && (
             <div className="w-screen h-screen absolute left-0 top-0 bg-black bg-opacity-60 z-50 flex items-center justify-center">
-              <div className={`bg-white rounded-md relative ${modalWidthClass} overflow-y-auto`}>
+                <div className={`bg-white rounded-md relative ${modalWidthClass} overflow-y-auto`}>
 
-                {/*<div className="bg-white p-4 rounded-md relative w-[90%] sm:w-[450px] max-w-full">*/}
+                    {/*<div className="bg-white p-4 rounded-md relative w-[90%] sm:w-[450px] max-w-full">*/}
 
                     <Form />
                     <div className="absolute top-4 right-4 cursor-pointer" onClick={() => setOpen(false)}>
