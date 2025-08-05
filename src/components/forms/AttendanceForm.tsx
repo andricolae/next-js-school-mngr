@@ -63,11 +63,11 @@ const AttendanceForm = ({
     const { students, lessons } = relatedData || {};
 
     return (
-        
-      <form
-  className="flex flex-col gap-6 w-full "
-  onSubmit={onSubmit}
->
+
+        <form
+            className="flex flex-col gap-6 w-full "
+            onSubmit={onSubmit}
+        >
 
             <h1 className="text-xl font-semibold">{type === "create" ? "Create attendance record" : "Update attendance record"}</h1>
 
@@ -156,20 +156,20 @@ const AttendanceForm = ({
                 </div>
             </div>
 
-           {state.error && (
+            {state.error && (
                 <span className="text-red-500">
                     {state.message || "Something went wrong!"}
                 </span>
             )}
-             <div className="flex justify-center mt-4">
-     <button
-      type="submit"
-      className={`bg-blue-500 text-white px-8 py-2 rounded-md text-sm w-max mx-auto hover:bg-blue-600 transition ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
-      disabled={isSubmitting}
-    >
-      {type === "create" ? "Create" : "Update"}
-    </button>
-  </div>
+            <div className="flex justify-center mt-4">
+                <button
+                    type="submit"
+                    className={`bg-blue-500 text-white px-8 py-2 rounded-md text-sm w-max mx-auto hover:bg-blue-600 transition ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
+                    disabled={isSubmitting}
+                >
+                    {type === "create" ? "Create" : "Update"}
+                </button>
+            </div>
         </form>
     )
 };

@@ -4,7 +4,7 @@ import FinanceChart from "./FinanceChart";
 const FinanceChartContainer = async () => {
     const [studentCount, teacherCount, adminCount] = await Promise.all([
         prisma.student.count(),
-        prisma.teacher.count(), 
+        prisma.teacher.count(),
         prisma.admin.count()
     ]);
 
@@ -46,7 +46,7 @@ const FinanceChartContainer = async () => {
  */
 function generateFinanceData(studentCount: number, teacherCount: number, adminCount: number) {
     const currentDate = new Date();
-    const currentMonth = currentDate.getMonth(); 
+    const currentMonth = currentDate.getMonth();
     const currentYear = currentDate.getFullYear();
 
     const months = [
@@ -78,8 +78,8 @@ function generateFinanceData(studentCount: number, teacherCount: number, adminCo
             };
         }
 
-        let prorationFactor = 1; 
-        
+        let prorationFactor = 1;
+
         if (index === currentMonth) {
             const currentDay = currentDate.getDate();
             const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
@@ -87,11 +87,11 @@ function generateFinanceData(studentCount: number, teacherCount: number, adminCo
         }
 
         const monthlyTuitionPerStudent = 450;
-        const additionalFeesPerStudent = 150; 
-        const totalIncomePerStudent = monthlyTuitionPerStudent + additionalFeesPerStudent; 
-        
+        const additionalFeesPerStudent = 150;
+        const totalIncomePerStudent = monthlyTuitionPerStudent + additionalFeesPerStudent;
+
         const monthlyIncome = studentCount * totalIncomePerStudent;
-        
+
         const teacherSalaries = teacherCount * 2000;
         const adminSalaries = adminCount * 1600;
         const supportStaffCount = Math.ceil(studentCount / 40);
@@ -105,7 +105,7 @@ function generateFinanceData(studentCount: number, teacherCount: number, adminCo
         const facilityMaintenancePerStudent = 25;
         const educationalMaterialsPerTeacher = 300;
         const adminOperationsPerAdmin = 200;
-        
+
         const facilityMaintenance = studentCount * facilityMaintenancePerStudent;
         const educationalMaterials = teacherCount * educationalMaterialsPerTeacher;
         const adminOperations = adminCount * adminOperationsPerAdmin;

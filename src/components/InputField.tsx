@@ -27,10 +27,10 @@ const InputField = ({
         /*<div className={hidden ? "hidden" : "flex flex-col gap-2 w-full"}>*/
         <div className={`${hidden ? "hidden" : "flex flex-col gap-2 pt-2"} ${className}`}>
             <label className="text-xs text-gray-400">{label}</label>
-            <input 
-                type={type} 
-                {...register(name)} 
-                className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full" 
+            <input
+                type={type}
+                {...register(name)}
+                className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
                 {...inputProps}
                 defaultValue={defaultValue}
             />
