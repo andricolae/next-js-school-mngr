@@ -13,20 +13,20 @@ const SortButton = ({ currentSort }: SortButtonProps) => {
 
     const handleSort = () => {
         const params = new URLSearchParams(searchParams);
-        
+
         if (!currentSort || currentSort === "desc") {
             params.set("sort", "asc");
         } else {
             params.set("sort", "desc");
         }
-        
+
         params.delete("page");
-        
+
         router.push(`${window.location.pathname}?${params}`);
     };
 
     return (
-        <button 
+        <button
             className="w-8 h-8 flex items-center justify-center rounded-full bg-yellow hover:bg-yellow/80 transition-colors"
             onClick={handleSort}
             title={`Sort ${currentSort === "asc" ? "descending" : "ascending"}`}

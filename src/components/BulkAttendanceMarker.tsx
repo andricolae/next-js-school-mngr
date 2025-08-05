@@ -19,11 +19,11 @@ type Lesson = {
     class: { name: string; id: number };
 };
 
-const BulkAttendanceMarker = ({ 
-    lessons, 
-    onClose 
-}: { 
-    lessons: Lesson[]; 
+const BulkAttendanceMarker = ({
+    lessons,
+    onClose
+}: {
+    lessons: Lesson[];
     onClose: () => void;
 }) => {
     const [selectedLesson, setSelectedLesson] = useState<number | null>(null);
@@ -47,7 +47,7 @@ const BulkAttendanceMarker = ({
             const response = await fetch(`/api/students/by-class/${lesson.class.id}`);
             const studentsData = await response.json();
             setStudents(studentsData);
-            
+
             const initialAttendance: Record<string, boolean> = {};
             studentsData.forEach((student: Student) => {
                 initialAttendance[student.id] = true;
@@ -124,7 +124,7 @@ const BulkAttendanceMarker = ({
         <div className="flex flex-col gap-6">
             <div className="flex items-center justify-between">
                 <h1 className="text-xl font-semibold">Mark Class Attendance</h1>
-                <button 
+                <button
                     onClick={onClose}
                     className="p-2 hover:bg-gray-100 rounded-full"
                 >
@@ -189,19 +189,17 @@ const BulkAttendanceMarker = ({
                             {students.map((student) => (
                                 <div
                                     key={student.id}
-                                    className={`flex items-center justify-between p-3 rounded-lg border cursor-pointer transition-colors ${
-                                        attendanceData[student.id]
+                                    className={`flex items-center justify-between p-3 rounded-lg border cursor-pointer transition-colors ${attendanceData[student.id]
                                             ? "bg-green-50 border-green-200"
                                             : "bg-red-50 border-red-200"
-                                    }`}
+                                        }`}
                                     onClick={() => toggleAttendance(student.id)}
                                 >
                                     <div className="flex items-center gap-3">
-                                        <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
-                                            attendanceData[student.id]
+                                        <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${attendanceData[student.id]
                                                 ? "bg-green-500 border-green-500"
                                                 : "border-red-300"
-                                        }`}>
+                                            }`}>
                                             {attendanceData[student.id] && (
                                                 <div className="w-2 h-2 bg-white rounded-full"></div>
                                             )}
@@ -213,11 +211,10 @@ const BulkAttendanceMarker = ({
                                             <p className="text-xs text-gray-500">{student.username}</p>
                                         </div>
                                     </div>
-                                    <span className={`px-2 py-1 rounded text-xs font-medium ${
-                                        attendanceData[student.id]
+                                    <span className={`px-2 py-1 rounded text-xs font-medium ${attendanceData[student.id]
                                             ? "bg-green-100 text-green-800"
                                             : "bg-red-100 text-red-800"
-                                    }`}>
+                                        }`}>
                                         {attendanceData[student.id] ? "Present" : "Absent"}
                                     </span>
                                 </div>

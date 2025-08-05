@@ -75,7 +75,7 @@ const ResultForm = ({
         <form className="flex flex-col gap-6 mx-auto" onSubmit={onSubmit}>
             <h1 className="text-xl font-semibold">
                 {type === "create" ? "Create a new result" : "Update the result"}</h1>
- 
+
             <div className=" mt-2 text-xs text-gray-500">
                 Note: Select either an exam OR an assignment, not both.
             </div>
@@ -132,8 +132,8 @@ const ResultForm = ({
                         defaultValue={data?.examId || ""}
                         {...register("examId")}
                         onChange={(e) => {
-                        setValue("examId", parseInt(e.target.value));
-                        setValue("assignmentId", undefined);
+                            setValue("examId", parseInt(e.target.value));
+                            setValue("assignmentId", undefined);
                         }}
                     >
                         <option value="">Select an exam</option>
@@ -159,8 +159,8 @@ const ResultForm = ({
                         defaultValue={data?.assignmentId || ""}
                         {...register("assignmentId")}
                         onChange={(e) => {
-                        setValue("assignmentId", parseInt(e.target.value));
-                        setValue("examId", undefined);
+                            setValue("assignmentId", parseInt(e.target.value));
+                            setValue("examId", undefined);
                         }}
                     >
                         <option value="">Select an assignment</option>
@@ -180,20 +180,20 @@ const ResultForm = ({
                 </div>
             </div>
 
-          {state.error && (
+            {state.error && (
                 <span className="text-red-500">
                     {state.message || "Something went wrong!"}
                 </span>
             )}
-             <div className="flex justify-center mt-2">
-     <button
-      type="submit"
-      className={`bg-blue-500 text-white px-8 py-2 rounded-md text-sm w-max mx-auto hover:bg-blue-600 transition ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
-      disabled={isSubmitting}
-    >
-      {type === "create" ? "Create" : "Update"}
-    </button>
-  </div>
+            <div className="flex justify-center mt-2">
+                <button
+                    type="submit"
+                    className={`bg-blue-500 text-white px-8 py-2 rounded-md text-sm w-max mx-auto hover:bg-blue-600 transition ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
+                    disabled={isSubmitting}
+                >
+                    {type === "create" ? "Create" : "Update"}
+                </button>
+            </div>
 
         </form>
     )

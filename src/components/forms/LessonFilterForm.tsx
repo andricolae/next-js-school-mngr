@@ -108,7 +108,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
             <label htmlFor={id} className="block text-sm font-medium text-gray-700 mb-1">
                 {label}
             </label>
-            
+
             {selectedIds.length > 0 && (
                 <div className="flex flex-wrap gap-1 mb-2">
                     {getSelectedOptions().map((option) => (
@@ -154,7 +154,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
                     <span className="text-gray-400">▼</span>
                 </div>
             </div>
-            
+
             {isOpen && filteredOptions.length > 0 && (
                 <div
                     ref={dropdownRef}
@@ -172,7 +172,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
                     ))}
                 </div>
             )}
-            
+
             {isOpen && filteredOptions.length === 0 && searchText && (
                 <div
                     ref={dropdownRef}
@@ -221,7 +221,7 @@ const LessonFilterForm: React.FC<LessonFilterFormProps> = ({
 
     const handleApplyFilters = () => {
         const newSearchParams = new URLSearchParams();
-        
+
         // Păstrează parametrii 'search' și 'sort' existenți
         const existingSearchParam = searchParams.get("search");
         if (existingSearchParam) {
@@ -246,18 +246,18 @@ const LessonFilterForm: React.FC<LessonFilterFormProps> = ({
 
     const handleClearFilters = () => {
         const newSearchParams = new URLSearchParams();
-        
+
         // Păstrează parametrii 'search' și 'sort' existenți
         const existingSearchParam = searchParams.get("search");
         if (existingSearchParam) {
             newSearchParams.set("search", existingSearchParam);
         }
-        
+
         const existingSortParam = searchParams.get("sort");
         if (existingSortParam) {
             newSearchParams.set("sort", existingSortParam);
         }
-        
+
         router.push(`${window.location.pathname}?${newSearchParams.toString()}`);
 
         setSubjectFilters([]);
@@ -267,7 +267,7 @@ const LessonFilterForm: React.FC<LessonFilterFormProps> = ({
         setIsOpen(false);
     };
 
-    const activeFiltersCount = 
+    const activeFiltersCount =
         subjectFilters.length +
         teacherFilters.length +
         classFilters.length +

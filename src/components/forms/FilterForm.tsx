@@ -19,10 +19,10 @@ interface FilterFormProps {
 }
 
 interface ModuleOption {
-    id: string; 
+    id: string;
     name: string;
-    startDate: string; 
-    endDate: string;  
+    startDate: string;
+    endDate: string;
 }
 
 const SORT_DATE_OPTIONS = [
@@ -126,7 +126,7 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
             <label htmlFor={id} className="block text-sm font-medium text-gray-700 mb-1">
                 {label}
             </label>
-            
+
             {selectedIds.length > 0 && (
                 <div className="flex flex-wrap gap-1 mb-2">
                     {getSelectedOptions().map((option) => (
@@ -140,7 +140,7 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
                                 onClick={() => handleRemoveSelected(option.id)}
                                 className="ml-1 inline-flex items-center justify-center w-4 h-4 rounded-full hover:bg-blue-200"
                             >
-                                x    
+                                x
                             </button>
                         </span>
                     ))}
@@ -172,7 +172,7 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
                     <span className="text-gray-400">▼</span>
                 </div>
             </div>
-            
+
             {isOpen && filteredOptions.length > 0 && (
                 <div
                     ref={dropdownRef}
@@ -190,7 +190,7 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
                     ))}
                 </div>
             )}
-            
+
             {isOpen && filteredOptions.length === 0 && searchText && (
                 <div
                     ref={dropdownRef}
@@ -226,21 +226,21 @@ const FilterForm: React.FC<FilterFormProps> = ({
     const [moduleFilter, setModuleFilter] = useState(currentFilters.moduleId || "");
     const [sortDateOption, setSortDateOption] = useState("");
     const [sortGradeOption, setSortGradeOption] = useState("");
-    
+
 
     useEffect(() => {
         setTitleFilter(currentFilters.title || "");
-        
+
         setSubjectFilters(currentFilters.subjectId ? currentFilters.subjectId.split(',') : []);
         setStudentFilters(currentFilters.studentId ? currentFilters.studentId.split(',') : []);
         setTeacherFilters(currentFilters.teacherId ? currentFilters.teacherId.split(',') : []);
         setClassFilters(currentFilters.classId ? currentFilters.classId.split(',') : []);
         setModuleFilter(currentFilters.moduleId || "");
-      
+
         setSortDateOption(currentFilters.sortDate || "");
         setSortGradeOption(currentFilters.sortGrade || "");
-        
-      
+
+
         if (currentFilters.sort && !currentFilters.sortDate && !currentFilters.sortGrade) {
             const currentSort = currentFilters.sort;
             if (currentSort === "date_asc" || currentSort === "date_desc") {
@@ -265,8 +265,8 @@ const FilterForm: React.FC<FilterFormProps> = ({
         if (teacherFilters.length > 0) newSearchParams.set("teacherId", teacherFilters.join(','));
         if (classFilters.length > 0) newSearchParams.set("classId", classFilters.join(','));
         if (moduleFilter) newSearchParams.set("moduleId", moduleFilter);
-        
-      
+
+
         if (sortDateOption) newSearchParams.set("sortDate", sortDateOption);
         if (sortGradeOption) newSearchParams.set("sortGrade", sortGradeOption);
 
@@ -295,7 +295,7 @@ const FilterForm: React.FC<FilterFormProps> = ({
         setIsOpen(false);
     };
 
-    const activeFiltersCount = 
+    const activeFiltersCount =
         (titleFilter ? 1 : 0) +
         subjectFilters.length +
         studentFilters.length +

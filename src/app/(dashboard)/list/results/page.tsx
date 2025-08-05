@@ -29,7 +29,7 @@ type ResultList = {
 
 
 const fetchModules = async () => {
-   
+
     return [
         { id: "1", name: "Semester 1", startDate: "06/01/2025", endDate: "06/30/2025" },
         { id: "2", name: "Semester 2", startDate: "07/01/2025", endDate: "07/31/2025" },
@@ -52,7 +52,7 @@ const ResultListPage = async ({
 
     const modulesData = await fetchModules();
 
-   
+
     const [subjectsData, classesData, studentsData, teachersData] = await Promise.all([
         prisma.subject.findMany({ select: { id: true, name: true } }),
         prisma.class.findMany({ select: { id: true, name: true } }),
@@ -64,10 +64,10 @@ const ResultListPage = async ({
         }),
     ]);
 
-    const subjects = subjectsData.map(s => ({ id: String(s.id), name: s.name })); 
-    const classes = classesData.map(c => ({ id: String(c.id), name: c.name }));   
-    const formattedStudents = studentsData.map(s => ({ id: s.id, name: `${s.name} ${s.surname}` })); 
-    const formattedTeachers = teachersData.map(t => ({ id: t.id, name: `${t.name} ${t.surname}` })); 
+    const subjects = subjectsData.map(s => ({ id: String(s.id), name: s.name }));
+    const classes = classesData.map(c => ({ id: String(c.id), name: c.name }));
+    const formattedStudents = studentsData.map(s => ({ id: s.id, name: `${s.name} ${s.surname}` }));
+    const formattedTeachers = teachersData.map(t => ({ id: t.id, name: `${t.name} ${t.surname}` }));
     const currentFilters = Object.fromEntries(
         Object.entries(searchParams).map(([key, value]) => [key, Array.isArray(value) ? value.join(',') : value])
     );
@@ -151,7 +151,7 @@ const ResultListPage = async ({
     const { page, sort, sortDate, sortGrade, ...queryParams } = searchParams;
     const p = page ? parseInt(page) : 1;
 
-    
+
     const query: Prisma.ResultWhereInput = {};
     const andConditions: Prisma.ResultWhereInput[] = [];
 
@@ -160,18 +160,18 @@ const ResultListPage = async ({
             if (value !== undefined && value !== '') {
                 switch (key) {
                     case "studentId":
-                       const studentIds = value.split(',').filter(id => id.trim() !== '');
+                        const studentIds = value.split(',').filter(id => id.trim() !== '');
                         if (studentIds.length === 1) {
                             isSingleStudentSelected = true;
                             andConditions.push({ studentId: { in: studentIds } });
                         } else if (studentIds.length > 1) {
-                            isSingleStudentSelected = false; 
+                            isSingleStudentSelected = false;
                             andConditions.push({ studentId: { in: studentIds } });
                         }
                         break;
-                        
+
                     case "teacherId":
-                        
+
                         const teacherIds = value.split(',').filter(id => id.trim() !== '');
                         if (teacherIds.length > 0) {
                             andConditions.push({
@@ -182,9 +182,9 @@ const ResultListPage = async ({
                             });
                         }
                         break;
-                        
+
                     case "subjectId":
-                      
+
                         const subjectIds = value.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id));
                         if (subjectIds.length > 0) {
                             andConditions.push({
@@ -195,9 +195,9 @@ const ResultListPage = async ({
                             });
                         }
                         break;
-                        
+
                     case "classId":
-                     
+
                         const classIds = value.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id));
                         if (classIds.length > 0) {
                             andConditions.push({
@@ -208,9 +208,9 @@ const ResultListPage = async ({
                             });
                         }
                         break;
-                        
+
                     case "title":
-                        
+
                         andConditions.push({
                             OR: [
                                 { exam: { title: { contains: value, mode: "insensitive" } } },
@@ -218,9 +218,9 @@ const ResultListPage = async ({
                             ]
                         });
                         break;
-                        
+
                     case "search":
-                       
+
                         andConditions.push({
                             OR: [
                                 { exam: { title: { contains: value, mode: "insensitive" } } },
@@ -230,49 +230,49 @@ const ResultListPage = async ({
                             ]
                         });
                         break;
-                    
+
                     case "moduleId":
                         const selectedModuleId = value;
                         const selectedModule = modulesData.find(mod => mod.id === selectedModuleId);
 
                         if (selectedModule) {
-                            
+
                             const [startMonth, startDay, startYear] = selectedModule.startDate.split('/');
                             const [endMonth, endDay, endYear] = selectedModule.endDate.split('/');
-                            
+
                             const moduleStartDate = new Date(parseInt(startYear), parseInt(startMonth) - 1, parseInt(startDay), 0, 0, 0, 0);
                             const moduleEndDate = new Date(parseInt(endYear), parseInt(endMonth) - 1, parseInt(endDay), 23, 59, 59, 999);
 
 
                             andConditions.push({
-                                        OR: [
-                                            {
-                                                exam: {
-                                                    startTime: {
-                                                        gte: moduleStartDate,
-                                                        lte: moduleEndDate,
-                                                    },
-                                                },
+                                OR: [
+                                    {
+                                        exam: {
+                                            startTime: {
+                                                gte: moduleStartDate,
+                                                lte: moduleEndDate,
                                             },
-                                            {
-                                                assignment: {
-                                                    startDate: {
-                                                        gte: moduleStartDate,
-                                                        lte: moduleEndDate,
-                                                    },
-                                                },
+                                        },
+                                    },
+                                    {
+                                        assignment: {
+                                            startDate: {
+                                                gte: moduleStartDate,
+                                                lte: moduleEndDate,
                                             },
-                                        ],
-                                    });
+                                        },
+                                    },
+                                ],
+                            });
                         }
                         break;
-                                            
-                                        default:
-                                            break;
-                                    }
-                                }
-                            }
-                        }
+
+                    default:
+                        break;
+                }
+            }
+        }
+    }
 
 
     switch (role) {
@@ -329,12 +329,12 @@ const ResultListPage = async ({
         }
     }
 
-  
+
     const shouldSortByScore = sortGrade && sortGrade !== '';
     const shouldSortByTitle = sort !== undefined;
     const shouldSortTransformed = shouldSortByTitle || shouldSortByScore;
 
-   
+
     const [dataRes, count] = await prisma.$transaction([
         prisma.result.findMany({
             where: query,
@@ -400,7 +400,7 @@ const ResultListPage = async ({
         orderBy: shouldSortTransformed ? undefined : orderBy,
     });
 
-   
+
     let data = dataRes.map((item) => {
         const assessment = item.exam || item.assignment;
 
@@ -426,7 +426,7 @@ const ResultListPage = async ({
     }).filter(Boolean) as ResultList[];
 
 
-     let allDataTransformedForExport = allDataForExportRes.map((item) => {
+    let allDataTransformedForExport = allDataForExportRes.map((item) => {
         const assessment = item.exam || item.assignment;
 
         if (!assessment) return null;
@@ -449,17 +449,17 @@ const ResultListPage = async ({
             subject: assessment.lesson.subject.name,
         };
     }).filter(Boolean) as ResultList[];
- 
+
     if (shouldSortTransformed) {
         if (shouldSortByTitle && sort) {
-            
+
             data.sort((a, b) => {
                 const aValue = a.title.toLowerCase();
                 const bValue = b.title.toLowerCase();
                 return sort === "asc" ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
             });
         } else if (shouldSortByScore) {
-            
+
             data.sort((a, b) => {
                 if (sortGrade === 'score_asc') {
                     return a.score - b.score;
@@ -487,7 +487,7 @@ const ResultListPage = async ({
                             teachers={formattedTeachers}
                             modules={modulesData}
                         />
-                        
+
                         <DownloadButton
                             dataToExport={allDataTransformedForExport}
                             headerDetails={{
@@ -508,14 +508,14 @@ const ResultListPage = async ({
             <Pagination page={p} count={count} />
 
             {isSingleStudentSelected && (
-            <AverageCalculator 
-                data={allDataTransformedForExport} 
-                title="General average"
-                precision={2}
-                showCount={true}
-                containerStyle="info"
-            />
-             )}
+                <AverageCalculator
+                    data={allDataTransformedForExport}
+                    title="General average"
+                    precision={2}
+                    showCount={true}
+                    containerStyle="info"
+                />
+            )}
         </div>
     );
 };

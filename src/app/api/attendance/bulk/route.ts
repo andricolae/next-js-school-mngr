@@ -7,10 +7,10 @@ export async function POST(request: NextRequest) {
     try {
         const { userId, sessionClaims } = await auth();
         let tokenData;
-	if (sessionClaims !== null) {
-		tokenData = sessionClaims as unknown as TokenData;
-	}
-	let role = tokenData?.userPblcMtdt?.role;
+        if (sessionClaims !== null) {
+            tokenData = sessionClaims as unknown as TokenData;
+        }
+        let role = tokenData?.userPblcMtdt?.role;
 
         if (!userId || (role !== "admin" && role !== "teacher")) {
             return NextResponse.json(
@@ -82,9 +82,9 @@ export async function POST(request: NextRequest) {
             data: formattedRecords
         });
 
-        return NextResponse.json({ 
+        return NextResponse.json({
             message: "Attendance recorded successfully",
-            recordsCreated: formattedRecords.length 
+            recordsCreated: formattedRecords.length
         });
 
     } catch (error) {

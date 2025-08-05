@@ -1,6 +1,6 @@
-"use client"; 
+"use client";
 import React from 'react';
-import Image from "next/image"; 
+import Image from "next/image";
 import { GenerateResultsPDF } from "@/components/ExportPDF";
 
 interface ResultItemForPdf {
@@ -24,8 +24,8 @@ interface PdfHeaderDetails {
 }
 
 interface DownloadButtonProps {
-    dataToExport: ResultItemForPdf[]; 
-    headerDetails?: PdfHeaderDetails; 
+    dataToExport: ResultItemForPdf[];
+    headerDetails?: PdfHeaderDetails;
 }
 
 const DownloadButton: React.FC<DownloadButtonProps> = ({
@@ -33,15 +33,15 @@ const DownloadButton: React.FC<DownloadButtonProps> = ({
     headerDetails,
 }) => {
     const handleDownloadPdf = () => {
-       
+
         GenerateResultsPDF(dataToExport, headerDetails);
     };
 
     return (
         <button
             className="w-8 h-8 flex items-center justify-center rounded-full bg-yellow"
-            onClick={handleDownloadPdf} 
-           
+            onClick={handleDownloadPdf}
+
         >
             <Image src="/download.png" alt="Download PDF" width={19} height={19} />
         </button>

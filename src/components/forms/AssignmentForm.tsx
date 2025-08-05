@@ -66,7 +66,7 @@ const AssignmentForm = ({
     return (
         <form className="flex flex-col gap-4 max-auto" onSubmit={onSubmit}>
             <h1 className="text-xl font-semibold">{type === "create" ? "Create a new assignment" : "Update the assignment"}</h1>
-       
+
             <div className="flex flex-col gap-6">
                 <InputField
                     label="Assignment Title"
@@ -108,7 +108,7 @@ const AssignmentForm = ({
                         {...register("lessonId")}
                         defaultValue={data?.lessonId}
                     >
-                         <option value="">Select lesson</option>
+                        <option value="">Select lesson</option>
                         {lessons.map(
                             (lesson: { id: number; name: string; }) => (
                                 <option value={lesson.id} key={lesson.id}>
@@ -124,20 +124,20 @@ const AssignmentForm = ({
                     }
                 </div>
             </div>
-          {state.error && (
+            {state.error && (
                 <span className="text-red-500">
                     {state.message || "Something went wrong!"}
                 </span>
             )}
-          <div className="flex justify-center mt-4">
-         <button
-            type="submit"
-            className={`bg-blue-500 text-white px-8 py-2 rounded-md text-sm w-max mx-auto hover:bg-blue-600 transition ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
-            disabled={isSubmitting}
-         >
-          {type === "create" ? "Create" : "Update"}
-        </button>
-      </div>
+            <div className="flex justify-center mt-4">
+                <button
+                    type="submit"
+                    className={`bg-blue-500 text-white px-8 py-2 rounded-md text-sm w-max mx-auto hover:bg-blue-600 transition ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
+                    disabled={isSubmitting}
+                >
+                    {type === "create" ? "Create" : "Update"}
+                </button>
+            </div>
         </form>
     )
 };
