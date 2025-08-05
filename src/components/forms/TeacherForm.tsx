@@ -415,7 +415,8 @@ const TeacherForm = ({
             <div className="flex justify-center mt-2">
                 <button
                     type="submit"
-                    className="bg-blue-500 text-white px-8 py-2 rounded-md text-sm w-max"
+                    className={`bg-blue-500 transition ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""} text-white px-8 py-2 rounded-md text-sm w-max`}
+                    disabled={isSubmitting}
                 >
                     {type === "create" ? "Create" : "Update"}
                 </button>
