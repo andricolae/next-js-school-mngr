@@ -12,13 +12,13 @@ import { TokenData } from "@/lib/utils";
 type EventList = Event & { class: Class };
 
 const EventListPage = async ({ searchParams }: { searchParams: { [key: string]: string | undefined } }) => {
-    
+
     const { userId, sessionClaims } = await auth();
     let tokenData;
-	if (sessionClaims !== null) {
-		tokenData = sessionClaims as unknown as TokenData;
-	}
-	let role = tokenData?.userPblcMtdt?.role;
+    if (sessionClaims !== null) {
+        tokenData = sessionClaims as unknown as TokenData;
+    }
+    let role = tokenData?.userPblcMtdt?.role;
     const currentUserId = userId;
 
     const columns = [
@@ -56,8 +56,8 @@ const EventListPage = async ({ searchParams }: { searchParams: { [key: string]: 
             <td className="flex items-center gap-4 p-4">{item.title}</td>
             <td>
                 {item.classId === null
-                ? "School-wide event"
-                : item.class?.name || "-"}
+                    ? "School-wide event"
+                    : item.class?.name || "-"}
             </td>
             <td className="hidden md:table-cell">{new Intl.DateTimeFormat("en-UK").format(item.startTime)}</td>
             <td className="hidden md:table-cell">{item.startTime.toLocaleTimeString("en-UK", {
@@ -87,7 +87,7 @@ const EventListPage = async ({ searchParams }: { searchParams: { [key: string]: 
     const p = page ? parseInt(page) : 1;
 
     const query: Prisma.EventWhereInput = {};
-    
+
     if (queryParams) {
         for (const [key, value] of Object.entries(queryParams)) {
             if (value !== undefined) {

@@ -22,10 +22,10 @@ const AssignmentListPage = async ({ searchParams }: { searchParams: { [key: stri
 
     const { userId, sessionClaims } = await auth();
     let tokenData;
-	if (sessionClaims !== null) {
-		tokenData = sessionClaims as unknown as TokenData;
-	}
-	let role = tokenData?.userPblcMtdt?.role;
+    if (sessionClaims !== null) {
+        tokenData = sessionClaims as unknown as TokenData;
+    }
+    let role = tokenData?.userPblcMtdt?.role;
     const currentUserId = userId;
 
     const columns = [

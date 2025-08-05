@@ -57,19 +57,19 @@ const ParentForm = ({
     }, [state, router, type, setOpen]);
 
     return (
-  <form className="flex flex-col gap-8 mx-auto " onSubmit={onSubmit}>
+        <form className="flex flex-col gap-8 mx-auto " onSubmit={onSubmit}>
 
             <h1 className="text-xl font-semibold">
                 {type === "create" ? "Create a new parent" : "Update the parent"}
             </h1>
 
-        
+
             <div className="flex gap-8">
                 <span className="text-xs text-gray-400 font-medium flex-1">Authentication Information</span>
                 <span className="text-xs text-gray-400 font-medium flex-1">Personal Information</span>
             </div>
 
-          
+
             <div className="flex gap-8">
                 {/* Coloana 1 */}
                 <div className="flex flex-col gap-2 flex-1">
@@ -124,7 +124,7 @@ const ParentForm = ({
                 </div>
             </div>
 
- 
+
             <InputField
                 label="Address"
                 name="address"
@@ -142,14 +142,14 @@ const ParentForm = ({
                     {state.message || "Something went wrong!"}
                 </span>
             )}
-   <div className="flex justify-center mt-1">
-        <button
-        className={`bg-blue-500 text-white px-8 py-2 rounded-md text-sm w-max ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
-        disabled={isSubmitting}
-        >
-          {type === "create" ? "Create" : "Update"}
-        </button>
-      </div>
+            <div className="flex justify-center mt-1">
+                <button
+                    className={`bg-blue-500 text-white px-8 py-2 rounded-md text-sm w-max ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
+                    disabled={isSubmitting}
+                >
+                    {type === "create" ? "Create" : "Update"}
+                </button>
+            </div>
         </form>
     );
 };

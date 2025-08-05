@@ -10,7 +10,7 @@ import { Class, Lesson, Prisma, Subject, Teacher } from "@prisma/client"
 import Image from "next/image"
 import { TokenData } from "@/lib/utils";
 import LessonFilterForm from "@/components/forms/LessonFilterForm";
-import { availableModules, ModuleType } from "@/lib/modules"; 
+import { availableModules, ModuleType } from "@/lib/modules";
 
 type LessonList = Lesson & { subject: Subject } & { class: Class } & { teacher: Teacher }
 
@@ -49,7 +49,7 @@ const LessonListPage = async ({ searchParams }: { searchParams: { [key: string]:
             className: "hidden md:table-cell",
         },
         {
-            header: "Start Time", 
+            header: "Start Time",
             accessor: "startTime",
         },
         ...(role === "admin" || role === "teacher" ? [{
@@ -64,7 +64,7 @@ const LessonListPage = async ({ searchParams }: { searchParams: { [key: string]:
             <td>{item.class.name}</td>
             <td className="hidden md:table-cell">{item.teacher.name + " " + item.teacher.surname}</td>
             <td>
-              
+
                 {item.startTime ? new Date(item.startTime).toLocaleString('ro-RO', {
                     year: 'numeric',
                     month: 'numeric',
@@ -91,10 +91,10 @@ const LessonListPage = async ({ searchParams }: { searchParams: { [key: string]:
 
     const queryConditions: Prisma.LessonWhereInput[] = [];
 
-    
+
     const hasSpecificFilters = queryParams.classId || queryParams.teacherId || queryParams.subjectId || queryParams.search || queryParams.moduleId;
 
- 
+
     if (!hasSpecificFilters) {
         const now = new Date();
         const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
@@ -102,8 +102,8 @@ const LessonListPage = async ({ searchParams }: { searchParams: { [key: string]:
 
         queryConditions.push({ startTime: { gte: startOfToday } });
         queryConditions.push({ startTime: { lt: startOfTomorrow } });
-    } 
-   
+    }
+
     if (queryParams) {
         for (const [key, value] of Object.entries(queryParams)) {
             if (value !== undefined && value !== '') {
@@ -117,13 +117,13 @@ const LessonListPage = async ({ searchParams }: { searchParams: { [key: string]:
                     case "subjectId":
                         queryConditions.push({ subjectId: parseInt(value) });
                         break;
-                    case "moduleId": 
+                    case "moduleId":
                         const selectedModuleId = parseInt(value);
                         const selectedModule = availableModules.find(mod => mod.id === selectedModuleId);
                         if (selectedModule) {
                             const moduleStartDate = new Date(selectedModule.startDate);
                             const moduleEndDate = new Date(selectedModule.endDate);
-                           
+
                             moduleEndDate.setHours(23, 59, 59, 999);
 
                             queryConditions.push({
@@ -151,17 +151,17 @@ const LessonListPage = async ({ searchParams }: { searchParams: { [key: string]:
         }
     }
 
-    
+
     const query: Prisma.LessonWhereInput = {
-        AND: queryConditions.length > 0 ? queryConditions : undefined 
+        AND: queryConditions.length > 0 ? queryConditions : undefined
     };
 
-   
+
     const orderBy: Prisma.LessonOrderByWithRelationInput[] = [
         { startTime: "asc" },
         { subject: { name: "asc" } }
     ];
-  
+
 
     const [data, count] = await prisma.$transaction([
         prisma.lesson.findMany({
@@ -178,7 +178,7 @@ const LessonListPage = async ({ searchParams }: { searchParams: { [key: string]:
         prisma.lesson.count({ where: query })
     ]);
 
-    
+
     const title = hasSpecificFilters ? "All Lessons (Filtered)" : "Lessons for Today";
 
     return (
@@ -194,7 +194,7 @@ const LessonListPage = async ({ searchParams }: { searchParams: { [key: string]:
                             classes={classes}
                             teachers={formattedTeachers}
                             subjects={subjects}
-							modules={availableModules} 
+                            modules={availableModules}
                         />
                         {role === "admin" && (
                             <FormContainer table="lesson" type="create" />

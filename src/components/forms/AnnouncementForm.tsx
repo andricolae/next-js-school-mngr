@@ -65,7 +65,7 @@ const AnnouncementForm = ({
         <form className="flex flex-col gap-8" onSubmit={onSubmit}>
             <h1 className="text-xl font-semibold">{type === "create" ? "Create a new announcement" : "Update the announcement"}</h1>
 
-<div className="flex flex-col gap-4 w-full">
+            <div className="flex flex-col gap-4 w-full">
 
                 <InputField
                     label="Announcement Title"
@@ -73,21 +73,21 @@ const AnnouncementForm = ({
                     defaultValue={data?.title}
                     register={register}
                     error={errors?.title}
-                      className="w-full"
+                    className="w-full"
                 />
 
                 <div className="flex flex-col gap-2 w-full ">
-  <label className="text-xs text-gray-400">Description</label>
-  <textarea
-    className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full resize-vertical min-h-[80px]"
-    placeholder="Announcement description..."
-    defaultValue={data?.description}
-    {...register("description")}
-  />
-  {errors.description?.message && (
-    <p className="text-xs text-red-400">{errors.description.message.toString()}</p>
-  )}
-</div>
+                    <label className="text-xs text-gray-400">Description</label>
+                    <textarea
+                        className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full resize-vertical min-h-[80px]"
+                        placeholder="Announcement description..."
+                        defaultValue={data?.description}
+                        {...register("description")}
+                    />
+                    {errors.description?.message && (
+                        <p className="text-xs text-red-400">{errors.description.message.toString()}</p>
+                    )}
+                </div>
 
 
                 <InputField
@@ -97,7 +97,7 @@ const AnnouncementForm = ({
                     register={register}
                     error={errors?.date}
                     type="date"
-                      className="w-full"
+                    className="w-full"
                 />
 
                 {data && (
@@ -139,20 +139,20 @@ const AnnouncementForm = ({
                 Leave class empty to create a school-wide announcement visible to everyone.
             </div>
 
-           {state.error && (
+            {state.error && (
                 <span className="text-red-500">
                     {state.message || "Something went wrong!"}
                 </span>
             )}
-         <div className="flex justify-center mt-2">
-    <button
-      type="submit"
-      className={`bg-blue-500 text-white px-8 py-2 rounded-md text-sm w-max mx-auto hover:bg-blue-600 transition ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
-      disabled={isSubmitting}
-    >
-      {type === "create" ? "Create" : "Update"}
-    </button>
-  </div>
+            <div className="flex justify-center mt-2">
+                <button
+                    type="submit"
+                    className={`bg-blue-500 text-white px-8 py-2 rounded-md text-sm w-max mx-auto hover:bg-blue-600 transition ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
+                    disabled={isSubmitting}
+                >
+                    {type === "create" ? "Create" : "Update"}
+                </button>
+            </div>
         </form>
     )
 };

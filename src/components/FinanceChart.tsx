@@ -31,13 +31,13 @@ const FinanceChart = ({ data }: FinanceChartProps) => {
                     }}
                 >
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" axisLine={false} tick={{fill:"#D1D5DB"}} tickLine={false} tickMargin={10} />
-                    <YAxis axisLine={false} tick={{fill:"#D1D5DB"}} tickLine={false} tickMargin={20} />
-                    <Tooltip 
+                    <XAxis dataKey="name" axisLine={false} tick={{ fill: "#D1D5DB" }} tickLine={false} tickMargin={10} />
+                    <YAxis axisLine={false} tick={{ fill: "#D1D5DB" }} tickLine={false} tickMargin={20} />
+                    <Tooltip
                         formatter={(value: number) => [`€${value.toLocaleString()}`]}
                         labelFormatter={(label) => `Month: ${label}`}
                     />
-                    <Legend align="center" verticalAlign="top" wrapperStyle={{paddingTop:"10px", paddingBottom:"30px"}} />
+                    <Legend align="center" verticalAlign="top" wrapperStyle={{ paddingTop: "10px", paddingBottom: "30px" }} />
                     <Line type="monotone" dataKey="income" stroke="#FCE149" strokeWidth={3} name="Income" />
                     <Line type="monotone" dataKey="expense" stroke="#ABE7FF" strokeWidth={3} name="Expenses" />
                 </LineChart>

@@ -96,7 +96,6 @@ const FormModal = ({ table, type, data, id, relatedData }: FormContainerProps & 
                 ? "w-[40%] p-3 h-fit"
                 : "w-[50%] p-4 h-fit";
 
-
     const Form = () => {
 
         const [state, formAction] = useFormState(deleteActionMap[table], {
