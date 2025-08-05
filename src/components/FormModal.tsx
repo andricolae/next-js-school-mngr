@@ -89,13 +89,12 @@ const FormModal = ({ table, type, data, id, relatedData }: FormContainerProps & 
     const [open, setOpen] = useState(false);
 
     const modalWidthClass = table === "subject"
-        ? "w-[30%] p-5 h-[50%]"
+        ? "w-[30%] p-5 h-fit"
         : ["exam", "assignment", "result", "attendance"].includes(table)
-            ? "w-[40%] p-6 h-[70%]"
+            ? "w-[40%] p-6 h-fit"
             : ["announcement", "event", "lesson", "class", "teacher", "student", "parent"].includes(table)
-                ? "w-[40%] p-3 h-[80%]"
-                : "w-[50%] p-4 h-[80%]";
-
+                ? "w-[40%] p-3 h-fit"
+                : "w-[50%] p-4 h-fit";
 
     const Form = () => {
 
