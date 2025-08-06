@@ -33,10 +33,10 @@ const EventForm = ({
     const [state, formAction] = useFormState(type === "create"
         ? createEvent : updateEvent, { success: false, error: false })
 
-    const [isSubmitting, setIsSubmitting] = useState(false); // added this line
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const onSubmit = handleSubmit(formData => {
-        setIsSubmitting(true); // added this line
+        setIsSubmitting(true);
         const submissionData = {
             ...formData,
             ...(type === "update" && data?.id && { id: data.id }),
@@ -152,14 +152,15 @@ const EventForm = ({
                     {state.message || "Something went wrong!"}
                 </span>
             )}
-                        <div className="flex justify-center mt-6s">
-    <button
-      type="submit"
-      className="bg-blue-500 text-white px-8 py-2 rounded-md text-sm w-max"
-    >
-      {type === "create" ? "Create" : "Update"}
-    </button>
-  </div>
+            <div className="flex justify-center mt-6s">
+                <button
+                    type="submit"
+                    className={`bg-blue-500 transition ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""} text-white px-8 py-2 rounded-md text-sm w-max`}
+                    disabled={isSubmitting}
+                >
+                    {type === "create" ? "Create" : "Update"}
+                </button>
+            </div>
         </form>
     )
 };

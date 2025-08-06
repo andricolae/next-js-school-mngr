@@ -4,7 +4,7 @@ import { RadialBarChart, RadialBar, ResponsiveContainer } from "recharts";
 
 
 
-const CountChart = ({boys, girls, others}:{boys:number, girls:number, others:number}) => {
+const CountChart = ({ boys, girls, others }: { boys: number, girls: number, others: number }) => {
     const data = [
         {
             name: "Total",

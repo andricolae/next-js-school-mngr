@@ -18,11 +18,11 @@ const SingleTeacherPage = async ({
 
     const { sessionClaims } = await auth();
     let tokenData;
-	if (sessionClaims !== null) {
-		tokenData = sessionClaims as unknown as TokenData;
-	}
-	let role = tokenData?.userPblcMtdt?.role;
-    
+    if (sessionClaims !== null) {
+        tokenData = sessionClaims as unknown as TokenData;
+    }
+    let role = tokenData?.userPblcMtdt?.role;
+
     const teacher: (Teacher & { _count: { subjects: number; lessons: number; classes: number } }) | null = await prisma.teacher.findUnique({
         where: { id },
         include: {

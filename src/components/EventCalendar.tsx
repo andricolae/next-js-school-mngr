@@ -12,7 +12,7 @@ const EventCalendar = () => {
     const [value, onChange] = useState<Value>(new Date());
     const [mounted, setMounted] = useState(false);
     const router = useRouter();
-    
+
     useEffect(() => {
         setMounted(true);
     }, []);

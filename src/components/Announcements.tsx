@@ -6,10 +6,10 @@ const Announcements = async () => {
 
     const { userId, sessionClaims } = await auth()
     let tokenData;
-	if (sessionClaims !== null) {
-		tokenData = sessionClaims as unknown as TokenData;
-	}
-	let role = tokenData?.userPblcMtdt?.role;
+    if (sessionClaims !== null) {
+        tokenData = sessionClaims as unknown as TokenData;
+    }
+    let role = tokenData?.userPblcMtdt?.role;
     const roleConditions = {
         teacher: { lessons: { some: { teacherId: userId! } } },
         student: { students: { some: { id: userId! } } },

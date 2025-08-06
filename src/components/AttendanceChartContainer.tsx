@@ -33,7 +33,7 @@ const AttendanceChartContainer = async () => {
     responseData.forEach(item => {
         const itemDate = new Date(item.date);
         const itemDayOfWeek = itemDate.getDay();
-        
+
         if (itemDayOfWeek >= 1 && itemDayOfWeek <= 5) {
             const dayName = daysOfWeek[itemDayOfWeek - 1];
             if (item.present) {
@@ -56,7 +56,7 @@ const AttendanceChartContainer = async () => {
                 <h1 className='text-lg font-semibold'>Attendance</h1>
                 {/* <Image src="/moreDark.png" alt="" width={20} height={20} /> */}
             </div>
-            <AttendanceChart data={data}/>
+            <AttendanceChart data={data} />
         </div>
 
     )

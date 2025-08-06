@@ -18,27 +18,27 @@ interface AverageCalculatorProps<T extends ScoreData> {
 
 
 const useAverageCalculation = <T extends ScoreData>(
-    data: T[], 
+    data: T[],
     precision: number = 2
 ) => {
     return React.useMemo(() => {
         if (data.length === 0) {
             return { average: 0, totalWithScores: 0, hasValidData: false };
         }
-        
-        const validScores = data.filter(item => 
-            item.score !== null && 
-            item.score !== undefined && 
+
+        const validScores = data.filter(item =>
+            item.score !== null &&
+            item.score !== undefined &&
             !isNaN(item.score)
         );
-        
+
         if (validScores.length === 0) {
             return { average: 0, totalWithScores: 0, hasValidData: false };
         }
-        
+
         const sum = validScores.reduce((acc, item) => acc + item.score!, 0);
         const average = Math.round((sum / validScores.length) * Math.pow(10, precision)) / Math.pow(10, precision);
-        
+
         return {
             average,
             totalWithScores: validScores.length,
@@ -73,7 +73,7 @@ const AverageCalculator = <T extends ScoreData>({
 }: AverageCalculatorProps<T>) => {
     const { average, totalWithScores, hasValidData } = useAverageCalculation(data, precision);
 
-   
+
     if (!hasValidData) {
         return (
             <div className={`bg-gray-50 p-3 rounded-md mt-4 text-center text-gray-600 ${className}`}>
@@ -82,7 +82,7 @@ const AverageCalculator = <T extends ScoreData>({
         );
     }
 
-    
+
     return (
         <div className={`${getContainerStyles(containerStyle)} p-3 rounded-md mt-4 text-center border ${className}`}>
             <span className="text-lg font-semibold">
