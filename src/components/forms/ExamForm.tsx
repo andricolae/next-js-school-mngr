@@ -7,7 +7,7 @@ import Image from "next/image";
 import { examSchema, ExamSchema, subjectSchema, SubjectSchema } from "@/lib/formValidationSchemas";
 import { createExam, createSubject, updateExam, updateSubject } from "@/lib/actions";
 import { useFormState } from "react-dom";
-import { Dispatch, SetStateAction, useEffect } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 
@@ -34,7 +34,10 @@ const ExamForm = ({
     const [state, formAction] = useFormState(type === "create"
         ? createExam : updateExam, { success: false, error: false })
 
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
     const onSubmit = handleSubmit(data => {
+        setIsSubmitting(true);
         data.startTime = new Date(new Date(data.startTime).getTime() + (3 * 60 * 60 * 1000));
         data.endTime = new Date(new Date(data.endTime).getTime() + (3 * 60 * 60 * 1000));
         formAction(data);
@@ -47,6 +50,10 @@ const ExamForm = ({
             toast(`Exam has been ${type === "create" ? "created" : "updated"} successfully!`);
             setOpen(false);
             router.refresh();
+        }
+        if (state.error) {
+            const errorMessage = state.message || "Something went wrong!";
+            setIsSubmitting(false);
         }
     }, [state, router, type, setOpen]);
 
@@ -125,7 +132,8 @@ const ExamForm = ({
             <div className="flex justify-center mt-4">
                 <button
                     type="submit"
-                    className="bg-blue-500 text-white px-8 py-2 rounded-md text-sm w-max"
+                    className={`bg-blue-500 transition ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""} text-white px-8 py-2 rounded-md text-sm w-max`}
+                    disabled={isSubmitting}
                 >
                     {type === "create" ? "Create" : "Update"}
                 </button>

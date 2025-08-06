@@ -27,16 +27,16 @@ export const generateCertificatePDF = (unitateInvatamant: any, nr: any, data: an
     doc.setFontSize(12);
     doc.setFont("Times", "Normal");
 
-    doc.text(`        Elev ${elev} este inscris în clasa (anul) ${clasa} numar matricol ${nrMatricol}`, marginLeft, y);
+    doc.text(`        Elev(a) ${elev} este inscris(a) in clasa (anul) ${clasa} numar matricol ${nrMatricol}`, marginLeft, y);
     y += 20;
-    doc.text(`in anul scolar 20${anuScolarIncep} - 20${anuScolarSfrst} . Adeverinta se elibereaza de unitatea de invatamant pentru a-i servi la:`, marginLeft, y);
+    doc.text(`in anul scolar ${anuScolarIncep} - ${anuScolarSfrst}. Adeverinta se elibereaza de unitatea de invatamant pentru a-i servi la:`, marginLeft, y);
 
     y += 30;
     doc.text(`${serversteLa}`, marginLeft, y);
 
     y += 60;
     doc.text("DIRECTOR,", marginLeft, y);
-    doc.text("Secretar,", doc.internal.pageSize.getWidth() - marginLeft - 60, y); // Right aligned
+    doc.text("Secretar,", doc.internal.pageSize.getWidth() - marginLeft - 60, y);
 
     doc.save("adeverinta.pdf");
 };

@@ -62,6 +62,11 @@ const AdeverintaElevForm = ({
     const [allSubjects, setAllSubjects] = useState<FilterOption[]>([]);
     const [subjectFilters, setSubjectFilters] = useState<string[]>([]);
 
+    const [errorsInputs, setErrorsInputs] = useState({
+        startDate: false,
+        endDate: false,
+        subjects: false,
+    });
 
     function filterAndGroupBySubjectAverage(
         results: ResultItem[],
@@ -110,11 +115,49 @@ const AdeverintaElevForm = ({
         return resultArray;
     }
 
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
     const onSubmit = (e: any) => {
         e.preventDefault();
         const formData = new FormData(e.target);
         const startDate = formData.get("startDate") as string;
         const endDate = formData.get("endDate") as string;
+
+        // If only one date is set, show an error
+        if ((startDate && !endDate) || (!startDate && endDate)) {
+            const newErrors = {
+                startDate: !startDate,
+                endDate: !endDate,
+                subjects: false,
+            };
+            setErrorsInputs(newErrors);
+            return;
+        }
+
+        // If both are set, validate that start is before end
+        if (startDate && endDate) {
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+
+            if (start >= end) {
+                const newErrors = {
+                    startDate: true,
+                    endDate: true,
+                    subjects: false,
+                };
+                setErrorsInputs(newErrors);
+                return;
+            } else {
+                const newErrors = {
+                    startDate: false,
+                    endDate: false,
+                    subjects: false,
+                };
+                setErrorsInputs(newErrors);
+            }
+        }
+
+        setIsSubmitting(true);
 
         let aux: any = [];
         for (let i = 0; i < subjectFilters.length; ++i) {
@@ -137,12 +180,21 @@ const AdeverintaElevForm = ({
 
         generateTranscriptPDF("10101010", `${student.surname} ${student.name}`, "cnp 5010526388915",
             `loc nastere damaroaia ${new Date(student.birthday).toLocaleDateString('en-GB').replace(/\//g, '.')}`,
-            "nationalitate ungur", "numeTata Ion", "numeMame Ioana", "domiciliuParinti Ungaria", `${student.address}`, materiiSiNote);
+            "nationalitate ungur", "numeTata Ion", "numeMama Ioana", "domiciliuParinti Ungaria", `${student.address}`, materiiSiNote);
+        setOpen(false);
+        setIsSubmitting(false);
     };
 
     const router = useRouter();
 
     useEffect(() => {
+        // console.log(data);
+        // console.log(relatedData);
+        // console.log(student);
+        // console.log(results);
+
+        // console.log(subjectFilters);
+        // console.log(allSubjects);
         if (state.success) {
             toast(`Assignment has been ${type === "create" ? "created" : "updated"} successfully!`);
             setOpen(false);
@@ -151,6 +203,7 @@ const AdeverintaElevForm = ({
 
         if (state.error) {
             const errorMessage = state.message || "Something went wrong!";
+            setIsSubmitting(false);
         }
     }, [state, router, type, setOpen]);
 
@@ -170,6 +223,9 @@ const AdeverintaElevForm = ({
                         className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
                         defaultValue="undefined"
                     />
+                    {errorsInputs.startDate && (
+                        <span className="text-red-500 text-sm">Date calendaristice invalide.</span>
+                    )}
                 </div>
                 <div className="flex flex-col gap-2 w-full">
                     <label className="text-xs text-gray-400">End Date</label>
@@ -179,11 +235,19 @@ const AdeverintaElevForm = ({
                         className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
                         defaultValue="undefined"
                     />
+                    {errorsInputs.endDate && (
+                        <span className="text-red-500 text-sm">Date calendaristice invalide.</span>
+                    )}
                 </div>
                 <MultiSelect id="foaieMatricola" label="Subjects" options={allSubjects} placeholder="Add another..."
                     selectedIds={subjectFilters} onSelectionChange={setSubjectFilters} />
             </div>
-            <button type="submit" className="bg-blue-500 text-white p-2 rounded-md w-fit">{type === "create" ? "Create" : "Update"}</button>
+            <button type="submit"
+                className={`bg-blue-500 text-white p-2 rounded-md w-fit`}
+                disabled={isSubmitting}
+            >
+                {type === "create" ? "Create" : "Update"}
+            </button>
         </form>
     )
 };
