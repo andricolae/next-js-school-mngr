@@ -10,6 +10,7 @@ import { createTeacher, updateTeacher } from "@/lib/actions";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { useFormState } from "react-dom";
+import { CldUploadWidget } from "next-cloudinary";
 
 interface FilterOption {
     id: string;
@@ -247,28 +248,29 @@ const TeacherForm = ({
         setIsSubmitting(true);
     });
 
-    function openUploadWidget() {
-        // @ts-ignore
-        const cloudinary = (window as any).cloudinary;
-        if (!cloudinary) {
-            alert("Cloudinary widget is not loaded");
-            return;
-        }
+    // function openUploadWidget() {
+    //     // @ts-ignore
+    //     const cloudinary = (window as any).cloudinary;
+    //     if (!cloudinary) {
+    //         alert("Cloudinary widget is not loaded");
+    //         return;
+    //     }
 
-        const widget = cloudinary.createUploadWidget(
-            {
-                cloudName: "YOUR_CLOUD_NAME",
-                uploadPreset: "YOUR_UPLOAD_PRESET",
-            },
-            (error: any, result: any) => {
-                if (!error && result && result.event === "success") {
-                    setImg(result.info);
-                }
-            }
-        );
+    //     const widget = cloudinary.createUploadWidget(
+    //         {
+    //             cloudName: "YOUR_CLOUD_NAME",
+    //             uploadPreset: "YOUR_UPLOAD_PRESET",
+    //         },
+    //         (error: any, result: any) => {
+    //             if (!error && result && result.event === "success") {
+    //                 setImg(result.info);
+    //             }
+    //         }
+    //     );
 
-        widget.open();
-    }
+    //     widget.open();
+    // }
+    let openUploadWidget: () => void = () => { };
 
 
     return (
@@ -421,6 +423,18 @@ const TeacherForm = ({
                     {type === "create" ? "Create" : "Update"}
                 </button>
             </div>
+            <CldUploadWidget
+                uploadPreset="school-mgmt"
+                onSuccess={(result, { widget }) => {
+                    setImg(result.info);
+                    widget.close();
+                }}
+            >
+                {({ open }) => {
+                    openUploadWidget = open;
+                    return <></>;
+                }}
+            </CldUploadWidget>
         </form>
     );
 };
