@@ -192,6 +192,8 @@ const LessonForm = ({
                 setIsCreatingRecurring(false);
             }
         } else {
+            // const startDate = formData.startTime;
+            // console.log(formData.startTime);
 
             const submissionData = {
                 ...formData,
@@ -396,7 +398,7 @@ const LessonForm = ({
                     </div>
                 </div>
 
-                <div className="w-full h-fit flex items-center justify-center mt-12">
+                <div className="w-full h-fit flex flex-col items-center justify-center mt-12">
                     {state.error && <span className="text-red-500">Something went wrong!</span>}
 
                     <button

@@ -214,10 +214,10 @@ export const lessonSchema = z.object({
         (val) => {
             const hour = val.getHours();
             const minute = val.getMinutes();
-            return (hour >= 8 && hour < 15) || (hour === 15 && minute === 0);
+            return (hour >= 8 && hour < 18) || (hour === 18 && minute === 0);
         },
         {
-            message: "The start time must be between 08:00 and 15:00.",
+            message: "The start time must be between 08:00 and 18:00.",
         }
     ),
     endTime: z.coerce.date({ message: "End time is required" })
@@ -226,10 +226,10 @@ export const lessonSchema = z.object({
                 const hour = val.getHours();
                 const minute = val.getMinutes();
 
-                return (hour >= 8 && hour <= 15) || (hour === 8 && minute === 0);
+                return (hour >= 9 && hour < 19) || (hour === 9 && minute === 0);
             },
             {
-                message: "The end time must be between 08:00 and 15:00.",
+                message: "The end time must be between 09:00 and 19:00.",
             }
         ),
     subjectId: z.coerce.number({ message: "Subject is required" }),
