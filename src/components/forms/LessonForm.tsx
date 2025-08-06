@@ -192,9 +192,6 @@ const LessonForm = ({
                 setIsCreatingRecurring(false);
             }
         } else {
-            // const startDate = formData.startTime;
-            // console.log(formData.startTime);
-
             const submissionData = {
                 ...formData,
                 ...(type === "update" && data?.id && { id: data.id }),
