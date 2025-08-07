@@ -63,8 +63,8 @@ const AssignmentListPage = async ({ searchParams }: { searchParams: { [key: stri
                 <div className="flex items-center gap-2">
                     {(role === "admin" || role === "teacher") && (
                         <>
-                            <FormContainer table="assignment" type="delete" id={item.id} />
                             <FormContainer table="assignment" type="update" data={item} />
+                            <FormContainer table="assignment" type="delete" id={item.id} />
                         </>
                     )}
                 </div>
