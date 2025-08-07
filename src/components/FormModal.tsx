@@ -89,7 +89,7 @@ const FormModal = ({ table, type, data, id, relatedData }: FormContainerProps & 
     const [open, setOpen] = useState(false);
 
     const modalWidthClass =
-        (table === "teacher" || table === "student") && type === "create"
+        (table === "teacher" || table === "student") && (type === "create" || type === "update")
             ? "w-[40%] p-3 h-[70%]"
             : table === "subject"
                 ? "w-[30%] p-5 h-fit"
