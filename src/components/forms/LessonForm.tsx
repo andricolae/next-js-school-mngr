@@ -192,7 +192,6 @@ const LessonForm = ({
                 setIsCreatingRecurring(false);
             }
         } else {
-
             const submissionData = {
                 ...formData,
                 ...(type === "update" && data?.id && { id: data.id }),
@@ -396,7 +395,7 @@ const LessonForm = ({
                     </div>
                 </div>
 
-                <div className="w-full h-fit flex items-center justify-center mt-12">
+                <div className="w-full h-fit flex flex-col items-center justify-center mt-12">
                     {state.error && <span className="text-red-500">Something went wrong!</span>}
 
                     <button
