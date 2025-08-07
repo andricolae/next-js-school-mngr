@@ -9,6 +9,8 @@ import { createAttendance, updateAttendance } from "@/lib/actions";
 import { useFormState } from "react-dom";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
+import LoadingPopup from "@/components/LoadingPopup";
+import { useTransition } from "react";
 
 const AttendanceForm = ({
     type,
@@ -33,17 +35,20 @@ const AttendanceForm = ({
         ? createAttendance : updateAttendance, { success: false, error: false })
 
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isPending, startTransition] = useTransition();
 
     const onSubmit = handleSubmit((formData) => {
-        setIsSubmitting(true);
-        const actionData = {
-            id: formData.id,
-            date: formData.date,
-            present: formData.present === "true",
-            studentId: formData.studentId,
-            lessonId: formData.lessonId,
-        };
-        formAction(actionData);
+        startTransition(() => {
+            setIsSubmitting(true);
+            const actionData = {
+                id: formData.id,
+                date: formData.date,
+                present: formData.present === "true",
+                studentId: formData.studentId,
+                lessonId: formData.lessonId,
+            };
+            formAction(actionData);
+        });
     })
 
     const router = useRouter();
@@ -170,6 +175,7 @@ const AttendanceForm = ({
                     {type === "create" ? "Create" : "Update"}
                 </button>
             </div>
+            {isPending && <LoadingPopup />}
         </form>
     )
 };

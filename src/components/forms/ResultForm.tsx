@@ -10,7 +10,8 @@ import { useFormState } from "react-dom";
 import { createResult, updateResult } from "@/lib/actions";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
-
+import LoadingPopup from "@/components/LoadingPopup";
+import { useTransition } from "react";
 
 const ResultForm = ({
     type,
@@ -45,14 +46,17 @@ const ResultForm = ({
         ? createResult : updateResult, { success: false, error: false })
 
     const [isSubmitting, setIsSubmitting] = useState(false); // added to avoid multiple submitions
+    const [isPending, startTransition] = useTransition();
 
     const onSubmit = handleSubmit(formData => {
-        setIsSubmitting(true); // added to avoid multiple submitions
-        const submissionData = {
-            ...formData,
-            ...(type === "update" && data?.id && { id: data.id }),
-        };
-        formAction(submissionData);
+        startTransition(() => {
+            setIsSubmitting(true); // added to avoid multiple submitions
+            const submissionData = {
+                ...formData,
+                ...(type === "update" && data?.id && { id: data.id }),
+            };
+            formAction(submissionData);
+        });
     })
 
     const router = useRouter();
@@ -194,7 +198,7 @@ const ResultForm = ({
                     {type === "create" ? "Create" : "Update"}
                 </button>
             </div>
-
+            {isPending && <LoadingPopup />}
         </form>
     )
 };

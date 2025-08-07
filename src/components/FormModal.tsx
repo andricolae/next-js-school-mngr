@@ -8,6 +8,8 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useFormState } from "react-dom";
 import { toast } from "react-toastify";
 import { FormContainerProps } from "./FormContainer";
+import LoadingPopup from "@/components/LoadingPopup";
+import { useTransition } from "react";
 
 const deleteActionMap = {
     subject: deleteSubject,
@@ -25,40 +27,40 @@ const deleteActionMap = {
 }
 
 const TeacherForm = dynamic(() => import("./forms/TeacherForm"), {
-    loading: () => <h1>Loading...</h1>,
+    loading: () => <LoadingPopup />,
 });
 const StudentForm = dynamic(() => import("./forms/StudentForm"), {
-    loading: () => <h1>Loading...</h1>,
+    loading: () => <LoadingPopup />,
 });
 const SubjectForm = dynamic(() => import("./forms/SubjectForm"), {
-    loading: () => <h1>Loading...</h1>,
+    loading: () => <LoadingPopup />,
 });
 const ClassForm = dynamic(() => import("./forms/ClassForm"), {
-    loading: () => <h1>Loading...</h1>,
+    loading: () => <LoadingPopup />,
 });
 const ExamForm = dynamic(() => import("./forms/ExamForm"), {
-    loading: () => <h1>Loading...</h1>
+    loading: () => <LoadingPopup />
 });
 const AssignmentForm = dynamic(() => import("./forms/AssignmentForm"), {
-    loading: () => <h1>Loading...</h1>
+    loading: () => <LoadingPopup />
 });
 const ResultForm = dynamic(() => import("./forms/ResultForm"), {
-    loading: () => <h1>Loading...</h1>
+    loading: () => <LoadingPopup />
 });
 const EventForm = dynamic(() => import("./forms/EventForm"), {
-    loading: () => <h1>Loading...</h1>
+    loading: () => <LoadingPopup />
 });
 const ParentForm = dynamic(() => import("./forms/ParentForm"), {
-    loading: () => <h1>Loading...</h1>
+    loading: () => <LoadingPopup />
 });
 const LessonForm = dynamic(() => import("./forms/LessonForm"), {
-    loading: () => <h1>Loading...</h1>
+    loading: () => <LoadingPopup />
 });
 const AttendanceForm = dynamic(() => import("./forms/AttendanceForm"), {
-    loading: () => <h1>Loading...</h1>
+    loading: () => <LoadingPopup />
 });
 const AnnouncementForm = dynamic(() => import("./forms/AnnouncementForm"), {
-    loading: () => <h1>Loading...</h1>
+    loading: () => <LoadingPopup />
 });
 
 const forms: {
@@ -100,11 +102,17 @@ const FormModal = ({ table, type, data, id, relatedData }: FormContainerProps & 
                         : "w-[50%] p-4 h-fit";
 
     const Form = () => {
-
+        const [isPending, startTransition] = useTransition();
         const [state, formAction] = useFormState(deleteActionMap[table], {
             success: false,
             error: false,
         });
+
+        const formActionWrapper = (formData: FormData) => {
+            startTransition(() => {
+                formAction(formData);
+            });
+        };
 
         const router = useRouter();
 
@@ -121,10 +129,11 @@ const FormModal = ({ table, type, data, id, relatedData }: FormContainerProps & 
         }, [state, router]);
 
         return type === "delete" && id ? (
-            <form action={formAction} className="p-4 flex flex-col gap-4">
-                <input type="text|number" name="id" value={id} hidden readOnly/>
+            <form action={formActionWrapper} className="p-4 flex flex-col gap-4">
+                <input type="text|number" name="id" value={id} hidden readOnly />
                 <span className="text-center font-medium">All data will be lost. Are you sure you want to delete this {table}?</span>
                 <button className="bg-red-600 text-white py-3 px-4 rounded-md border-none w-max self-center">Delete</button>
+                {isPending && <LoadingPopup />}
             </form>
         ) : type === "create" || type === "update" ? (
             forms[table](setOpen, type, data, relatedData)

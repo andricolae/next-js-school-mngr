@@ -10,6 +10,8 @@ import { useFormState } from "react-dom";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
+import LoadingPopup from "@/components/LoadingPopup";
+import { useTransition } from "react";
 
 const ExamForm = ({
     type,
@@ -35,12 +37,15 @@ const ExamForm = ({
         ? createExam : updateExam, { success: false, error: false })
 
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isPending, startTransition] = useTransition();
 
     const onSubmit = handleSubmit(data => {
-        setIsSubmitting(true);
-        data.startTime = new Date(new Date(data.startTime).getTime() + (3 * 60 * 60 * 1000));
-        data.endTime = new Date(new Date(data.endTime).getTime() + (3 * 60 * 60 * 1000));
-        formAction(data);
+        startTransition(() => {
+            setIsSubmitting(true);
+            data.startTime = new Date(new Date(data.startTime).getTime() + (3 * 60 * 60 * 1000));
+            data.endTime = new Date(new Date(data.endTime).getTime() + (3 * 60 * 60 * 1000));
+            formAction(data);
+        });
     })
 
     const router = useRouter();
@@ -138,6 +143,7 @@ const ExamForm = ({
                     {type === "create" ? "Create" : "Update"}
                 </button>
             </div>
+            {isPending && <LoadingPopup />}
         </form>
     )
 };

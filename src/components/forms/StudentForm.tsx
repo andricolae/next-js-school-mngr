@@ -11,6 +11,8 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { useFormState } from "react-dom";
 import { CldUploadWidget } from "next-cloudinary";
+import LoadingPopup from "@/components/LoadingPopup";
+import { useTransition } from "react";
 
 const StudentForm = ({
     type,
@@ -41,9 +43,13 @@ const StudentForm = ({
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const onSubmit = handleSubmit((data) => {
-        formAction({ ...data, img: img?.secure_url });
-        setIsSubmitting(true);
+        startTransition(() => {
+            formAction({ ...data, img: img?.secure_url });
+            setIsSubmitting(true);
+        });
     });
+
+    const [isPending, startTransition] = useTransition();
 
     const router = useRouter();
 
@@ -288,6 +294,8 @@ const StudentForm = ({
                     {type === "create" ? "Create" : "Update"}
                 </button>
             </div>
+
+            {isPending && <LoadingPopup />}
 
             <CldUploadWidget
                 uploadPreset="school-mgmt"

@@ -9,6 +9,8 @@ import { useFormState } from "react-dom";
 import { Dispatch, SetStateAction, useEffect, useState, useRef } from "react";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
+import LoadingPopup from "@/components/LoadingPopup";
+import { useTransition } from "react";
 
 interface FilterOption {
     id: string;
@@ -214,6 +216,8 @@ const SubjectForm = ({
         name: teacher.name + " " + teacher.surname,
     })) || [];
 
+    const [isPending, startTransition] = useTransition();
+
     useEffect(() => {
         if (state.success) {
             toast(`Subject has been ${type === "create" ? "created" : "updated"} successfully!`);
@@ -228,8 +232,10 @@ const SubjectForm = ({
     }, [state, router, type, setOpen]);
 
     const onSubmit = handleSubmit((formData) => {
-        setIsSubmitting(true);
-        formAction(formData);
+        startTransition(() => {
+            setIsSubmitting(true);
+            formAction(formData);
+        });
     });
 
     return (
@@ -276,6 +282,7 @@ const SubjectForm = ({
                     {type === "create" ? "Create" : "Update"}
                 </button>
             </div>
+            {isPending && <LoadingPopup />}
         </form>
     );
 };
