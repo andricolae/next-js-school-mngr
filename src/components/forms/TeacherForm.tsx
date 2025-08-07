@@ -10,6 +10,7 @@ import { createTeacher, updateTeacher } from "@/lib/actions";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { useFormState } from "react-dom";
+import { CldUploadWidget } from "next-cloudinary";
 
 interface FilterOption {
     id: string;
@@ -247,28 +248,7 @@ const TeacherForm = ({
         setIsSubmitting(true);
     });
 
-    function openUploadWidget() {
-        // @ts-ignore
-        const cloudinary = (window as any).cloudinary;
-        if (!cloudinary) {
-            alert("Cloudinary widget is not loaded");
-            return;
-        }
-
-        const widget = cloudinary.createUploadWidget(
-            {
-                cloudName: "YOUR_CLOUD_NAME",
-                uploadPreset: "YOUR_UPLOAD_PRESET",
-            },
-            (error: any, result: any) => {
-                if (!error && result && result.event === "success") {
-                    setImg(result.info);
-                }
-            }
-        );
-
-        widget.open();
-    }
+    let openUploadWidget: () => void = () => { };
 
 
     return (
@@ -385,13 +365,24 @@ const TeacherForm = ({
                     register={register}
                     error={errors?.birthday}
                 />
-                <InputField
-                    label="Gender"
-                    name="gender"
-                    defaultValue={data?.gender}
-                    register={register}
-                    error={errors?.gender}
-                />
+                <div className="flex flex-col gap-2">
+                    <label className="text-xs text-gray-400 font-medium">Gender</label>
+                    <select
+                        className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
+                        {...register("gender")}
+                        defaultValue={data?.gender || ""}
+                    >
+                        <option value="">Select gender</option>
+                        <option value="FEMALE">Female</option>
+                        <option value="MALE">Male</option>
+                        <option value="OTHER">Other</option>
+                    </select>
+                    {errors.gender?.message && (
+                        <p className="text-xs text-red-400">
+                            {errors.gender.message.toString()}
+                        </p>
+                    )}
+                </div>
 
                 <div className="mt-3 ">
                     {/* Subjects MultiSelect */}
@@ -421,6 +412,18 @@ const TeacherForm = ({
                     {type === "create" ? "Create" : "Update"}
                 </button>
             </div>
+            <CldUploadWidget
+                uploadPreset="school-mgmt"
+                onSuccess={(result, { widget }) => {
+                    setImg(result.info);
+                    widget.close();
+                }}
+            >
+                {({ open }) => {
+                    openUploadWidget = open;
+                    return <></>;
+                }}
+            </CldUploadWidget>
         </form>
     );
 };

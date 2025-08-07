@@ -178,7 +178,6 @@ export const updateTeacher = async (currentState: CurrentState, data: TeacherSch
                 id: data.id
             },
             data: {
-                ...(data.password !== "" && { password: data.password }),
                 username: data.username,
                 name: data.name,
                 surname: data.surname,
@@ -303,7 +302,6 @@ export const updateStudent = async (currentState: CurrentState, data: StudentSch
                 id: data.id
             },
             data: {
-                ...(data.password !== "" && { password: data.password }),
                 username: data.username,
                 name: data.name,
                 surname: data.surname,
