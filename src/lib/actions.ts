@@ -1254,8 +1254,8 @@ export const deleteLesson = async (currentState: CurrentState, data: FormData) =
         return { success: true, error: false }
 
     } catch (e) {
-        console.log(e);
-        return { success: false, error: true }
+        console.log(e)
+        return { error: true, success: false }
     }
 }
 
