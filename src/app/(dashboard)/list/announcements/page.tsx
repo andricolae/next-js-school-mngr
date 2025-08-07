@@ -71,8 +71,8 @@ const AnnouncementListPage = async ({
                 <div className="flex items-center gap-2">
                     {role === "admin" && (
                         <>
-                            <FormContainer table="announcement" type="delete" id={item.id} />
                             <FormContainer table="announcement" type="update" data={item} />
+                            <FormContainer table="announcement" type="delete" id={item.id} />
                         </>
                     )}
                 </div>

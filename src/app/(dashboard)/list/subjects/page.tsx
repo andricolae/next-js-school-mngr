@@ -46,8 +46,8 @@ const SubjectListPage = async ({ searchParams }: { searchParams: { [key: string]
                 <div className="flex items-center gap-2">
                     {role === "admin" && (
                         <>
-                            <FormContainer table="subject" type="delete" id={item.id} />
                             <FormContainer table="subject" type="update" data={item} />
+                            <FormContainer table="subject" type="delete" id={item.id} />
                         </>
                     )}
                 </div>

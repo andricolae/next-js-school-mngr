@@ -63,8 +63,8 @@ const ParentListPage = async ({ searchParams }: { searchParams: { [key: string]:
                 <div className="flex items-center gap-2">
                     {role === "admin" && (
                         <>
-                            <FormContainer table="parent" type="delete" id={item.id} />
                             <FormContainer table="parent" type="update" data={item} />
+                            <FormContainer table="parent" type="delete" id={item.id} />
                         </>
                     )}
                 </div>
