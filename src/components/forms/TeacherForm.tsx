@@ -47,11 +47,11 @@ const MultiSelect = ({
             const filtered = options.filter(
                 (option) =>
                     option.name.toLowerCase().includes(searchText.toLowerCase()) &&
-                    !selectedIds.includes(option.id)
+                    !selectedIds?.includes(option.id)
             );
             setFilteredOptions(filtered);
         } else {
-            setFilteredOptions(options.filter((option) => !selectedIds.includes(option.id)));
+            setFilteredOptions(options.filter((option) => !selectedIds?.includes(option.id)));
         }
     }, [searchText, options, selectedIds]);
 
@@ -103,7 +103,7 @@ const MultiSelect = ({
             </label>
 
 
-            {selectedIds.length > 0 && (
+            {selectedIds?.length > 0 && (
                 <div className="flex flex-wrap gap-1 mb-2">
                     {getSelectedOptions().map((option) => (
                         <span
@@ -132,11 +132,11 @@ const MultiSelect = ({
                     value={searchText}
                     onChange={handleInputChange}
                     onFocus={handleInputFocus}
-                    placeholder={selectedIds.length > 0 ? "Add another..." : placeholder}
+                    placeholder={selectedIds?.length > 0 ? "Add another..." : placeholder}
                     className="block w-full px-3 py-2 pr-20 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 />
                 <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center gap-1">
-                    {selectedIds.length > 0 && (
+                    {selectedIds?.length > 0 && (
                         <button
                             type="button"
                             onClick={handleClearAll}
@@ -199,7 +199,7 @@ const TeacherForm = ({
         setValue,
         watch,
     } = useForm<TeacherSchema>({
-        resolver: zodResolver(teacherSchema),
+        resolver: zodResolver(teacherSchema(type === "update")),
         defaultValues: {
             id: data?.id,
             username: data?.username,
@@ -229,8 +229,6 @@ const TeacherForm = ({
     })) || [];
 
     const [isPending, startTransition] = useTransition();
-
-    const selectedSubjects = watch("subjects") || [];
 
     useEffect(() => {
         if (state.success) {
@@ -401,7 +399,11 @@ const TeacherForm = ({
                                 label="Subjects"
                                 options={subjects}
                                 placeholder="Select subjects..."
-                                selectedIds={field.value}
+                                selectedIds={
+                                    field.value && field.value.length > 0
+                                        ? field.value
+                                        : data?.subjects
+                                }
                                 onSelectionChange={(ids) => field.onChange(ids)}
                             />
                         )}
@@ -420,7 +422,7 @@ const TeacherForm = ({
             </div>
 
             {isPending && <LoadingPopup />}
-            
+
             <CldUploadWidget
                 uploadPreset="school-mgmt"
                 onSuccess={(result, { widget }) => {

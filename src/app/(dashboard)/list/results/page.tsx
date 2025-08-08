@@ -5,14 +5,12 @@ import SortButton from "@/components/SortButton";
 import prisma from "@/lib/prisma";
 import { ITEM_PER_PAGE } from "@/lib/settings";
 import { Prisma } from "@prisma/client";
-import Image from "next/image";
 import { auth } from "@clerk/nextjs/server";
 import FilterForm from "@/components/forms/FilterForm";
 import FormContainer from "@/components/FormContainer";
 import { TokenData } from "@/lib/utils";
 import DownloadButton from "@/components/DownloadButton";
 import AverageCalculator from "@/components/AverageCalculator";
-import { useEffect } from "react";
 
 type ResultList = {
     id: number;

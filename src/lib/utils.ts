@@ -1,5 +1,3 @@
-import { auth } from "@clerk/nextjs/server";
-
 const currentWorkWeek = () => {
     const today = new Date();
 

@@ -1,7 +1,6 @@
 import Announcements from '@/components/Announcements'
 import BigCalendarContainer from '@/components/BigCalendarContainer'
 import FormContainer from '@/components/FormContainer'
-import Performance from '@/components/Performance'
 import prisma from '@/lib/prisma'
 import { auth } from '@clerk/nextjs/server'
 import { Teacher } from '@prisma/client'
@@ -26,6 +25,7 @@ const SingleTeacherPage = async ({
     const teacher: (Teacher & { _count: { subjects: number; lessons: number; classes: number } }) | null = await prisma.teacher.findUnique({
         where: { id },
         include: {
+            subjects: true,
             _count: {
                 select: {
                     subjects: true,
