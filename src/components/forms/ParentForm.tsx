@@ -9,6 +9,8 @@ import { createParent, updateParent } from "@/lib/actions";
 import { useFormState } from "react-dom";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
+import LoadingPopup from "@/components/LoadingPopup";
+import { useTransition } from "react";
 
 const ParentForm = ({
     type,
@@ -35,10 +37,13 @@ const ParentForm = ({
     );
 
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isPending, startTransition] = useTransition();
 
     const onSubmit = handleSubmit(data => {
-        formAction(data);
-        setIsSubmitting(true);
+        startTransition(() => {
+            formAction(data);
+            setIsSubmitting(true);
+        });
     });
 
     const router = useRouter();
@@ -150,6 +155,7 @@ const ParentForm = ({
                     {type === "create" ? "Create" : "Update"}
                 </button>
             </div>
+            {isPending && <LoadingPopup />}
         </form>
     );
 };

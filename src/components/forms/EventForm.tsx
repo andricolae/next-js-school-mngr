@@ -10,6 +10,8 @@ import { useFormState } from "react-dom";
 import { useRouter } from "next/navigation";
 import { createEvent, updateEvent } from "@/lib/actions";
 import { toast } from "react-toastify";
+import LoadingPopup from "@/components/LoadingPopup";
+import { useTransition } from "react";
 
 const EventForm = ({
     type,
@@ -34,16 +36,19 @@ const EventForm = ({
         ? createEvent : updateEvent, { success: false, error: false })
 
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isPending, startTransition] = useTransition();
 
     const onSubmit = handleSubmit(formData => {
-        setIsSubmitting(true);
-        const submissionData = {
-            ...formData,
-            ...(type === "update" && data?.id && { id: data.id }),
-            startTime: new Date(new Date(formData.startTime).getTime() + (3 * 60 * 60 * 1000)),
-            endTime: new Date(new Date(formData.endTime).getTime() + (3 * 60 * 60 * 1000)),
-        };
-        formAction(submissionData);
+        startTransition(() => {
+            setIsSubmitting(true);
+            const submissionData = {
+                ...formData,
+                ...(type === "update" && data?.id && { id: data.id }),
+                startTime: new Date(new Date(formData.startTime).getTime() + (3 * 60 * 60 * 1000)),
+                endTime: new Date(new Date(formData.endTime).getTime() + (3 * 60 * 60 * 1000)),
+            };
+            formAction(submissionData);
+        });
     })
 
     const router = useRouter();
@@ -161,6 +166,7 @@ const EventForm = ({
                     {type === "create" ? "Create" : "Update"}
                 </button>
             </div>
+            {isPending && <LoadingPopup />}
         </form>
     )
 };

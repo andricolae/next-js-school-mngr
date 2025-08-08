@@ -9,6 +9,8 @@ import { useFormState } from "react-dom";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
+import LoadingPopup from "@/components/LoadingPopup";
+import { useTransition } from "react";
 
 const ClassForm = ({
     type,
@@ -41,10 +43,13 @@ const ClassForm = ({
     );
 
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isPending, startTransition] = useTransition();
 
     const onSubmit = handleSubmit(data => {
-        setIsSubmitting(true);
-        formAction(data);
+        startTransition(() => {
+            setIsSubmitting(true);
+            formAction(data);
+        });
     });
 
     const router = useRouter();
@@ -156,6 +161,7 @@ const ClassForm = ({
                     {type === "create" ? "Create" : "Update"}
                 </button>
             </div>
+            {isPending && <LoadingPopup />}
         </form>
     );
 };

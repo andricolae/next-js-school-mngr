@@ -11,6 +11,8 @@ import { useFormState } from "react-dom";
 import { createAnnouncement, updateAnnouncement } from "@/lib/actions";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
+import LoadingPopup from "@/components/LoadingPopup";
+import { useTransition } from "react";
 
 const AnnouncementForm = ({
     type,
@@ -35,14 +37,17 @@ const AnnouncementForm = ({
         ? createAnnouncement : updateAnnouncement, { success: false, error: false })
 
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isPending, startTransition] = useTransition();
 
     const onSubmit = handleSubmit(data => {
-        setIsSubmitting(true);
-        const formattedData = {
-            ...data,
-            date: new Date(data.date)
-        };
-        formAction(formattedData);
+        startTransition(() => {
+            setIsSubmitting(true);
+            const formattedData = {
+                ...data,
+                date: new Date(data.date)
+            };
+            formAction(formattedData);
+        });
     })
 
     const router = useRouter();
@@ -153,6 +158,7 @@ const AnnouncementForm = ({
                     {type === "create" ? "Create" : "Update"}
                 </button>
             </div>
+            {isPending && <LoadingPopup />}
         </form>
     )
 };

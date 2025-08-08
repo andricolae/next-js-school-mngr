@@ -11,6 +11,8 @@ import { createAssignment, updateAssignment } from "@/lib/actions";
 import { useFormState } from "react-dom";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
+import LoadingPopup from "@/components/LoadingPopup";
+import { useTransition } from "react";
 
 const AssignmentForm = ({
     type,
@@ -35,15 +37,18 @@ const AssignmentForm = ({
         ? createAssignment : updateAssignment, { success: false, error: false })
 
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isPending, startTransition] = useTransition();
 
     const onSubmit = handleSubmit(data => {
-        setIsSubmitting(true);
-        const formattedData = {
-            ...data,
-            startDate: new Date(data.startDate),
-            dueDate: new Date(data.dueDate)
-        };
-        formAction(formattedData);
+        startTransition(() => {
+            setIsSubmitting(true);
+            const formattedData = {
+                ...data,
+                startDate: new Date(data.startDate),
+                dueDate: new Date(data.dueDate)
+            };
+            formAction(formattedData);
+        });
     })
 
     const router = useRouter();
@@ -138,6 +143,7 @@ const AssignmentForm = ({
                     {type === "create" ? "Create" : "Update"}
                 </button>
             </div>
+            {isPending && <LoadingPopup />}
         </form>
     )
 };

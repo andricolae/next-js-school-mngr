@@ -3,6 +3,8 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
+import LoadingPopup from "@/components/LoadingPopup";
+import { useTransition } from "react";
 
 export interface FilterOption {
     id: string;
@@ -226,6 +228,7 @@ const FilterForm: React.FC<FilterFormProps> = ({
     const [moduleFilter, setModuleFilter] = useState(currentFilters.moduleId || "");
     const [sortDateOption, setSortDateOption] = useState("");
     const [sortGradeOption, setSortGradeOption] = useState("");
+    const [isPending, startTransition] = useTransition();
 
 
     useEffect(() => {
@@ -252,28 +255,30 @@ const FilterForm: React.FC<FilterFormProps> = ({
     }, [currentFilters]);
 
     const handleApplyFilters = () => {
-        const newSearchParams = new URLSearchParams();
+        startTransition(() => {
+            const newSearchParams = new URLSearchParams();
 
-        const existingSearchParam = searchParams.get("search");
-        if (existingSearchParam) {
-            newSearchParams.set("search", existingSearchParam);
-        }
+            const existingSearchParam = searchParams.get("search");
+            if (existingSearchParam) {
+                newSearchParams.set("search", existingSearchParam);
+            }
 
-        if (titleFilter) newSearchParams.set("title", titleFilter);
-        if (subjectFilters.length > 0) newSearchParams.set("subjectId", subjectFilters.join(','));
-        if (studentFilters.length > 0) newSearchParams.set("studentId", studentFilters.join(','));
-        if (teacherFilters.length > 0) newSearchParams.set("teacherId", teacherFilters.join(','));
-        if (classFilters.length > 0) newSearchParams.set("classId", classFilters.join(','));
-        if (moduleFilter) newSearchParams.set("moduleId", moduleFilter);
+            if (titleFilter) newSearchParams.set("title", titleFilter);
+            if (subjectFilters.length > 0) newSearchParams.set("subjectId", subjectFilters.join(','));
+            if (studentFilters.length > 0) newSearchParams.set("studentId", studentFilters.join(','));
+            if (teacherFilters.length > 0) newSearchParams.set("teacherId", teacherFilters.join(','));
+            if (classFilters.length > 0) newSearchParams.set("classId", classFilters.join(','));
+            if (moduleFilter) newSearchParams.set("moduleId", moduleFilter);
 
 
-        if (sortDateOption) newSearchParams.set("sortDate", sortDateOption);
-        if (sortGradeOption) newSearchParams.set("sortGrade", sortGradeOption);
+            if (sortDateOption) newSearchParams.set("sortDate", sortDateOption);
+            if (sortGradeOption) newSearchParams.set("sortGrade", sortGradeOption);
 
-        newSearchParams.set("page", "1");
+            newSearchParams.set("page", "1");
 
-        router.push(`?${newSearchParams.toString()}`);
-        setIsOpen(false);
+            router.push(`?${newSearchParams.toString()}`);
+            setIsOpen(false);
+        });
     };
 
     const handleClearFilters = () => {
@@ -318,6 +323,7 @@ const FilterForm: React.FC<FilterFormProps> = ({
                     </span>
                 )}
             </button>
+            {isPending && <LoadingPopup />}
 
             {isOpen && (
                 <div className="filter-modal-overlay fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">

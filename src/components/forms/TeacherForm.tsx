@@ -11,6 +11,8 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { useFormState } from "react-dom";
 import { CldUploadWidget } from "next-cloudinary";
+import LoadingPopup from "@/components/LoadingPopup";
+import { useTransition } from "react";
 
 interface FilterOption {
     id: string;
@@ -226,6 +228,8 @@ const TeacherForm = ({
         name: sub.name,
     })) || [];
 
+    const [isPending, startTransition] = useTransition();
+
     const selectedSubjects = watch("subjects") || [];
 
     useEffect(() => {
@@ -244,8 +248,10 @@ const TeacherForm = ({
     }, [state, router, type, setOpen]);
 
     const onSubmit = handleSubmit((formData) => {
-        formAction({ ...formData, img: img?.secure_url });
-        setIsSubmitting(true);
+        startTransition(() => {
+            formAction({ ...formData, img: img?.secure_url });
+            setIsSubmitting(true);
+        });
     });
 
     let openUploadWidget: () => void = () => { };
@@ -412,6 +418,9 @@ const TeacherForm = ({
                     {type === "create" ? "Create" : "Update"}
                 </button>
             </div>
+
+            {isPending && <LoadingPopup />}
+            
             <CldUploadWidget
                 uploadPreset="school-mgmt"
                 onSuccess={(result, { widget }) => {

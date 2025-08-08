@@ -9,7 +9,8 @@ import { createLesson, updateLesson, createRecurringLessons } from "@/lib/action
 import { useFormState } from "react-dom";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
-
+import LoadingPopup from "@/components/LoadingPopup";
+import { useTransition } from "react";
 
 type ModuleType = {
     id: number;
@@ -65,6 +66,7 @@ const LessonForm = ({
     const [isRecurring, setIsRecurring] = useState(false);
     const [selectedModuleId, setSelectedModuleId] = useState<number | null>(null);
     const [isCreatingRecurring, setIsCreatingRecurring] = useState(false);
+    const [isPending, startTransition] = useTransition();
 
     const {
         register,
@@ -174,32 +176,34 @@ const LessonForm = ({
     };
 
     const onSubmit = handleSubmit(async (formData) => {
-        if (isRecurring && selectedModuleId) {
-            setIsCreatingRecurring(true);
-            try {
-                const result = await generateRecurringLessons(formData, selectedModuleId);
-                if (result && result.success > 0) {
-                    toast.success(`Successfully created ${result.success} out of ${result.total} recurring lessons!`);
-                    setOpen(false);
-                    router.refresh();
-                } else {
+        startTransition(async () => {
+            if (isRecurring && selectedModuleId) {
+                setIsCreatingRecurring(true);
+                try {
+                    const result = await generateRecurringLessons(formData, selectedModuleId);
+                    if (result && result.success > 0) {
+                        toast.success(`Successfully created ${result.success} out of ${result.total} recurring lessons!`);
+                        setOpen(false);
+                        router.refresh();
+                    } else {
+                        toast.error("Error creating recurring lessons!");
+                    }
+                } catch (error) {
+                    console.error("Error generating recurring lessons:", error);
                     toast.error("Error creating recurring lessons!");
+                } finally {
+                    setIsCreatingRecurring(false);
                 }
-            } catch (error) {
-                console.error("Error generating recurring lessons:", error);
-                toast.error("Error creating recurring lessons!");
-            } finally {
-                setIsCreatingRecurring(false);
+            } else {
+                const submissionData = {
+                    ...formData,
+                    ...(type === "update" && data?.id && { id: data.id }),
+                    startTime: new Date(new Date(formData.startTime).getTime() + (3 * 60 * 60 * 1000)),
+                    endTime: new Date(new Date(formData.endTime).getTime() + (3 * 60 * 60 * 1000)),
+                };
+                formAction(submissionData);
             }
-        } else {
-            const submissionData = {
-                ...formData,
-                ...(type === "update" && data?.id && { id: data.id }),
-                startTime: new Date(new Date(formData.startTime).getTime() + (3 * 60 * 60 * 1000)),
-                endTime: new Date(new Date(formData.endTime).getTime() + (3 * 60 * 60 * 1000)),
-            };
-            formAction(submissionData);
-        }
+        });
     });
 
     useEffect(() => {
@@ -410,6 +414,7 @@ const LessonForm = ({
                     </button>
                 </div>
             </div>
+            {isPending && <LoadingPopup />}
         </form>
     );
 };
