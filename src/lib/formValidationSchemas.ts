@@ -94,17 +94,22 @@ export const teacherSchema = (isUpdate = false) => z.object({
 
 export type TeacherSchema = z.infer<ReturnType<typeof teacherSchema>>;
 
-export const studentSchema = z.object({
+export const studentSchema = (isUpdate = false) => z.object({
     id: z.string().optional(),
     username: z
         .string()
         .nonempty({ message: "Username is required!" })
         .min(3, { message: 'Username must be at least 3 characters long!' })
         .max(20, { message: 'Username must be max 20 characters long!' }),
-    password: z
-        .string()
-        .nonempty({ message: "Password is required!" })
-        .min(6, { message: "Password must be at least 8 characters!" }),
+    password: isUpdate
+        ? z.string()
+            .transform((val) => val === "" ? undefined : val)
+            .optional()
+            .refine(
+                (val) => val === undefined || val.length >= 8,
+                { message: "Password must be at least 8 characters!" }
+            )
+        : z.string().nonempty({ message: "Password is required!" }).min(6, { message: "Password must be at least 8 characters!" }),
 
     name: z.string().min(1, { message: "First Name is required!" }),
     surname: z.string().min(1, { message: "Last Name is required!" }),
@@ -115,14 +120,23 @@ export const studentSchema = z.object({
 
     img: z.string().optional(),
     phone: z.string().min(1, { message: "Phone is required!" }),
-    birthday: z.coerce.date({ message: "Birthday is required!" }),
+    birthday: z.coerce.date({ message: "Birthday is required!" })
+        .refine(
+            (date) => {
+                const ageDifMs = new Date().getTime() - date.getTime();
+                const ageDate = new Date(ageDifMs);
+                const age = Math.abs(ageDate.getUTCFullYear() - 1970);
+                return age >= 5;
+            },
+            { message: "Student must be at least 5 years old." }
+        ),
     gender: z.enum(["FEMALE", "MALE", "OTHER"], { message: "Gender is required!" }),
     gradeId: z.coerce.number().min(1, { message: "Grade is required" }),
     classId: z.coerce.number().min(1, { message: "Class is required" }),
     parentId: z.coerce.string().min(1, { message: "Parent ID is required" }),
 });
 
-export type StudentSchema = z.infer<typeof studentSchema>;
+export type StudentSchema = z.infer<ReturnType<typeof studentSchema>>;
 
 export const examSchema = z
     .object({

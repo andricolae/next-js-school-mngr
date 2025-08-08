@@ -237,8 +237,7 @@ const TeacherForm = ({
             );
             setOpen(false);
             router.refresh();
-        }
-        if (state.error) {
+        } else if (state.error) {
             const errorMessage = state.message || "Something went wrong!";
             toast.error(errorMessage);
             setIsSubmitting(false);
