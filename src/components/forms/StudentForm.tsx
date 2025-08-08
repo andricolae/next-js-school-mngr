@@ -30,7 +30,7 @@ const StudentForm = ({
         handleSubmit,
         formState: { errors },
     } = useForm<StudentSchema>({
-        resolver: zodResolver(studentSchema),
+        resolver: zodResolver(studentSchema(type === "update")),
     });
 
     const [img, setImg] = useState<any>();
@@ -60,8 +60,11 @@ const StudentForm = ({
             );
             setOpen(false);
             router.refresh();
+        } else if (state.error) {
+            const errorMessage = state.message || "Something went wrong!";
+            toast.error(errorMessage);
+            setIsSubmitting(false);
         }
-        else setIsSubmitting(false);
     }, [state, router, type, setOpen]);
 
     const { grades, classes, parents } = relatedData || {
@@ -278,12 +281,6 @@ const StudentForm = ({
                     error={errors?.id}
                     hidden
                 />
-            )}
-
-            {state.error && (
-                <span className="text-red-500">
-                    {state.message || "Something went wrong!"}
-                </span>
             )}
 
             <div className="flex justify-center mt-6">
