@@ -1,11 +1,10 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { set, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import InputField from "../InputField";
-import Image from "next/image";
-import { examSchema, ExamSchema, subjectSchema, SubjectSchema } from "@/lib/formValidationSchemas";
-import { createExam, createSubject, updateExam, updateSubject } from "@/lib/actions";
+import { examSchema, ExamSchema } from "@/lib/formValidationSchemas";
+import { createExam, updateExam } from "@/lib/actions";
 import { useFormState } from "react-dom";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { toast } from "react-toastify";

@@ -3,11 +3,9 @@
 import * as Clerk from '@clerk/elements/common'
 import * as SignIn from '@clerk/elements/sign-in'
 import { useUser } from '@clerk/nextjs'
-import { Sign } from 'crypto'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
-import { TokenData } from "@/lib/utils";
 import LoadingPopup from "@/components/LoadingPopup";
 import { useTransition } from "react";
 

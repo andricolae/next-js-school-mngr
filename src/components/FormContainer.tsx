@@ -1,7 +1,6 @@
 import prisma from "@/lib/prisma";
 import FormModal from "./FormModal";
 import { auth } from "@clerk/nextjs/server";
-import { useEffect } from "react";
 import { TokenData } from "@/lib/utils";
 
 export type FormContainerProps = {

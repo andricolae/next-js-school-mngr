@@ -1,5 +1,4 @@
 "use client"
-import Image from "next/image"
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 interface FinanceData {

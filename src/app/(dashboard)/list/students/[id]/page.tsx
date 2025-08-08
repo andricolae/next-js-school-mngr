@@ -1,9 +1,6 @@
 import Announcements from '@/components/Announcements'
-import BigCalendar from '@/components/BigCalendar'
 import BigCalendarContainer from '@/components/BigCalendarContainer'
 import FormContainer from '@/components/FormContainer'
-import FormModal from '@/components/FormModal'
-import Performance from '@/components/Performance'
 import StudentAttendanceCard from '@/components/StudentAttendanceCard'
 import prisma from '@/lib/prisma'
 import { auth } from '@clerk/nextjs/server'
@@ -11,7 +8,7 @@ import { Class, Prisma, Student } from '@prisma/client'
 import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { Suspense, useEffect } from 'react'
+import { Suspense } from 'react'
 import { TokenData } from "@/lib/utils";
 import FormModalCustom from '@/components/FormModalCustom'
 

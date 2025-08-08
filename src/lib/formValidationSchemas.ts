@@ -51,17 +51,23 @@ export const classSchema = z.object({
 
 export type ClassSchema = z.infer<typeof classSchema>;
 
-export const teacherSchema = z.object({
+export const teacherSchema = (isUpdate = false) => z.object({
     id: z.string().optional(),
     username: z
         .string()
         .nonempty({ message: "Username is required!" })
         .min(3, { message: 'Username must be at least 3 characters long!' })
         .max(20, { message: 'Username must be max 20 characters long!' }),
-    password: z
-        .string()
-        .nonempty({ message: "Password is required!" })
-        .min(6, { message: "Password must be at least 8 characters!" }),
+    password: isUpdate
+        ? z.string()
+            .transform((val) => val === "" ? undefined : val)
+            .optional()
+            .refine(
+                (val) => val === undefined || val.length >= 8,
+                { message: "Password must be at least 8 characters!" }
+            )
+        : z.string().nonempty({ message: "Password is required!" }).min(6, { message: "Password must be at least 8 characters!" }),
+
 
     name: z.string().min(1, { message: "First Name is required!" }),
     surname: z.string().min(1, { message: "Last Name is required!" }),
@@ -72,14 +78,21 @@ export const teacherSchema = z.object({
     address: z.string(),
     img: z.string().optional(),
     bloodType: z.string().optional(),
-    birthday: z.coerce.date({ message: "Birthday is required!" }),
+    birthday: z.coerce.date({ message: "Birthday is required!" })
+        .refine(
+            (date) => {
+                const ageDifMs = new Date().getTime() - date.getTime();
+                const ageDate = new Date(ageDifMs);
+                const age = Math.abs(ageDate.getUTCFullYear() - 1970);
+                return age >= 18;
+            },
+            { message: "Teacher must be at least 18 years old." }
+        ),
     gender: z.enum(["FEMALE", "MALE", "OTHER"], { message: "Gender is required!" }),
     subjects: z.array(z.string().min(1, { message: "Subject is required!" }))
-
-
 });
 
-export type TeacherSchema = z.infer<typeof teacherSchema>;
+export type TeacherSchema = z.infer<ReturnType<typeof teacherSchema>>;
 
 export const studentSchema = z.object({
     id: z.string().optional(),
