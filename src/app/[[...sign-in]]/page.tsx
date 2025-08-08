@@ -8,18 +8,23 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import { TokenData } from "@/lib/utils";
+import LoadingPopup from "@/components/LoadingPopup";
+import { useTransition } from "react";
 
 const LoginPage = () => {
 
     const { isLoaded, isSignedIn, user } = useUser();
     const router = useRouter();
+    const [isPending, startTransition] = useTransition();
 
     useEffect(() => {
-        if (!isLoaded || !isSignedIn) return;
-        const role = user?.publicMetadata.role;
-        if (role) {
-            router.push(`/${role}`);
-        }
+        startTransition(() => {
+            if (!isLoaded || !isSignedIn) return;
+            const role = user?.publicMetadata.role;
+            if (role) {
+                router.push(`/${role}`);
+            }
+        });
     }, [isLoaded, isSignedIn, user, router]);
 
     return (
@@ -46,7 +51,7 @@ const LoginPage = () => {
                     </Clerk.Field>
 
                     <SignIn.Action submit className='bg-blue-500 text-white my-1 rounded text-sm p-[10px]'>Sign In</SignIn.Action>
-
+                    {isPending && <LoadingPopup />}
                 </SignIn.Step>
             </SignIn.Root>
         </div>
