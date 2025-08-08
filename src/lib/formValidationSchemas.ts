@@ -268,17 +268,21 @@ export type LessonSchema = z.infer<typeof lessonSchema>;
 
 export type GeneratedLessonData = Omit<LessonSchema, 'isRecurring' | 'moduleId' | 'id'> & { id?: number };
 
-export const parentSchema = z.object({
+export const parentSchema = (isUpdate = false) => z.object({
     id: z.string().optional(),
     username: z
         .string()
         .min(3, { message: 'Username must be at least 3 characters long!' })
         .max(20, { message: 'Username must be max 20 characters long!' }),
-    password: z
-        .string()
-        .min(6, { message: "Password must be at least 6 characters long!" })
-        .optional()
-        .or(z.literal("")),
+    password: isUpdate
+        ? z.string()
+            .transform((val) => val === "" ? undefined : val)
+            .optional()
+            .refine(
+                (val) => val === undefined || val.length >= 8,
+                { message: "Password must be at least 8 characters!" }
+            )
+        : z.string().nonempty({ message: "Password is required!" }).min(6, { message: "Password must be at least 8 characters!" }),
     name: z.string().min(1, { message: "First Name is required!" }),
     surname: z.string().min(1, { message: "Last Name is required!" }),
     email: z
@@ -290,7 +294,7 @@ export const parentSchema = z.object({
     address: z.string().min(1, { message: "Address is required!" }),
 });
 
-export type ParentSchema = z.infer<typeof parentSchema>;
+export type ParentSchema = z.infer<ReturnType<typeof parentSchema>>;
 
 export const attendanceSchema = z.object({
     id: z.coerce.number().optional(),
