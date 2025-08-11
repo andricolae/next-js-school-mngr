@@ -982,7 +982,6 @@ export const updateParent = async (currentState: CurrentState, data: ParentSchem
     if (!data.id) {
         return { success: false, error: true };
     }
-
     try {
         const client = await clerkClient();
         const user = await client.users.updateUser(data.id, {
@@ -1047,7 +1046,6 @@ export const deleteParent = async (currentState: CurrentState, data: FormData) =
         return { success: false, error: true }
     }
 }
-
 
 export const createAttendance = async (currentState: CurrentState, data: AttendanceActionData) => {
     const { userId, sessionClaims } = await auth();
@@ -1284,8 +1282,6 @@ export async function createRecurringLessons(lessonsData: LessonSchema[]) {
     }
 }
 
-
-
 export async function checkTeacherAvailability(
     teacherId: string,
     day: string,
@@ -1342,7 +1338,6 @@ export async function checkTeacherAvailability(
     }
 }
 
-
 function getFriendlyErrorMessage(e: any): string {
     let friendlyMessage = "An unknown error occurred.";
 
@@ -1367,4 +1362,3 @@ function getFriendlyErrorMessage(e: any): string {
 
     return friendlyMessage;
 }
-

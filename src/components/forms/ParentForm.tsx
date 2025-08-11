@@ -29,6 +29,16 @@ const ParentForm = ({
         formState: { errors },
     } = useForm<ParentSchema>({
         resolver: zodResolver(parentSchema(type === "update")),
+        defaultValues: {
+            id: data?.id,
+            username: data?.username,
+            name: data?.name,
+            surname: data?.surname,
+            email: data?.email,
+            phone: data?.phone,
+            address: data?.address,
+            password: data?.password,
+        },
     });
 
     const [state, formAction] = useFormState(
