@@ -16,13 +16,17 @@ export type FormContainerProps = {
     | "result"
     | "attendance"
     | "event"
-    | "announcement";
+    | "announcement"
+    | "adeverinta"
+    | "matricola"
+    | "absente";
     type:
     "create"
     | "update"
     | "delete";
     data?: any;
     id?: number | string;
+    results?: any;
 }
 const FormContainer = async ({ table, type, data, id }: FormContainerProps) => {
 
