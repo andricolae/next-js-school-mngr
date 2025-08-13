@@ -28,7 +28,17 @@ const ParentForm = ({
         handleSubmit,
         formState: { errors },
     } = useForm<ParentSchema>({
-        resolver: zodResolver(parentSchema),
+        resolver: zodResolver(parentSchema(type === "update")),
+        defaultValues: {
+            id: data?.id,
+            username: data?.username,
+            name: data?.name,
+            surname: data?.surname,
+            email: data?.email,
+            phone: data?.phone,
+            address: data?.address,
+            password: data?.password,
+        },
     });
 
     const [state, formAction] = useFormState(
@@ -56,7 +66,7 @@ const ParentForm = ({
         }
         if (state.error) {
             const errorMessage = state.message || "Something went wrong!";
-            console.error(errorMessage);
+            toast.error(errorMessage);
             setIsSubmitting(false);
         }
     }, [state, router, type, setOpen]);
@@ -142,11 +152,6 @@ const ParentForm = ({
                 Note: Student assignments are managed through the student creation/update forms.
             </div>
 
-            {state.error && (
-                <span className="text-red-500">
-                    {state.message || "Something went wrong!"}
-                </span>
-            )}
             <div className="flex justify-center mt-1">
                 <button
                     className={`bg-blue-500 text-white px-8 py-2 rounded-md text-sm w-max ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}

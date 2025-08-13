@@ -10,7 +10,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { Suspense } from 'react'
 import { TokenData } from "@/lib/utils";
-import FormModalCustom from '@/components/FormModalCustom'
+import FormModal from '@/components/FormModal'
 
 const SingleStudentPage = async ({
     params: { id },
@@ -159,8 +159,9 @@ const SingleStudentPage = async ({
                         <Link className='p-3 rounded-md bg-purple-200' href={`/list/assignments?classId=${2}`}>Student&apos;s Assignments</Link>
                         {(role === "admin" || role === "teacher") && (
                             <>
-                                <div className=''><FormModalCustom table="teacher" type="create" title="Adeverinta elev" student={student} /></div>
-                                <div className=''><FormModalCustom table="parent" type="create" title="Foaie matricola" student={student} results={results} /></div>
+                                <div className=''><FormModal table="adeverinta" type="create" title="Adeverinta elev" student={student} /></div>
+                                <div className=''><FormModal table="matricola" type="create" title="Foaie matricola" student={student} results={results} /></div>
+                                <div className=''><FormModal table="absente" type="create" title="Raport absente" student={student} results={results} /></div>
                             </>
                         )}
                     </div>

@@ -24,6 +24,9 @@ const deleteActionMap = {
     parent: deleteParent,
     teacher: deleteTeacher,
     student: deleteStudent,
+    adeverinta: deleteStudent,
+    matricola: deleteStudent,
+    absente: deleteStudent,
 }
 
 const TeacherForm = dynamic(() => import("./forms/TeacherForm"), {
@@ -62,9 +65,18 @@ const AttendanceForm = dynamic(() => import("./forms/AttendanceForm"), {
 const AnnouncementForm = dynamic(() => import("./forms/AnnouncementForm"), {
     loading: () => <LoadingPopup />
 });
+const AdeverintaElevForm = dynamic(() => import("./forms/AdeverintaElevForm"), {
+    loading: () => <LoadingPopup />,
+});
+const FoaieMatricolaForm = dynamic(() => import("./forms/FoaieMatricolaForm"), {
+    loading: () => <LoadingPopup />,
+});
+const RaportAbsenteForm = dynamic(() => import("./forms/RaportAbsenteForm"), {
+    loading: () => <LoadingPopup />,
+});
 
 const forms: {
-    [key: string]: (setOpen: Dispatch<SetStateAction<boolean>>, type: "create" | "update", data?: any, relatedData?: any) => JSX.Element;
+    [key: string]: (setOpen: Dispatch<SetStateAction<boolean>>, type: "create" | "update", data?: any, relatedData?: any, student?: any, results?: any) => JSX.Element;
 } = {
     teacher: (setOpen, type, data, relatedData) => <TeacherForm type={type} data={data} setOpen={setOpen} relatedData={relatedData} />,
     student: (setOpen, type, data, relatedData) => <StudentForm type={type} data={data} setOpen={setOpen} relatedData={relatedData} />,
@@ -78,9 +90,12 @@ const forms: {
     attendance: (setOpen, type, data, relatedData) => <AttendanceForm type={type} data={data} setOpen={setOpen} relatedData={relatedData} />,
     event: (setOpen, type, data, relatedData) => <EventForm type={type} data={data} setOpen={setOpen} relatedData={relatedData} />,
     announcement: (setOpen, type, data, relatedData) => <AnnouncementForm type={type} data={data} setOpen={setOpen} relatedData={relatedData} />,
+    adeverinta: (setOpen, type, data, relatedData, student) => <AdeverintaElevForm type={type} data={data} setOpen={setOpen} relatedData={relatedData} student={student} />,
+    matricola: (setOpen, type, data, relatedData, student, results) => <FoaieMatricolaForm type={type} data={data} setOpen={setOpen} relatedData={relatedData} student={student} results={results} />,
+    absente: (setOpen, type, data, relatedData, student) => <RaportAbsenteForm type={type} data={data} setOpen={setOpen} relatedData={relatedData} student={student} />,
 };
 
-const FormModal = ({ table, type, data, id, relatedData }: FormContainerProps & { relatedData?: any }) => {
+const FormModal = ({ table, type, data, id, results, relatedData, title, student }: FormContainerProps & { relatedData?: any, title?: any, student?: any}) => {
     const size = type === "create" ? "w-8 h-8" : "w-7 h-7"
     const bgColor =
         type === "create" ? "bg-yellow"
@@ -136,16 +151,16 @@ const FormModal = ({ table, type, data, id, relatedData }: FormContainerProps & 
                 {isPending && <LoadingPopup />}
             </form>
         ) : type === "create" || type === "update" ? (
-            forms[table](setOpen, type, data, relatedData)
+            forms[table](setOpen, type, data, relatedData, student, results)
         ) : "Form not found";
     };
 
     return <>
         <button
-            className={`${size} flex items-center justify-center rounded-full ${bgColor}`}
+            className={title !== undefined ? `p-3 rounded-md bg-skyLight` : `${size} flex items-center justify-center rounded-full ${bgColor}`}
             onClick={() => { setOpen(true); }}
         >
-            <Image src={`/${type}.png`} alt="" width={16} height={16} />
+            {title !== undefined ? <div>{title}</div> : <Image src={`/${type}.png`} alt="" width={16} height={16} />}
         </button>
         {open && (
             <div className="w-screen h-screen absolute left-0 top-0 bg-black bg-opacity-60 z-50 flex items-center justify-center">
