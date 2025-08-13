@@ -2,11 +2,11 @@ import jsPDF from "jspdf";
 
 export const generateRaportAbsentePDF = (
     unitateInvatamant: string,
-    scoala: string,
     data: string,
     nume: string,
     prenume: string,
-    lunaAn: string
+    lunaAn: string,
+    absente: any,
 ) => {
     const doc = new jsPDF({
         orientation: "portrait",
@@ -30,7 +30,8 @@ export const generateRaportAbsentePDF = (
     doc.setFont("Times", "Bold");
     doc.text("Raport absente", doc.internal.pageSize.getWidth() / 2, y, { align: "center" });
     doc.setFontSize(12);
-    doc.text(`-${lunaAn}-`, doc.internal.pageSize.getWidth() / 2, y + 16, { align: "center" });
+    doc.text(`- ${new Date(lunaAn + "-01").toLocaleString("ro-RO", { month: "long", year: "numeric" })} -`,
+        doc.internal.pageSize.getWidth() / 2, y + 16, { align: "center" });
 
     // Nume și prenume
     y += 50;
@@ -39,35 +40,37 @@ export const generateRaportAbsentePDF = (
     doc.text(`Nume: ${nume}`, marginLeft, y);
     doc.text(`Prenume: ${prenume}`, marginLeft, y + 18);
 
-    // Tabel
     y += 30;
-    const startTableY = y;
-    const col1X = marginLeft;
-    const col2X = 350;
-    const tableWidth = 500;
-    const rowHeight = 20;
-    const numRows = 15;
 
     // Linii tabel
     doc.setDrawColor(0);
     doc.setLineWidth(0.5);
 
-    // Linii orizontale
-    for (let i = 0; i <= numRows; i++) {
-        doc.line(col1X, startTableY + i * rowHeight, col1X + tableWidth, startTableY + i * rowHeight);
+    y += 30;
+    const dataRowHeight = 20;
+    const colWidths = [310, 190]; // lățimile celor două coloane
+    const colX = [marginLeft, marginLeft + colWidths[0]];
+
+    let absenteMotivate = 0;
+    for (let i = 0; i < absente.length; i++) {
+        if (absente[i].status === "motivata") {
+            ++absenteMotivate;
+        }
+        doc.rect(colX[0], y + i * dataRowHeight, colWidths[0], dataRowHeight);
+        doc.rect(colX[1], y + i * dataRowHeight, colWidths[1], dataRowHeight);
+        doc.text(absente[i].data, colX[0] + 5, y + i * dataRowHeight + 14);
+        doc.text(absente[i].status, colX[1] + 5, y + i * dataRowHeight + 14);
     }
 
-    // Linii verticale
-    doc.line(col1X, startTableY, col1X, startTableY + numRows * rowHeight);
-    doc.line(col2X, startTableY, col2X, startTableY + numRows * rowHeight);
-    doc.line(col1X + tableWidth, startTableY, col1X + tableWidth, startTableY + numRows * rowHeight);
-
     // Totaluri
-    y = startTableY + numRows * rowHeight + 30;
+    y += absente.length * dataRowHeight + 20;
     doc.setFontSize(12);
     doc.text("Total absente motivate:", marginLeft, y);
+    doc.text(`${absenteMotivate}`, marginLeft + 120, y);
     doc.text("Total absente nemotivate:", marginLeft, y + 18);
+    doc.text(`${absente.length - absenteMotivate}`, marginLeft + 130, y + 18);
     doc.text("Total absente:", marginLeft, y + 36);
+    doc.text(`${absente.length}`, marginLeft + 75, y + 36);
 
     doc.save("raport_absente.pdf");
 };

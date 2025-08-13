@@ -31,10 +31,7 @@ const RaportAbsenteForm = ({
     });
 
     const [errorsInputs, setErrorsInputs] = useState({
-        numarAdeverinta: false,
-        motivAdeverinta: false,
-        anScolarStart: false,
-        anScolarSfarsit: false,
+        selectedMonthForReport: false,
     });
 
     const [state, formAction] = useFormState(type === "create"
@@ -43,28 +40,24 @@ const RaportAbsenteForm = ({
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const onSubmit = (e: any) => {
+
         e.preventDefault();
         const formData = new FormData(e.target);
-        const numarAdeverinta = formData.get("numarAdeverinta");
-        const motivAdeverinta = formData.get("motivAdeverinta");
-        const anScolarStart = formData.get("anScolarStart");
-        const anScolarSfarsit = formData.get("anScolarSfarsit");
+        const selectedMonthForReport = formData.get("selectedMonthForReport") as string;
 
-        if (numarAdeverinta === "" || motivAdeverinta === "") {
+        if (selectedMonthForReport === null) {
             const newErrors = {
-                numarAdeverinta: !numarAdeverinta,
-                motivAdeverinta: !motivAdeverinta,
-                anScolarStart: !anScolarStart,
-                anScolarSfarsit: !anScolarSfarsit,
+                selectedMonthForReport: !selectedMonthForReport,
             };
 
             setErrorsInputs(newErrors);
             return;
         }
         setIsSubmitting(true);
+        let absente = [{ data: "01.05", status: "motivata" }, { data: "07.05", status: "nemotivata" }, { data: "09.05", status: "motivata" }]
 
-        generateRaportAbsentePDF("UnitateInvatamant", "Scoala", new Date().toLocaleDateString("en-GB").replace(/\//g, "."),
-            "NumeIon", "PrenumePopa", "mai 2025");
+        generateRaportAbsentePDF("UnitateInvatamant", new Date().toLocaleDateString("en-GB").replace(/\//g, "."),
+            student?.surname, student?.name, selectedMonthForReport, absente);
         setOpen(false);
         setIsSubmitting(false);
     }
@@ -87,63 +80,59 @@ const RaportAbsenteForm = ({
     return (
         <form className="flex flex-col gap-8 items-center" onSubmit={onSubmit}>
             <div className="flex flex-col gap-4 w-full">
-                <h1 className="text-cl font-semibold">{type === "create" ? "Adeverinta student" : "Update the assignment"}</h1>
+                <h1 className="text-cl font-semibold">{type === "create" ? "Raport absente" : "Update the assignment"}</h1>
                 <div className="flex flex-col gap-2 w-full">
-                    <label className="text-xs text-gray-400">Numar adeverinta: </label>
-                    <input
-                        type="text"
-                        name="numarAdeverinta"
-                        className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
-                        defaultValue=""
-                    />
-                    {errorsInputs.numarAdeverinta && (
-                        <span className="text-red-500 text-sm">Acest camp este obligatoriu.</span>
-                    )}
-                </div>
-                <div className="flex flex-col gap-2 w-full">
-                    <label className="text-xs text-gray-400">Adeverinta serveste la: </label>
-                    <input
-                        type="text"
-                        name="motivAdeverinta"
-                        className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
-                        defaultValue=""
-                    />
-                    {errorsInputs.motivAdeverinta && (
-                        <span className="text-red-500 text-sm">Acest camp este obligatoriu.</span>
-                    )}
-                </div>
-                <div className="flex flex-col gap-2 w-full">
-                    <label className="text-xs text-gray-400">Anul scolar(inceput):</label>
+                    <label className="text-xs text-gray-400">Raport absente pentru luna:</label>
                     <select
-                        name="anScolarStart"
+                        name="selectedMonthForReport"
                         className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
                         defaultValue=""
                     >
-                        <option value="" disabled hidden className="h-12">Alege un an</option>
-                        {Array.from({ length: 2040 - 1989 + 1 }, (_, i) => {
-                            const year = 1989 + i;
-                            return <option key={year} value={year}>{year}</option>;
-                        })}
+                        <option value="" disabled hidden className="h-12">
+                            Alege o lună
+                        </option>
+                        {(() => {
+                            const options = [];
+                            const now = new Date();
+                            const currentYear = now.getFullYear();
+                            const previousYear = currentYear - 1;
+
+                            const monthNames = [
+                                "Ianuarie", "Februarie", "Martie", "Aprilie", "Mai", "Iunie",
+                                "Iulie", "August", "Septembrie", "Octombrie", "Noiembrie", "Decembrie"
+                            ];
+
+                            // Last 4 months of previous year (Sep–Dec)
+                            for (let month = 8; month <= 11; month++) {
+                                options.push(
+                                    <option
+                                        key={`${previousYear}-${month}`}
+                                        value={`${previousYear}-${month + 1}`}
+                                    >
+                                        {`${monthNames[month]} ${previousYear}`}
+                                    </option>
+                                );
+                            }
+
+                            // First 7 months of current year (Jan–Jul)
+                            for (let month = 0; month <= 6; month++) {
+                                options.push(
+                                    <option
+                                        key={`${currentYear}-${month}`}
+                                        value={`${currentYear}-${month + 1}`}
+                                    >
+                                        {`${monthNames[month]} ${currentYear}`}
+                                    </option>
+                                );
+                            }
+
+                            return options;
+                        })()}
                     </select>
-                    {errorsInputs.anScolarStart && (
-                        <span className="text-red-500 text-sm">Acest câmp este obligatoriu.</span>
-                    )}
-                </div>
-                <div className="flex flex-col gap-2 w-full">
-                    <label className="text-xs text-gray-400">Anul scolar(sfarsit):</label>
-                    <select
-                        name="anScolarSfarsit"
-                        className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
-                        defaultValue=""
-                    >
-                        <option value="" disabled hidden>Alege un an</option>
-                        {Array.from({ length: 2040 - 1989 + 1 }, (_, i) => {
-                            const year = 1989 + i;
-                            return <option key={year} value={year}>{year}</option>;
-                        })}
-                    </select>
-                    {errorsInputs.anScolarSfarsit && (
-                        <span className="text-red-500 text-sm">Acest câmp este obligatoriu.</span>
+                    {errorsInputs.selectedMonthForReport && (
+                        <span className="text-red-500 text-sm">
+                            Acest câmp este obligatoriu.
+                        </span>
                     )}
                 </div>
             </div>
