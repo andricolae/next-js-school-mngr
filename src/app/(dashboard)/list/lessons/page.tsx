@@ -1,6 +1,5 @@
 import FormContainer from "@/components/FormContainer"
 import Pagination from "@/components/Pagination"
-import Table from "@/components/Table"
 import TableSearch from "@/components/TableSearch"
 import SortButton from "@/components/SortButton"
 import prisma from "@/lib/prisma"
@@ -9,7 +8,9 @@ import { auth } from "@clerk/nextjs/server"
 import { Class, Lesson, Prisma, Subject, Teacher } from "@prisma/client"
 import { TokenData } from "@/lib/utils";
 import LessonFilterForm from "@/components/forms/LessonFilterForm";
-import { availableModules, ModuleType } from "@/lib/modules";
+import { availableModules } from "@/lib/modules";
+import { deleteSelectedLessons } from "@/lib/actions"
+import BulkDeleteForm from "@/components/forms/BulkDeleteForm"
 
 type LessonList = Lesson & { subject: Subject } & { class: Class } & { teacher: Teacher }
 
@@ -59,7 +60,7 @@ const LessonListPage = async ({ searchParams }: { searchParams: { [key: string]:
 
     const renderRow = (item: LessonList) => (
         <tr key={item.id} className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-skyLight">
-            <td className="flex items-center gap-4 p-4">{item.subject.name}</td>
+            <td className="flex items-center gap-4 p-4"><input type="checkbox" name="checkbox"></input>{item.subject.name}</td>
             <td>{item.class.name}</td>
             <td className="hidden md:table-cell">{item.teacher.name + " " + item.teacher.surname}</td>
             <td>
@@ -179,11 +180,18 @@ const LessonListPage = async ({ searchParams }: { searchParams: { [key: string]:
 
 
     const title = hasSpecificFilters ? "All Lessons (Filtered)" : "Lessons for Today";
+    const selectedIds = data.map(item => item.id);
 
     return (
         <div className='bg-white p-4 rounded-md flex-1 m-4 mt-0'>
             <div className='flex items-center justify-between'>
-                <h1 className='hidden md:block text-lg font-semibold'>{title}</h1>
+                <h1 className='hidden md:flex items-center gap-2 text-lg font-semibold'>
+                    {title}
+                    <BulkDeleteForm
+                        formActionWrapper={deleteSelectedLessons}
+                        table="lesson"
+                    />
+                </h1>
                 <div className='flex flex-col md:flex-row items-center gap-4 w-full md:w-auto'>
                     <TableSearch />
                     <div className='flex items-center gap-4 self-end'>
@@ -201,7 +209,48 @@ const LessonListPage = async ({ searchParams }: { searchParams: { [key: string]:
                     </div>
                 </div>
             </div>
-            <Table columns={columns} renderRow={renderRow} data={data} />
+            <div id="table-container">
+                <table className='w-full mt-4'>
+                    <thead>
+                        <tr className="text-left text-gray-500 text-sm">
+                            {columns.map(col => (
+                                <th key={col.accessor} className={col.className}>{col.header}</th>
+                            ))}
+                        </tr>
+                    </thead>
+                    <tbody id="table-body">{data.map((item: any) =>
+                        <tr key={item.id} className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-skyLight">
+                            <td className="flex items-center gap-4 p-4">
+                                <input type="checkbox" name="lessonIds" value={item.id}></input>
+                                {item.subject.name}
+                            </td>
+                            <td>{item.class.name}</td>
+                            <td className="hidden md:table-cell">{item.teacher.name + " " + item.teacher.surname}</td>
+                            <td>
+
+                                {item.startTime ? new Date(item.startTime).toLocaleString('ro-RO', {
+                                    year: 'numeric',
+                                    month: 'numeric',
+                                    day: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                }) : 'N/A'}
+                            </td>
+                            <td>
+                                <div className="flex items-center gap-2">
+                                    {role === "admin" && (
+                                        <>
+                                            <FormContainer table="lesson" type="update" data={item} />
+                                            <FormContainer table="lesson" type="delete" id={item.id} />
+                                        </>
+                                    )}
+                                </div>
+                            </td>
+                        </tr>
+                    )}
+                    </tbody>
+                </table>
+            </div>
             <Pagination page={p} count={count} />
         </div>
     )
