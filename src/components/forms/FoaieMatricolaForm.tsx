@@ -188,13 +188,6 @@ const AdeverintaElevForm = ({
     const router = useRouter();
 
     useEffect(() => {
-        // console.log(data);
-        // console.log(relatedData);
-        // console.log(student);
-        // console.log(results);
-
-        // console.log(subjectFilters);
-        // console.log(allSubjects);
         if (state.success) {
             toast(`Assignment has been ${type === "create" ? "created" : "updated"} successfully!`);
             setOpen(false);

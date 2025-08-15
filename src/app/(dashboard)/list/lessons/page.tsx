@@ -11,6 +11,7 @@ import LessonFilterForm from "@/components/forms/LessonFilterForm";
 import { availableModules } from "@/lib/modules";
 import { deleteSelectedLessons } from "@/lib/actions"
 import BulkDeleteForm from "@/components/forms/BulkDeleteForm"
+import Table from "@/components/Table"
 
 type LessonList = Lesson & { subject: Subject } & { class: Class } & { teacher: Teacher }
 
@@ -60,7 +61,10 @@ const LessonListPage = async ({ searchParams }: { searchParams: { [key: string]:
 
     const renderRow = (item: LessonList) => (
         <tr key={item.id} className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-skyLight">
-            <td className="flex items-center gap-4 p-4"><input type="checkbox" name="checkbox"></input>{item.subject.name}</td>
+            <td className="flex items-center gap-4 p-4">
+                <input type="checkbox" name="lessonIds" value={item.id}></input>
+                {item.subject.name}
+            </td>
             <td>{item.class.name}</td>
             <td className="hidden md:table-cell">{item.teacher.name + " " + item.teacher.surname}</td>
             <td>
@@ -209,48 +213,7 @@ const LessonListPage = async ({ searchParams }: { searchParams: { [key: string]:
                     </div>
                 </div>
             </div>
-            <div id="table-container">
-                <table className='w-full mt-4'>
-                    <thead>
-                        <tr className="text-left text-gray-500 text-sm">
-                            {columns.map(col => (
-                                <th key={col.accessor} className={col.className}>{col.header}</th>
-                            ))}
-                        </tr>
-                    </thead>
-                    <tbody id="table-body">{data.map((item: any) =>
-                        <tr key={item.id} className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-skyLight">
-                            <td className="flex items-center gap-4 p-4">
-                                <input type="checkbox" name="lessonIds" value={item.id}></input>
-                                {item.subject.name}
-                            </td>
-                            <td>{item.class.name}</td>
-                            <td className="hidden md:table-cell">{item.teacher.name + " " + item.teacher.surname}</td>
-                            <td>
-
-                                {item.startTime ? new Date(item.startTime).toLocaleString('ro-RO', {
-                                    year: 'numeric',
-                                    month: 'numeric',
-                                    day: 'numeric',
-                                    hour: '2-digit',
-                                    minute: '2-digit'
-                                }) : 'N/A'}
-                            </td>
-                            <td>
-                                <div className="flex items-center gap-2">
-                                    {role === "admin" && (
-                                        <>
-                                            <FormContainer table="lesson" type="update" data={item} />
-                                            <FormContainer table="lesson" type="delete" id={item.id} />
-                                        </>
-                                    )}
-                                </div>
-                            </td>
-                        </tr>
-                    )}
-                    </tbody>
-                </table>
-            </div>
+            <Table columns={columns} renderRow={renderRow} data={data} />
             <Pagination page={p} count={count} />
         </div>
     )

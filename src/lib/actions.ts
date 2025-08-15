@@ -1363,13 +1363,8 @@ function getFriendlyErrorMessage(e: any): string {
     return friendlyMessage;
 }
 
-export async function deleteSelectedLessons(formData: FormData) {
+export const deleteSelectedLessons = async (currentState: CurrentState, formData: FormData) => {
     const ids = formData.getAll('lessonIds') as string[];
-
-    console.log(1);
-    console.log(ids);
-    console.log(2);
-
 
     if (ids.length === 0) return { success: false, error: 'No items selected' }
 
@@ -1380,16 +1375,16 @@ export async function deleteSelectedLessons(formData: FormData) {
     }
     let role = tokenData?.userPblcMtdt?.role;
 
-    // try {
-    //     await prisma.lesson.deleteMany({
-    //         where: {
-    //             id: { in: ids.map(id => parseInt(id, 10)) },
-    //             ...(role === 'teacher' ? { teacherId: userId! } : {}),
-    //         },
-    //     })
-    //     return { success: true, error: false }
-    // } catch (e) {
-    //     console.error(e)
-    //     return { error: true, success: false }
-    // }
+    try {
+        await prisma.lesson.deleteMany({
+            where: {
+                id: { in: ids.map(id => parseInt(id, 10)) },
+                ...(role === 'teacher' ? { teacherId: userId! } : {}),
+            },
+        })
+        return { success: true, error: false }
+    } catch (e) {
+        console.error(e)
+        return { error: true, success: false }
+    }
 }
