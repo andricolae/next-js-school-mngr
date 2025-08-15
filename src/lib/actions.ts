@@ -1362,3 +1362,29 @@ function getFriendlyErrorMessage(e: any): string {
 
     return friendlyMessage;
 }
+
+export const deleteSelectedLessons = async (currentState: CurrentState, formData: FormData) => {
+    const ids = formData.getAll('lessonIds') as string[];
+
+    if (ids.length === 0) return { success: false, error: 'No items selected' }
+
+    const { userId, sessionClaims } = await auth();
+    let tokenData;
+    if (sessionClaims !== null) {
+        tokenData = sessionClaims as unknown as TokenData;
+    }
+    let role = tokenData?.userPblcMtdt?.role;
+
+    try {
+        await prisma.lesson.deleteMany({
+            where: {
+                id: { in: ids.map(id => parseInt(id, 10)) },
+                ...(role === 'teacher' ? { teacherId: userId! } : {}),
+            },
+        })
+        return { success: true, error: false }
+    } catch (e) {
+        console.error(e)
+        return { error: true, success: false }
+    }
+}
