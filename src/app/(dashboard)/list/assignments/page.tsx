@@ -33,6 +33,10 @@ const AssignmentListPage = async ({ searchParams }: { searchParams: { [key: stri
             accessor: "name",
         },
         {
+            header: "Description",
+            accessor: "description",
+        },
+        {
             header: "Class",
             accessor: "class",
         },
@@ -55,6 +59,7 @@ const AssignmentListPage = async ({ searchParams }: { searchParams: { [key: stri
     const renderRow = (item: AssignmentList) => (
         <tr key={item.id} className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-skyLight">
             <td className="flex items-center gap-4 p-4">{item.lesson.subject.name}</td>
+            <td>{item.description}</td>
             <td>{item.lesson.class.name}</td>
             <td className="hidden md:table-cell">{item.lesson.teacher.name + " " + item.lesson.teacher.surname}</td>
             <td className="hidden md:table-cell">{new Intl.DateTimeFormat("en-UK").format(item.dueDate)}</td>

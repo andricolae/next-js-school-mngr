@@ -164,6 +164,7 @@ export const assignmentSchema = z.object({
     title: z
         .string()
         .min(1, { message: 'Subject name is required' }),
+    description: z.coerce.string().min(1, { message: 'Description is required' }),
     startDate: z.coerce.date({ message: "Start date is required!" }).min(new Date(new Date().toDateString()), { message: "Start date cannot be in the past!" }),
     dueDate: z.coerce.date({ message: "Due date is required!" }),
     lessonId: z.coerce.number({ message: "Lesson is required!" }),
