@@ -69,7 +69,7 @@ const AttendanceListPage = async ({ searchParams }: { searchParams: { [key: stri
             </td>
             <td className="hidden md:table-cell">{item.lesson.subject.name}</td>
             <td className="hidden md:table-cell">{item.lesson.class.name}</td>
-            <td className="hidden lg:table-cell">{new Intl.DateTimeFormat("en-UK").format(item.date)}</td>
+            <td className="hidden lg:table-cell">{new Intl.DateTimeFormat("ro-RO").format(item.date)}</td>
             <td>
                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${item.present
                     ? "bg-green-100 text-green-800"

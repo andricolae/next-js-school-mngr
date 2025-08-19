@@ -59,13 +59,13 @@ const EventListPage = async ({ searchParams }: { searchParams: { [key: string]: 
                     ? "School-wide event"
                     : item.class?.name || "-"}
             </td>
-            <td className="hidden md:table-cell">{new Intl.DateTimeFormat("en-UK").format(item.startTime)}</td>
-            <td className="hidden md:table-cell">{item.startTime.toLocaleTimeString("en-UK", {
+            <td className="hidden md:table-cell">{new Intl.DateTimeFormat("ro-RO").format(item.startTime)}</td>
+            <td className="hidden md:table-cell">{item.startTime.toLocaleTimeString("ro-RO", {
                 hour: "2-digit",
                 minute: "2-digit",
                 hour12: false,
             })}</td>
-            <td className="hidden md:table-cell">{item.endTime.toLocaleTimeString("en-UK", {
+            <td className="hidden md:table-cell">{item.endTime.toLocaleTimeString("ro-RO", {
                 hour: "2-digit",
                 minute: "2-digit",
                 hour12: false,

@@ -473,6 +473,7 @@ export const createAssignment = async (currentState: CurrentState, data: Assignm
         await prisma.assignment.create({
             data: {
                 title: data.title,
+                description: data.description,
                 startDate: data.startDate,
                 dueDate: data.dueDate,
                 lessonId: data.lessonId,
@@ -512,6 +513,7 @@ export const updateAssignment = async (currentState: CurrentState, data: Assignm
             },
             data: {
                 title: data.title,
+                description: data.description,
                 startDate: data.startDate,
                 dueDate: data.dueDate,
                 lessonId: data.lessonId,

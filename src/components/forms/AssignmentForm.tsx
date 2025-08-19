@@ -79,6 +79,13 @@ const AssignmentForm = ({
                     error={errors?.title}
                 />
                 <InputField
+                    label="Assignment Description"
+                    name="description"
+                    defaultValue={data?.description}
+                    register={register}
+                    error={errors?.description}
+                />
+                <InputField
                     label="Start Date"
                     name="startDate"
                     defaultValue={data?.startDate ? new Date(data.startDate).toISOString().split('T')[0] : undefined}
