@@ -31,7 +31,7 @@ const LoginPage = () => {
                 <SignIn.Step name='start' className='bg-lime-50 p-12 rounded-md shadow-2xl flex flex-col gap-2'>
                     <h1 className='text-xl font-bold flex items-center gap-2'>
                         <Image src="/logo.png" alt="logo" width={32} height={32} />
-                        School Management System
+                        Smart Class
                     </h1>
                     <h2 className='text-gray-400'>Sign in to you account</h2>
 
