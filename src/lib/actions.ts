@@ -1367,7 +1367,6 @@ function getFriendlyErrorMessage(e: any): string {
 
 export const deleteSelectedLessons = async (currentState: CurrentState, formData: FormData) => {
     const ids = formData.getAll('lessonIds') as string[];
-    console.log(ids);
 
     if (ids.length === 0) return { success: false, error: 'No items selected' }
 
