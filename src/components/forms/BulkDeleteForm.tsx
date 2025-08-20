@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useFormState } from "react-dom";
 import { toast } from "react-toastify";
 import LoadingPopup from "@/components/LoadingPopup";
+import { useRouter } from "next/navigation";
 
 type DeleteLessonsState = {
     success: boolean;
@@ -50,12 +51,15 @@ const BulkDeleteForm = ({
         });
     };
 
+    const router = useRouter();
+
     useEffect(() => {
         console.log(state);
         if (state?.success) {
             toast(`Lessons have been deleted successfully!`);
             setSelectedIds([]);
             setOpen(false);
+            router.refresh();
         }
         if (state?.error) {
             setError("Lectiile nu au putut fi sterse");

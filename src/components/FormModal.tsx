@@ -95,7 +95,7 @@ const forms: {
     absente: (setOpen, type, data, relatedData, student) => <RaportAbsenteForm type={type} data={data} setOpen={setOpen} relatedData={relatedData} student={student} />,
 };
 
-const FormModal = ({ table, type, data, id, results, relatedData, title, student }: FormContainerProps & { relatedData?: any, title?: any, student?: any}) => {
+const FormModal = ({ table, type, data, id, results, relatedData, title, student }: FormContainerProps & { relatedData?: any, title?: any, student?: any }) => {
     const size = type === "create" ? "w-8 h-8" : "w-7 h-7"
     const bgColor =
         type === "create" ? "bg-yellow"
@@ -138,7 +138,7 @@ const FormModal = ({ table, type, data, id, results, relatedData, title, student
                 router.refresh();
             }
             if (state.error) {
-                toast(`${table} nu a putut fi sters. Exista o tema sau un examen asociat`);
+                toast(`${table} nu a putut fi sters.`);
                 setOpen(false);
             }
         }, [state, router]);

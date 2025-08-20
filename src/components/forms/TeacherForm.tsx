@@ -398,11 +398,7 @@ const TeacherForm = ({
                                 label="Subjects"
                                 options={subjects}
                                 placeholder="Select subjects..."
-                                selectedIds={
-                                    field.value && field.value.length > 0
-                                        ? field.value
-                                        : data?.subjects
-                                }
+                                selectedIds={field.value}
                                 onSelectionChange={(ids) => field.onChange(ids)}
                             />
                         )}
