@@ -56,13 +56,13 @@ const BulkDeleteForm = ({
     useEffect(() => {
         console.log(state);
         if (state?.success) {
-            toast(`Lessons have been deleted successfully!`);
+            toast(`Lecțiile au fost șterse cu succes!`);
             setSelectedIds([]);
             setOpen(false);
             router.refresh();
         }
         if (state?.error) {
-            setError("Lectiile nu au putut fi sterse");
+            setError("A intervenit o eroare la ștergerea lecțiilor!");
         }
     }, [state]);
 
@@ -101,7 +101,7 @@ const BulkDeleteForm = ({
                             ))}
 
                             <span className="text-center font-medium">
-                                All data will be lost. Are you sure you want to delete{" "}
+                                Toate datele vor fi pierdute. Ești sigur/ă că vrei să ștergi?{" "}
                                 {selectedIds.length} {table}
                                 {selectedIds.length > 1 ? "s" : ""}?
                             </span>
@@ -111,7 +111,7 @@ const BulkDeleteForm = ({
                                     type="submit"
                                     className="bg-red-600 text-white py-2 px-4 rounded-md"
                                 >
-                                    Delete
+                                    Șterge
                                 </button>
                             </div>
 
