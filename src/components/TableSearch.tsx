@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react'; //linie noua 
+import { useEffect, useState } from 'react';
 import LoadingPopup from "@/components/LoadingPopup";
 import { useTransition } from "react";
 
@@ -24,7 +24,7 @@ const TableSearch = () => {
 
                 router.push(`${window.location.pathname}?${params.toString()}`);
             });
-        }, 300); // debounce 300ms
+        }, 300);
 
         return () => clearTimeout(delayDebounce);
     }, [search]);
@@ -34,7 +34,7 @@ const TableSearch = () => {
             <Image src="/search.png" alt="" width={14} height={14} />
             <input
                 type="text"
-                placeholder="Search..."
+                placeholder="Căutare..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="w-[200px] p-2 bg-transparent outline-none"

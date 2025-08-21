@@ -23,30 +23,30 @@ const EventListPage = async ({ searchParams }: { searchParams: { [key: string]: 
 
     const columns = [
         {
-            header: "Title",
+            header: "Titlu",
             accessor: "title",
         },
         {
-            header: "Class",
+            header: "Clasa",
             accessor: "class",
         },
         {
-            header: "Date",
+            header: "Data",
             accessor: "date",
             className: "hidden md:table-cell",
         },
         {
-            header: "Start Time",
+            header: "Începere",
             accessor: "startTime",
             className: "hidden md:table-cell",
         },
         {
-            header: "End Time",
+            header: "Încheiere",
             accessor: "endTime",
             className: "hidden md:table-cell",
         },
         ...(role === "admin" ? [{
-            header: "Actions",
+            header: "Acțiuni",
             accessor: "actions",
         }] : []),
     ]
@@ -136,7 +136,7 @@ const EventListPage = async ({ searchParams }: { searchParams: { [key: string]: 
     return (
         <div className='bg-white p-4 rounded-md flex-1 m-4 mt-0'>
             <div className='flex items-center justify-between'>
-                <h1 className='hidden md:block text-lg font-semibold'>All Events</h1>
+                <h1 className='hidden md:block text-lg font-semibold'>Evenimente</h1>
                 <div className='flex flex-col md:flex-row items-center gap-4 w-full md:w-auto'>
                     <TableSearch />
                     <div className='flex items-center gap-4 self-end'>

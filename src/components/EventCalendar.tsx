@@ -27,7 +27,7 @@ const EventCalendar = () => {
         return <div className="h-64 bg-gray-100 animate-pulse rounded-md" />;
     }
 
-    return <Calendar onChange={onChange} value={value} locale="en-US" />
+    return <Calendar onChange={onChange} value={value} locale="ro-RO" />
 }
 
 export default EventCalendar
