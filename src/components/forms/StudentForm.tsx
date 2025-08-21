@@ -283,7 +283,7 @@ const StudentForm = ({
                 />
             )}
 
-            <div className="flex justify-center mt-6">
+            <div className="flex justify-center mt-6 mb-8">
                 <button
                     className={`bg-blue-500 text-white px-8 py-2 rounded-md text-sm w-max ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
                     disabled={isSubmitting}

@@ -63,7 +63,7 @@ const AdeverintaElevForm = ({
         }
         setIsSubmitting(true);
 
-        generateCertificatePDF("Scoala Loamnes", numarAdeverinta, new Date().toLocaleDateString("en-GB").replace(/\//g, "."),
+        generateCertificatePDF("Scoala Loamnes", numarAdeverinta, new Date().toLocaleDateString("ro-RO").replace(/\//g, "."),
             "Ion", "1 C", "111122223456789", anScolarStart, anScolarSfarsit, motivAdeverinta);
         setOpen(false);
         setIsSubmitting(false);

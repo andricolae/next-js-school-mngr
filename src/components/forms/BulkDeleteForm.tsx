@@ -54,7 +54,6 @@ const BulkDeleteForm = ({
     const router = useRouter();
 
     useEffect(() => {
-        console.log(state);
         if (state?.success) {
             toast(`Lessons have been deleted successfully!`);
             setSelectedIds([]);

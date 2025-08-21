@@ -250,7 +250,7 @@ const FormContainer = async ({ table, type, data, id }: FormContainerProps) => {
                             }
                         } : {}),
                     },
-                    select: { id: true, name: true, surname: true, username: true },
+                    select: { id: true, name: true, surname: true, username: true, classId: true },
                 });
                 const attendanceLessons = await prisma.lesson.findMany({
                     where: {
@@ -260,7 +260,8 @@ const FormContainer = async ({ table, type, data, id }: FormContainerProps) => {
                         id: true,
                         name: true,
                         subject: { select: { name: true } },
-                        class: { select: { name: true } }
+                        class: { select: { name: true } },
+                        classId: true
                     },
                 });
                 relatedData = {

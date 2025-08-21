@@ -61,6 +61,7 @@ const ResultForm = ({
     const router = useRouter();
 
     useEffect(() => {
+        console.log(relatedData)
         if (state.success) {
             toast(`Result has been ${type === "create" ? "created" : "updated"} successfully!`);
             setOpen(false);
@@ -73,6 +74,19 @@ const ResultForm = ({
     }, [state, router, type, setOpen]);
 
     const { students, exams, assignments } = relatedData;
+    const [filteredStudents, setFilteredStudents] = useState(students || []);
+    const [filteredExams, setFilteredExams] = useState(exams || []);
+    const [filteredAssignments, setFilteredAssignments] = useState(assignments || []);
+
+    const updateSelect = (selectedOption: "exam" | "assignment", id: string | number) => {
+        if (selectedOption === "exam") {
+            const newStudents = students?.filter((t: any) => t.subjects?.some((sub: any) => sub.name === id));
+            setFilteredStudents(newStudents || []);
+        } else if (selectedOption === "assignment") {
+            const newStudents = students?.find((s: any) => String(s.id) === String(id))?.subjects;
+            setFilteredStudents(newStudents || []);
+        }
+    };
 
     return (
         <form className="flex flex-col gap-6 mx-auto" onSubmit={onSubmit}>
@@ -113,7 +127,7 @@ const ResultForm = ({
                         {...register("studentId")}
                     >
                         <option value="">Select a student</option>
-                        {students?.map(
+                        {filteredStudents?.map(
                             (student: { id: string; name: string; surname: string }) => (
                                 <option value={student.id} key={student.id}>
                                     {student.name} {student.surname}
@@ -137,6 +151,11 @@ const ResultForm = ({
                         onChange={(e) => {
                             setValue("examId", parseInt(e.target.value));
                             setValue("assignmentId", undefined);
+                            const selectedId = e.target.value;
+                            const exam = filteredExams?.find((s: any) => s.id === selectedId);
+                            if (exam) {
+                                updateSelect("exam", exam.id);
+                            }
                         }}
                     >
                         <option value="">Select an exam</option>
@@ -164,6 +183,11 @@ const ResultForm = ({
                         onChange={(e) => {
                             setValue("assignmentId", parseInt(e.target.value));
                             setValue("examId", undefined);
+                            const selectedId = e.target.value;
+                            const assignment = filteredAssignments?.find((s: any) => s.id === selectedId);
+                            if (assignment) {
+                                updateSelect("assignment", assignment.id);
+                            }
                         }}
                     >
                         <option value="">Select an assignment</option>
@@ -188,7 +212,7 @@ const ResultForm = ({
                     {state.message || "Something went wrong!"}
                 </span>
             )}
-            <div className="flex justify-center mt-2">
+            <div className="flex justify-center mt-2 mb-8">
                 <button
                     type="submit"
                     className={`bg-blue-500 text-white px-8 py-2 rounded-md text-sm w-max mx-auto hover:bg-blue-600 transition ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}

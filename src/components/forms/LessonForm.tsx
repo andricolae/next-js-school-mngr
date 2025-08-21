@@ -215,6 +215,25 @@ const LessonForm = ({
     }, [state, router, type, setOpen, isRecurring]);
 
     const { subjects, classes, teachers } = relatedData || {};
+    const [filteredSubjects, setFilteredSubjects] = useState(subjects || []);
+    const [filteredClasses, setFilteredClasses] = useState(classes || []);
+    const [filteredTeachers, setFilteredTeachers] = useState(teachers || []);
+
+    const updateSelect = (selectedOption: "subjects" | "teachers", id: string | number) => {
+        if (selectedOption === "subjects") {
+            const newTeachers = teachers?.filter((t: any) => t.subjects?.some((sub: any) => sub.name === id));
+            setFilteredTeachers(newTeachers || []);
+            // TO DO
+            // const newClasses = classes?.filter((s: any) => String(s.classId) === String(id));
+            // setFilteredClasses(newClasses || []);
+        } else if (selectedOption === "teachers") {
+            const newSubjects = teachers?.find((s: any) => String(s.id) === String(id))?.subjects;
+            setFilteredSubjects(newSubjects || []);
+            // TO DO
+            // const newClasses = classes?.filter((s: any) => String(s.classId) === String(id));
+            // setFilteredClasses(newClasses || []);
+        }
+    };
 
     return (
         <form className="flex flex-col gap-6" onSubmit={onSubmit}>
@@ -261,9 +280,16 @@ const LessonForm = ({
                                 className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
                                 defaultValue={data?.teacherId || data?.teacher?.id || ""}
                                 {...register("teacherId")}
+                                onChange={(e) => {
+                                    const selectedId = e.target.value;
+                                    const teacher = filteredTeachers?.find((s: any) => s.id === selectedId);
+                                    if (teacher) {
+                                        updateSelect("teachers", teacher.id);
+                                    }
+                                }}
                             >
                                 <option value="">Select teacher</option>
-                                {teachers?.map(
+                                {filteredTeachers?.map(
                                     (teacher: { id: string; name: string; surname: string }) => (
                                         <option value={teacher.id} key={teacher.id}>
                                             {teacher.name} {teacher.surname}
@@ -286,7 +312,7 @@ const LessonForm = ({
                                 {...register("classId")}
                             >
                                 <option value="abc">Select class</option>
-                                {classes?.map(
+                                {filteredClasses?.map(
                                     (classItem: { id: number; name: string; grade: { level: number } }) => (
                                         <option value={classItem.id} key={classItem.id}>
                                             {classItem.name} - Grade {classItem.grade.level}
@@ -336,9 +362,16 @@ const LessonForm = ({
                                 className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
                                 defaultValue={data?.subjectId || data?.subject?.id || ""}
                                 {...register("subjectId")}
+                                onChange={(e) => {
+                                    const selectedId = Number(e.target.value);
+                                    const subject = filteredSubjects?.find((s: any) => s.id === selectedId);
+                                    if (subject) {
+                                        updateSelect("subjects", subject.name);
+                                    }
+                                }}
                             >
                                 <option value="abc">Select subject</option>
-                                {subjects?.map(
+                                {filteredSubjects?.map(
                                     (subject: { id: number; name: string }) => (
                                         <option value={subject.id} key={subject.id}>
                                             {subject.name}
@@ -399,7 +432,7 @@ const LessonForm = ({
                     </div>
                 </div>
 
-                <div className="w-full h-fit flex flex-col items-center justify-center mt-12">
+                <div className="w-full h-fit flex flex-col items-center justify-center mt-12 mb-8">
                     {state.error && <span className="text-red-500">Something went wrong!</span>}
 
                     <button

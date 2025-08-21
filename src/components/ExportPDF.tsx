@@ -211,7 +211,7 @@ function addEnhancedStatistics(doc: jsPDF, startY: number, stats: any) {
 
     doc.setTextColor(...[107, 114, 128]);
     doc.setFontSize(8);
-    doc.text(`Report generated: ${new Date().toLocaleDateString('en-US', {
+    doc.text(`Report generated: ${new Date().toLocaleDateString('ro-RO', {
         weekday: 'long',
         year: 'numeric',
         month: 'long',
@@ -374,7 +374,7 @@ export function GenerateResultsPDF(
         `${item.teacherName} ${item.teacherSurname}`,
         item.className,
         item.score.toString(),
-        new Intl.DateTimeFormat("en-US", {
+        new Intl.DateTimeFormat("ro-RO", {
             year: 'numeric',
             month: 'short',
             day: 'numeric'
