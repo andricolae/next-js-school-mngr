@@ -159,6 +159,7 @@ const FormModal = ({ table, type, data, id, results, relatedData, title, student
         <button
             className={title !== undefined ? `p-3 rounded-md bg-skyLight` : `${size} flex items-center justify-center rounded-full ${bgColor}`}
             onClick={() => { setOpen(true); }}
+            title={type === "create" ? "Adauga" : type === "delete" ? "Sterge" : "Editeaza"}
         >
             {title !== undefined ? <div>{title}</div> : <Image src={`/${type}.png`} alt="" width={16} height={16} />}
         </button>
