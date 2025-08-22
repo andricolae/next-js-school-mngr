@@ -52,12 +52,12 @@ const AnnouncementForm = ({
 
     useEffect(() => {
         if (state.success) {
-            toast(`Announcement has been ${type === "create" ? "created" : "updated"} successfully!`);
+            toast(`Anunț ${type === "create" ? "creat" : "actualizat"} cu succes!`);
             setOpen(false);
             router.refresh();
         }
         if (state.error) {
-            const errorMessage = state.message || "Something went wrong!";
+            const errorMessage = state.message || "A intervenit o eroare. Încearcă mai târziu.";
             setIsSubmitting(true);
         }
     }, [state, router, type, setOpen]);
@@ -66,12 +66,12 @@ const AnnouncementForm = ({
 
     return (
         <form className="flex flex-col gap-8" onSubmit={onSubmit}>
-            <h1 className="text-xl font-semibold">{type === "create" ? "Create a new announcement" : "Update the announcement"}</h1>
+            <h1 className="text-xl font-semibold">{type === "create" ? "Adaugă un anunț" : "Actualizează anunțul"}</h1>
 
             <div className="flex flex-col gap-4 w-full">
 
                 <InputField
-                    label="Announcement Title"
+                    label="Titlul anunțului"
                     name="title"
                     defaultValue={data?.title}
                     register={register}
@@ -80,10 +80,10 @@ const AnnouncementForm = ({
                 />
 
                 <div className="flex flex-col gap-2 w-full ">
-                    <label className="text-xs text-gray-400">Description</label>
+                    <label className="text-xs text-gray-400">Descriere</label>
                     <textarea
                         className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full resize-vertical min-h-[80px]"
-                        placeholder="Announcement description..."
+                        placeholder="Descriere anunț..."
                         defaultValue={data?.description}
                         {...register("description")}
                     />
@@ -94,7 +94,7 @@ const AnnouncementForm = ({
 
 
                 <InputField
-                    label="Date"
+                    label="Data"
                     name="date"
                     defaultValue={data?.date ? new Date(data.date).toISOString().split('T')[0] : undefined}
                     register={register}
@@ -115,13 +115,13 @@ const AnnouncementForm = ({
                 )}
 
                 <div className="flex flex-col gap-2 w-full">
-                    <label className="text-xs text-gray-400">Class (Optional)</label>
+                    <label className="text-xs text-gray-400">Clasa (Opțional)</label>
                     <select
                         className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
                         {...register("classId")}
                         defaultValue={data?.classId || ""}
                     >
-                        <option value="">School-wide announcement</option>
+                        <option value="">Anunț pentru întreaga școală</option>
                         {classes?.map(
                             (classItem: { id: number; name: string; grade: { level: number } }) => (
                                 <option value={classItem.id} key={classItem.id}>
@@ -139,12 +139,12 @@ const AnnouncementForm = ({
             </div>
 
             <div className="text-xs text-gray-500">
-                Leave class empty to create a school-wide announcement visible to everyone.
+                Important: Pentru a crea un anunț pentru întreaga școală, lăsați câmpul „clasă” liber!
             </div>
 
             {state.error && (
                 <span className="text-red-500">
-                    {state.message || "Something went wrong!"}
+                    {state.message || "A intervenit o eroare. Încearcă mai târziu."}
                 </span>
             )}
             <div className="flex justify-center mt-2">
@@ -153,7 +153,7 @@ const AnnouncementForm = ({
                     className={`bg-blue-500 text-white px-8 py-2 rounded-md text-sm w-max mx-auto hover:bg-blue-600 transition ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
                     disabled={isSubmitting}
                 >
-                    {type === "create" ? "Create" : "Update"}
+                    {type === "create" ? "Adaugă anunț" : "Actualizează anunțul"}
                 </button>
             </div>
             {isPending && <LoadingPopup />}

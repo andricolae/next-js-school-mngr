@@ -143,7 +143,8 @@ export const examSchema = z
         title: z
             .string()
             .min(1, { message: 'Denumirea materiei este obligatorie!' }),
-        startTime: z.coerce.date({ message: "Data și ora de început sunt obligatorii!" }),
+        startTime: z
+            .coerce.date({ message: "Data și ora de început sunt obligatorii!" }),
         endTime: z.coerce.date({ message: "Data și ora de sfârșit sunt obligatorii!" }),
         lessonId: z.coerce.number({ message: "Ora asociată este obligatorie!" }),
     })
@@ -166,7 +167,9 @@ export const assignmentSchema = z.object({
     description: z.coerce.string().min(1, { message: 'Descrierea este obligatorie!' }),
     startDate: z.coerce.date({ message: "Data de început este obligatorie!" }).min(new Date(new Date().toDateString()), { message: "Ora de început nu poate să fie în trecut!" }),
     dueDate: z.coerce.date({ message: "Termenul limită este obligatoriu!" }),
-    lessonId: z.coerce.number({ message: "Ora asociată este obligatorie!" }),
+    lessonId: z
+        .coerce.number({ message: "Ora asociată este obligatorie!" })
+        .refine((val) => val > 0, { message: "Ora asociată este obligatorie!" }),
 })
 
     .refine(
@@ -181,7 +184,11 @@ export type AssignmentSchema = z.infer<typeof assignmentSchema>;
 
 export const resultSchema = z.object({
     id: z.coerce.number().optional(),
-    score: z.coerce.number().min(0).max(100, { message: "Nota trebuie să fie între 1 și 10!" }),
+    score: z
+        .coerce.number()
+        .min(1)
+        .max(10, { message: "Nota trebuie să fie între 1 și 10!" })
+        .refine((val) => val < 1, { message: "Nota trebuie să fie mai mare sau egală cu 1!" }),
     examId: z.coerce.number().optional(),
     assignmentId: z.coerce.number().optional(),
     studentId: z.string().min(1, { message: "Studentul este obligatoriu!" }),
@@ -302,7 +309,9 @@ export const attendanceSchema = z.object({
     date: z.coerce.date({ message: "Data este obligatorie!" }),
     present: z.string(),
     studentId: z.string().min(1, { message: "Studentul este obligatoriu!" }),
-    lessonId: z.coerce.number({ message: "Ora ete obligatorie!" }),
+    lessonId: z.coerce
+        .number({ message: "Ora asociată este obligatorie!" })
+        .refine((val) => val > 0, { message: "Ora asociată este obligatorie!" }),
 });
 
 export type AttendanceFormData = z.infer<typeof attendanceSchema>;

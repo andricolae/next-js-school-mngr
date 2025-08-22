@@ -220,13 +220,13 @@ const SubjectForm = ({
 
     useEffect(() => {
         if (state.success) {
-            toast(`Subject has been ${type === "create" ? "created" : "updated"} successfully!`);
+            toast(`Materie ${type === "create" ? "creată" : "actualizată"} cu succes!`);
             setOpen(false);
             router.refresh();
         }
 
         if (state.error) {
-            toast.error(state.message || "Something went wrong!");
+            toast.error(state.message || "Ceva nu a funcționat. Încearcă mai târziu.");
             setIsSubmitting(false);
         }
     }, [state, router, type, setOpen]);
@@ -241,11 +241,11 @@ const SubjectForm = ({
     return (
         <form className="flex flex-col gap-8 mx-auto w-full max-w-lg" onSubmit={onSubmit}>
             <h1 className="text-xl font-semibold text-left mb-6">
-                {type === "create" ? "Create a new subject" : "Update the subject"}
+                {type === "create" ? "Adaugă o nouă materie" : "Actualizează materia"}
             </h1>
 
             <InputField
-                label="Subject Name"
+                label="Denumire materie"
                 name="name"
                 defaultValue={data?.name}
                 register={register}
@@ -259,17 +259,22 @@ const SubjectForm = ({
                 render={({ field }) => (
                     <MultiSelect
                         id="teachers"
-                        label="Teachers"
+                        label="Profesori"
                         options={teachers}
-                        placeholder="Select teachers..."
+                        placeholder="Alege profesori..."
                         selectedIds={field.value}
                         onSelectionChange={field.onChange}
                     />
                 )}
             />
+            {errors.teachers && (
+                <p className="text-red-500 text-sm mt-1">
+                    {errors.teachers.message as string}
+                </p>
+            )}
 
             {state.error && (
-                <span className="text-red-500 text-center">{state.message || "Something went wrong!"}</span>
+                <span className="text-red-500 text-center">{state.message || "Ceva nu a funcționat. Încearcă mai târziu."}</span>
             )}
 
             <div className="flex justify-center mt-2">
@@ -279,7 +284,7 @@ const SubjectForm = ({
                     className={`bg-blue-500 text-white px-8 py-2 rounded-md text-sm w-max ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""
                         }`}
                 >
-                    {type === "create" ? "Create" : "Update"}
+                    {type === "create" ? "Adaugă" : "Actualizează"} materia
                 </button>
             </div>
             {isPending && <LoadingPopup />}

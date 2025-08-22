@@ -44,12 +44,12 @@ const ResultForm = ({
     const [state, formAction] = useFormState(type === "create"
         ? createResult : updateResult, { success: false, error: false })
 
-    const [isSubmitting, setIsSubmitting] = useState(false); // added to avoid multiple submitions
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [isPending, startTransition] = useTransition();
 
     const onSubmit = handleSubmit(formData => {
         startTransition(() => {
-            setIsSubmitting(true); // added to avoid multiple submitions
+            setIsSubmitting(true);
             const submissionData = {
                 ...formData,
                 ...(type === "update" && data?.id && { id: data.id }),
@@ -62,13 +62,13 @@ const ResultForm = ({
 
     useEffect(() => {
         if (state.success) {
-            toast(`Result has been ${type === "create" ? "created" : "updated"} successfully!`);
+            toast(`Notă ${type === "create" ? "adăugată" : "actualizată"} cu succes!`);
             setOpen(false);
             router.refresh();
         }
         if (state.error) {
-            const errorMessage = state.message || "Something went wrong!";
-            setIsSubmitting(true); // added to re-enable button if error happens
+            const errorMessage = state.message || "Ceva nu a funcționat. Încearcă mai târziu.";
+            setIsSubmitting(true);
         }
     }, [state, router, type, setOpen]);
 
@@ -77,15 +77,15 @@ const ResultForm = ({
     return (
         <form className="flex flex-col gap-6 mx-auto" onSubmit={onSubmit}>
             <h1 className="text-xl font-semibold">
-                {type === "create" ? "Create a new result" : "Update the result"}</h1>
+                {type === "create" ? "Adaugă o nouă notă" : "Actualizează nota"}</h1>
 
             <div className=" mt-2 text-xs text-gray-500">
-                Note: Select either an exam OR an assignment, not both.
+                Important: Pentru a adăuga o notă, selectează un test sau o temă, nu ambele.
             </div>
 
             <div className="flex flex-col gap-4">
                 <InputField
-                    label="Score"
+                    label="Nota"
                     name="score"
                     type="number"
                     defaultValue={data?.score}
@@ -106,13 +106,13 @@ const ResultForm = ({
                 )}
 
                 <div className="flex flex-col gap-2 w-full">
-                    <label className="text-xs text-gray-400">Student</label>
+                    <label className="text-xs text-gray-400">Elev</label>
                     <select
                         className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
                         defaultValue={data?.studentId || ""}
                         {...register("studentId")}
                     >
-                        <option value="">Select a student</option>
+                        <option value="">Alege un elev</option>
                         {students?.map(
                             (student: { id: string; name: string; surname: string }) => (
                                 <option value={student.id} key={student.id}>
@@ -129,7 +129,7 @@ const ResultForm = ({
                 </div>
 
                 <div className="flex flex-col gap-2 w-full">
-                    <label className="text-xs text-gray-400">Exam (Optional)</label>
+                    <label className="text-xs text-gray-400">Test (Opțional)</label>
                     <select
                         className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
                         defaultValue={data?.examId || ""}
@@ -139,7 +139,7 @@ const ResultForm = ({
                             setValue("assignmentId", undefined);
                         }}
                     >
-                        <option value="">Select an exam</option>
+                        <option value="">Selectează un test</option>
                         {exams?.map(
                             (exam: { id: number; title: string; lesson: { subject: { name: string }, class: { name: string } } }) => (
                                 <option value={exam.id} key={exam.id}>
@@ -156,7 +156,7 @@ const ResultForm = ({
                 </div>
 
                 <div className="flex flex-col gap-2 w-full">
-                    <label className="text-xs text-gray-400">Assignment (Optional)</label>
+                    <label className="text-xs text-gray-400">Temă (Opțional)</label>
                     <select
                         className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
                         defaultValue={data?.assignmentId || ""}
@@ -166,7 +166,7 @@ const ResultForm = ({
                             setValue("examId", undefined);
                         }}
                     >
-                        <option value="">Select an assignment</option>
+                        <option value="">Selectează o temă</option>
                         {assignments?.map(
                             (assignment: { id: number; title: string; lesson: { subject: { name: string }, class: { name: string } } }) => (
                                 <option value={assignment.id} key={assignment.id}>
@@ -185,7 +185,7 @@ const ResultForm = ({
 
             {state.error && (
                 <span className="text-red-500">
-                    {state.message || "Something went wrong!"}
+                    {state.message || "Ceva nu a funcționat. Încearcă mai târziu."}
                 </span>
             )}
             <div className="flex justify-center mt-2">
@@ -194,7 +194,7 @@ const ResultForm = ({
                     className={`bg-blue-500 text-white px-8 py-2 rounded-md text-sm w-max mx-auto hover:bg-blue-600 transition ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
                     disabled={isSubmitting}
                 >
-                    {type === "create" ? "Create" : "Update"}
+                    {type === "create" ? "Adaugă nota" : "Actualizează nota"}
                 </button>
             </div>
             {isPending && <LoadingPopup />}
