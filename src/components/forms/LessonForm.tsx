@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import InputField from "../InputField";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { lessonSchema, LessonSchema } from "@/lib/formValidationSchemas";
-import { createLesson, updateLesson, createRecurringLessons } from "@/lib/actions";
+import { createLesson, updateLesson, createRecurringLessons, classesOfSubject, teacherClasses } from "@/lib/actions";
 import { useFormState } from "react-dom";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
@@ -219,20 +219,20 @@ const LessonForm = ({
     const [filteredClasses, setFilteredClasses] = useState(classes || []);
     const [filteredTeachers, setFilteredTeachers] = useState(teachers || []);
 
-    const updateSelect = (selectedOption: "subjects" | "teachers", id: string | number) => {
-        if (selectedOption === "subjects") {
-            const newTeachers = teachers?.filter((t: any) => t.subjects?.some((sub: any) => sub.name === id));
-            setFilteredTeachers(newTeachers || []);
-            // TO DO
-            // const newClasses = classes?.filter((s: any) => String(s.classId) === String(id));
-            // setFilteredClasses(newClasses || []);
-        } else if (selectedOption === "teachers") {
-            const newSubjects = teachers?.find((s: any) => String(s.id) === String(id))?.subjects;
-            setFilteredSubjects(newSubjects || []);
-            // TO DO
-            // const newClasses = classes?.filter((s: any) => String(s.classId) === String(id));
-            // setFilteredClasses(newClasses || []);
-        }
+    const updateSelect = async (selectedOption: "subjects" | "teachers", teacherIdOrSubjectName: string) => {
+        startTransition(async () => {
+            if (selectedOption === "subjects") {
+                const newTeachers = teachers?.filter((t: any) => t.subjects?.some((sub: any) => sub.name === teacherIdOrSubjectName));
+                setFilteredTeachers(newTeachers || []);
+                const newClasses = await classesOfSubject(teacherIdOrSubjectName); // subjectName
+                setFilteredClasses(newClasses || []);
+            } else if (selectedOption === "teachers") {
+                const newSubjects = teachers?.find((s: any) => String(s.id) === String(teacherIdOrSubjectName))?.subjects;
+                setFilteredSubjects(newSubjects || []);
+                const newClasses = await teacherClasses(teacherIdOrSubjectName); // teacherId
+                setFilteredClasses(newClasses || []);
+            }
+        });
     };
 
     return (

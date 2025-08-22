@@ -6,7 +6,7 @@ import InputField from "../InputField";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { resultSchema, ResultSchema } from "@/lib/formValidationSchemas";
 import { useFormState } from "react-dom";
-import { createResult, updateResult } from "@/lib/actions";
+import { createResult, studentsOfClassAssignedToAnAssignment, updateResult } from "@/lib/actions";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import LoadingPopup from "@/components/LoadingPopup";
@@ -61,7 +61,6 @@ const ResultForm = ({
     const router = useRouter();
 
     useEffect(() => {
-        console.log(relatedData)
         if (state.success) {
             toast(`Result has been ${type === "create" ? "created" : "updated"} successfully!`);
             setOpen(false);
@@ -75,17 +74,17 @@ const ResultForm = ({
 
     const { students, exams, assignments } = relatedData;
     const [filteredStudents, setFilteredStudents] = useState(students || []);
-    const [filteredExams, setFilteredExams] = useState(exams || []);
-    const [filteredAssignments, setFilteredAssignments] = useState(assignments || []);
 
-    const updateSelect = (selectedOption: "exam" | "assignment", id: string | number) => {
-        if (selectedOption === "exam") {
-            const newStudents = students?.filter((t: any) => t.subjects?.some((sub: any) => sub.name === id));
-            setFilteredStudents(newStudents || []);
-        } else if (selectedOption === "assignment") {
-            const newStudents = students?.find((s: any) => String(s.id) === String(id))?.subjects;
-            setFilteredStudents(newStudents || []);
-        }
+    const updateSelect = async (selectedOption: "exam" | "assignment", id: number) => {
+        startTransition(async () => {
+            if (selectedOption === "exam") {
+                const newStudents = students?.filter((t: any) => t.subjects?.some((sub: any) => sub.name === id));
+                setFilteredStudents(newStudents || []);
+            } else if (selectedOption === "assignment") {
+                const newStudents = await studentsOfClassAssignedToAnAssignment(id);
+                setFilteredStudents(newStudents || []);
+            }
+        });
     };
 
     return (
@@ -127,13 +126,19 @@ const ResultForm = ({
                         {...register("studentId")}
                     >
                         <option value="">Select a student</option>
-                        {filteredStudents?.map(
-                            (student: { id: string; name: string; surname: string }) => (
-                                <option value={student.id} key={student.id}>
-                                    {student.name} {student.surname}
-                                </option>
-                            )
-                        )}
+                        {filteredStudents !== undefined ?
+                            <>
+                                {filteredStudents?.lesson?.class?.students?.map(
+                                    (student: { id: string; name: string; surname: string }) => (
+                                        <option value={student.id} key={student.id}>
+                                            {student.name} {student.surname}
+                                        </option>
+                                    )
+                                )}
+                            </>
+                            :
+                            <></>
+                        }
                     </select>
                     {errors.studentId?.message && (
                         <p className="text-xs text-red-400">
@@ -151,11 +156,11 @@ const ResultForm = ({
                         onChange={(e) => {
                             setValue("examId", parseInt(e.target.value));
                             setValue("assignmentId", undefined);
-                            const selectedId = e.target.value;
-                            const exam = filteredExams?.find((s: any) => s.id === selectedId);
-                            if (exam) {
-                                updateSelect("exam", exam.id);
-                            }
+                            // const selectedId = e.target.value;
+                            // const exam = exams?.find((s: any) => s.id === selectedId);
+                            // if (exam) {
+                            //     updateSelect("exam", exam.id);
+                            // }
                         }}
                     >
                         <option value="">Select an exam</option>
@@ -183,8 +188,8 @@ const ResultForm = ({
                         onChange={(e) => {
                             setValue("assignmentId", parseInt(e.target.value));
                             setValue("examId", undefined);
-                            const selectedId = e.target.value;
-                            const assignment = filteredAssignments?.find((s: any) => s.id === selectedId);
+                            const selectedId = Number(e.target.value);
+                            const assignment = assignments?.find((s: any) => s.id === selectedId);
                             if (assignment) {
                                 updateSelect("assignment", assignment.id);
                             }
