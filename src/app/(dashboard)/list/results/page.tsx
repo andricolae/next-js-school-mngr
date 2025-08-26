@@ -130,7 +130,7 @@ const ResultListPage = async ({
             </td>
             <td className="hidden md:table-cell">{item.className}</td>
             <td className="hidden md:table-cell">
-                {new Intl.DateTimeFormat("en-US").format(item.startTime)}
+                {new Intl.DateTimeFormat("ro-RO").format(item.startTime)}
             </td>
             <td>
                 <div className="flex items-center gap-2">

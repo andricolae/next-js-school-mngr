@@ -54,7 +54,6 @@ const BulkDeleteForm = ({
     const router = useRouter();
 
     useEffect(() => {
-        console.log(state);
         if (state?.success) {
             toast(`Lecțiile au fost șterse cu succes!`);
             setSelectedIds([]);
@@ -72,6 +71,7 @@ const BulkDeleteForm = ({
                 type="button"
                 className="w-7 h-7 flex items-center justify-center rounded-full bg-orange"
                 onClick={handleOpen}
+                title="Sterge lectiile selectate"
             >
                 <Image src={`/delete.png`} alt="Sterge" width={16} height={16} />
             </button>

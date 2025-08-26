@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import InputField from "../InputField";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { lessonSchema, LessonSchema } from "@/lib/formValidationSchemas";
-import { createLesson, updateLesson, createRecurringLessons } from "@/lib/actions";
+import { createLesson, updateLesson, createRecurringLessons, classesOfSubject, teacherClasses } from "@/lib/actions";
 import { useFormState } from "react-dom";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
@@ -206,6 +206,25 @@ const LessonForm = ({
     }, [state, router, type, setOpen, isRecurring]);
 
     const { subjects, classes, teachers } = relatedData || {};
+    const [filteredSubjects, setFilteredSubjects] = useState(subjects || []);
+    const [filteredClasses, setFilteredClasses] = useState(classes || []);
+    const [filteredTeachers, setFilteredTeachers] = useState(teachers || []);
+
+    const updateSelect = async (selectedOption: "subjects" | "teachers", teacherIdOrSubjectName: string) => {
+        startTransition(async () => {
+            if (selectedOption === "subjects") {
+                const newTeachers = teachers?.filter((t: any) => t.subjects?.some((sub: any) => sub.name === teacherIdOrSubjectName));
+                setFilteredTeachers(newTeachers || []);
+                const newClasses = await classesOfSubject(teacherIdOrSubjectName); // subjectName
+                setFilteredClasses(newClasses || []);
+            } else if (selectedOption === "teachers") {
+                const newSubjects = teachers?.find((s: any) => String(s.id) === String(teacherIdOrSubjectName))?.subjects;
+                setFilteredSubjects(newSubjects || []);
+                const newClasses = await teacherClasses(teacherIdOrSubjectName); // teacherId
+                setFilteredClasses(newClasses || []);
+            }
+        });
+    };
 
     return (
         <form className="flex flex-col gap-6" onSubmit={onSubmit}>
@@ -252,9 +271,16 @@ const LessonForm = ({
                                 className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
                                 defaultValue={data?.teacherId || data?.teacher?.id || ""}
                                 {...register("teacherId")}
+                                onChange={(e) => {
+                                    const selectedId = e.target.value;
+                                    const teacher = filteredTeachers?.find((s: any) => s.id === selectedId);
+                                    if (teacher) {
+                                        updateSelect("teachers", teacher.id);
+                                    }
+                                }}
                             >
-                                <option value="">Alege profesor</option>
-                                {teachers?.map(
+                                <option value="">Alege un profesor</option>
+                                {filteredTeachers?.map(
                                     (teacher: { id: string; name: string; surname: string }) => (
                                         <option value={teacher.id} key={teacher.id}>
                                             {teacher.name} {teacher.surname}
@@ -276,8 +302,8 @@ const LessonForm = ({
                                 defaultValue={data?.classId || data?.class?.id || ""}
                                 {...register("classId")}
                             >
-                                <option value="abc">Alege o clasă</option>
-                                {classes?.map(
+                                <option value="abc">Select class</option>
+                                {filteredClasses?.map(
                                     (classItem: { id: number; name: string; grade: { level: number } }) => (
                                         <option value={classItem.id} key={classItem.id}>
                                             {classItem.name} - Grade {classItem.grade.level}
@@ -327,9 +353,16 @@ const LessonForm = ({
                                 className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
                                 defaultValue={data?.subjectId || data?.subject?.id || ""}
                                 {...register("subjectId")}
+                                onChange={(e) => {
+                                    const selectedId = Number(e.target.value);
+                                    const subject = filteredSubjects?.find((s: any) => s.id === selectedId);
+                                    if (subject) {
+                                        updateSelect("subjects", subject.name);
+                                    }
+                                }}
                             >
-                                <option value="abc">Alege o materie</option>
-                                {subjects?.map(
+                                <option value="abc">Select subject</option>
+                                {filteredSubjects?.map(
                                     (subject: { id: number; name: string }) => (
                                         <option value={subject.id} key={subject.id}>
                                             {subject.name}
@@ -390,7 +423,7 @@ const LessonForm = ({
                     </div>
                 </div>
 
-                <div className="w-full h-fit flex flex-col items-center justify-center mt-12">
+                <div className="w-full h-fit flex flex-col items-center justify-center mt-12 mb-8">
                     {state.error && <span className="text-red-500">Ceva nu a funcționat. Încearcă mai târziu.</span>}
 
                     <button

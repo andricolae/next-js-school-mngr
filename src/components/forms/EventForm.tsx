@@ -156,7 +156,7 @@ const EventForm = ({
                     {state.message || "A apărut o eroare. Încearcă din nou."}
                 </span>
             )}
-            <div className="flex justify-center mt-6s">
+            <div className="flex justify-center mt-6 mb-8">
                 <button
                     type="submit"
                     className={`bg-blue-500 transition ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""} text-white px-8 py-2 rounded-md text-sm w-max`}

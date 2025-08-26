@@ -147,7 +147,7 @@ const AnnouncementForm = ({
                     {state.message || "A intervenit o eroare. Încearcă mai târziu."}
                 </span>
             )}
-            <div className="flex justify-center mt-2">
+            <div className="flex justify-center mt-2 mb-8">
                 <button
                     type="submit"
                     className={`bg-blue-500 text-white px-8 py-2 rounded-md text-sm w-max mx-auto hover:bg-blue-600 transition ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}

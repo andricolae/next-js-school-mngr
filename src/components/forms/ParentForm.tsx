@@ -152,7 +152,7 @@ const ParentForm = ({
                 Important: Asocierea elevului se realizează prin formularul de student.
             </div>
 
-            <div className="flex justify-center mt-1">
+            <div className="flex justify-center mt-1 mb-8">
                 <button
                     className={`bg-blue-500 text-white px-8 py-2 rounded-md text-sm w-max ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
                     disabled={isSubmitting}

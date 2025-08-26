@@ -123,11 +123,11 @@ const SingleTeacherPage = async ({
                 <div className='bg-white p-4 rounded-md'>
                     <h1 className='text-xl font-semibold'>Acces rapid</h1>
                     <div className='mt-4 flex gap-4 flex-wrap text-xs text-gray-500'>
-                        <Link className='p-3 rounded-md bg-skyLight' href={`/list/classes?supervisorId=${"teacher2"}`}>Clasele profesorului</Link>
-                        <Link className='p-3 rounded-md bg-orangeLight' href={`/list/students?teacherId=${"teacher2"}`}>Elevii Profesorului</Link>
-                        <Link className='p-3 rounded-md bg-yellowLight' href={`/list/lessons?teacherId=${"teacher2"}`}>Orele profesorului</Link>
-                        <Link className='p-3 rounded-md bg-green-300' href={`/list/exams?teacherId=${"teacher2"}`}>Testele profesorului</Link>
-                        <Link className='p-3 rounded-md bg-purple-200' href={`/list/assignments?teacherId=${"teacher2"}`}>Temele profesorului</Link>
+                        <Link className='p-3 rounded-md bg-skyLight' href={`/list/classes?supervisorId=${id}`}>Clasele profesorului</Link>
+                        <Link className='p-3 rounded-md bg-orangeLight' href={`/list/students?teacherId=${id}`}>Elevii Profesorului</Link>
+                        <Link className='p-3 rounded-md bg-yellowLight' href={`/list/lessons?teacherId=${id}`}>Orele profesorului</Link>
+                        <Link className='p-3 rounded-md bg-green-300' href={`/list/exams?teacherId=${id}`}>Testele profesorului</Link>
+                        <Link className='p-3 rounded-md bg-purple-200' href={`/list/assignments?teacherId=${id}`}>Temele profesorului</Link>
                     </div>
                 </div>
                 {/* <Performance /> */}

@@ -56,7 +56,7 @@ const RaportAbsenteForm = ({
         setIsSubmitting(true);
         let absente = [{ data: "01.05", status: "motivata" }, { data: "07.05", status: "nemotivata" }, { data: "09.05", status: "motivata" }]
 
-        generateRaportAbsentePDF("UnitateInvatamant", new Date().toLocaleDateString("en-GB").replace(/\//g, "."),
+        generateRaportAbsentePDF("UnitateInvatamant", new Date().toLocaleDateString("ro-RO").replace(/\//g, "."),
             student?.surname, student?.name, selectedMonthForReport, absente);
         setOpen(false);
         setIsSubmitting(false);

@@ -66,6 +66,18 @@ const AttendanceForm = ({
     }, [state, router, type, setOpen]);
 
     const { students, lessons } = relatedData || {};
+    const [filteredStudents, setFilteredStudents] = useState(students || []);
+    const [filteredLessons, setFilteredLessons] = useState(lessons || []);
+
+    const updateSelect = (selectedOption: "student" | "lesson", classId: string | number) => {
+        if (selectedOption === "student") {
+            const newLessons = lessons?.filter((l: any) => String(l.classId) === String(classId));
+            setFilteredLessons(newLessons || []);
+        } else if (selectedOption === "lesson") {
+            const newStudents = students?.filter((s: any) => String(s.classId) === String(classId));
+            setFilteredStudents(newStudents || []);
+        }
+    };
 
     return (
 
@@ -120,9 +132,16 @@ const AttendanceForm = ({
                         className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
                         {...register("studentId")}
                         defaultValue={data?.studentId}
+                        onChange={(e) => {
+                            const selectedId = e.target.value;
+                            const student = filteredStudents?.find((s: any) => s.id === selectedId);
+                            if (student) {
+                                updateSelect("student", student.classId);
+                            }
+                        }}
                     >
-                        <option value="">Selectează un elev</option>
-                        {students?.map(
+                        <option value="">Alege un elev</option>
+                        {filteredStudents?.map(
                             (student: { id: string; name: string; surname: string; username: string }) => (
                                 <option value={student.id} key={student.id}>
                                     {student.name} {student.surname} ({student.username})
@@ -143,30 +162,40 @@ const AttendanceForm = ({
                         className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
                         {...register("lessonId")}
                         defaultValue={data?.lessonId}
+                        onChange={(e) => {
+                            const selectedId = Number(e.target.value);
+                            const lesson = filteredLessons?.find((s: any) => s.id === selectedId);
+                            if (lesson) {
+                                updateSelect("lesson", lesson.classId);
+                            }
+                        }}
                     >
-                        <option value="">Selectează o oră</option>
-                        {lessons?.map(
+                        <option value="">Alege o oră</option>
+                        {filteredLessons?.map(
                             (lesson: { id: number; name: string; subject: { name: string }; class: { name: string } }) => (
                                 <option value={lesson.id} key={lesson.id}>
                                     {lesson.subject.name} - {lesson.class.name} ({lesson.name})
                                 </option>
                             )
-                        )}
-                    </select>
-                    {errors.lessonId?.message && (
-                        <p className="text-xs text-red-400">
-                            {errors.lessonId.message.toString()}
-                        </p>
-                    )}
-                </div>
-            </div>
+                        )
+                        }
+                    </select >
+                    {
+                        errors.lessonId?.message && (
+                            <p className="text-xs text-red-400">
+                                {errors.lessonId.message.toString()}
+                            </p>
+                        )
+                    }
+                </div >
+            </div >
 
             {state.error && (
                 <span className="text-red-500">
-                    {state.message || "Ceva nu a funcționat. Încearcă mai târziu."}
+                    {state.message || "Something went wrong!"}
                 </span>
             )}
-            <div className="flex justify-center mt-4">
+            <div className="flex justify-center mt-4 mb-8">
                 <button
                     type="submit"
                     className={`bg-blue-500 text-white px-8 py-2 rounded-md text-sm w-max mx-auto hover:bg-blue-600 transition ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
@@ -174,9 +203,9 @@ const AttendanceForm = ({
                 >
                     {type === "create" ? "Adaugă prezența" : "Actualizează prezența"}
                 </button>
-            </div>
+            </div >
             {isPending && <LoadingPopup />}
-        </form>
+        </form >
     )
 };
 
