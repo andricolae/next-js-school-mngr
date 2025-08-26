@@ -315,6 +315,7 @@ const FilterForm: React.FC<FilterFormProps> = ({
             <button
                 className="w-8 h-8 flex items-center justify-center rounded-full bg-yellow relative"
                 onClick={() => setIsOpen(true)}
+                title="Filtrare"
             >
                 <Image src="/filter.png" alt="Filter" width={14} height={14} />
                 {activeFiltersCount > 0 && (

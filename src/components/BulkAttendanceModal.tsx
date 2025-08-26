@@ -18,7 +18,7 @@ const BulkAttendanceModal = ({ lessons }: { lessons: Lesson[] }) => {
         <>
             <button
                 onClick={() => setIsOpen(true)}
-                className="bg-blue-500 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-600 flex items-center gap-2"
+                className="bg-blue-300 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-400 flex items-center gap-2"
             >
                 <Image src="/calendar.png" alt="" width={16} height={16} />
                 Mark Class Attendance

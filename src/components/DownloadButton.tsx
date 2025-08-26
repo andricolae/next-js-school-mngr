@@ -41,7 +41,7 @@ const DownloadButton: React.FC<DownloadButtonProps> = ({
         <button
             className="w-8 h-8 flex items-center justify-center rounded-full bg-yellow"
             onClick={handleDownloadPdf}
-
+            title="Descarca"
         >
             <Image src="/download.png" alt="Download PDF" width={19} height={19} />
         </button>
