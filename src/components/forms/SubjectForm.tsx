@@ -272,7 +272,7 @@ const SubjectForm = ({
                 <span className="text-red-500 text-center">{state.message || "Something went wrong!"}</span>
             )}
 
-            <div className="flex justify-center mt-2">
+            <div className="flex justify-center mt-2 mb-8">
                 <button
                     type="submit"
                     disabled={isSubmitting}

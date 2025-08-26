@@ -455,7 +455,7 @@ const FilterForm: React.FC<FilterFormProps> = ({
                             </div>
                         </div>
 
-                        <div className="filter-modal-footer flex justify-end gap-2 pt-4 border-t mt-4">
+                        <div className="filter-modal-footer flex justify-end gap-2 pt-4 border-t mt-4 mb-8">
                             <button
                                 className="filter-button-clear px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50"
                                 onClick={handleClearFilters}

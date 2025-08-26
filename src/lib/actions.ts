@@ -1444,3 +1444,97 @@ export const deleteSelectedLessons = async (currentState: CurrentState, formData
         return { error: true, success: false }
     }
 }
+
+export const teacherClasses = async (teacherId: string) => {
+    const newClasses = await prisma.class.findMany({
+        where: {
+            lessons: {
+                some: {
+                    teacherId: teacherId,
+                },
+            },
+        },
+        select: {
+            id: true,
+            name: true,
+            grade: {
+                select: {
+                    level: true,
+                },
+            },
+        },
+    });
+    return newClasses;
+}
+
+export const classesOfSubject = async (subjectName: string) => {
+    const newClasses = await prisma.class.findMany({
+        where: {
+            lessons: {
+                some: {
+                    subject: {
+                        name: subjectName,
+                    },
+                },
+            },
+        },
+        select: {
+            id: true,
+            name: true,
+            grade: {
+                select: {
+                    level: true,
+                },
+            },
+        },
+    });
+    return newClasses;
+}
+
+export const studentsAssignedToAnExam = async (examId: number) => {
+    const examStudents = await prisma.student.findMany({
+        where: {
+            results: {
+                some: {
+                    examId: examId, // only students who have a result for this exam
+                },
+            },
+        },
+        select: {
+            id: true,
+            username: true,
+            name: true,
+            surname: true,
+        },
+    });
+    return examStudents;
+}
+
+export const studentsOfClassAssignedToAnAssignment = async (assignmentId: number) => {
+    const assignmentClassStudents = await prisma.assignment.findUnique({
+        where: { id: assignmentId },
+        select: {
+            id: true,
+            title: true,
+            lesson: {
+                select: {
+                    class: {
+                        select: {
+                            id: true,
+                            name: true,
+                            students: {
+                                select: {
+                                    id: true,
+                                    name: true,
+                                    surname: true,
+                                    username: true,
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+    });
+    return assignmentClassStudents;
+}

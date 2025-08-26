@@ -139,7 +139,7 @@ const AssignmentForm = ({
                     {state.message || "Something went wrong!"}
                 </span>
             )}
-            <div className="flex justify-center mt-4">
+            <div className="flex justify-center mt-4 mb-8">
                 <button
                     type="submit"
                     className={`bg-blue-500 text-white px-8 py-2 rounded-md text-sm w-max mx-auto hover:bg-blue-600 transition ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
