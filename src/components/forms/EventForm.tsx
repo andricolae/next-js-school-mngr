@@ -26,7 +26,7 @@ const EventForm = ({
     const {
         register,
         handleSubmit,
-        formState: { errors },
+        formState: { errors, touchedFields, isSubmitted },
     } = useForm<EventSchema>({
         resolver: zodResolver(eventSchema),
     });
@@ -66,6 +66,20 @@ const EventForm = ({
 
     const { classes } = relatedData || {};
 
+    const getDateError = (field: "startTime" | "endTime") => {
+        const err = errors[field];
+        if (isSubmitted && !touchedFields[field] && !err) {
+            return field === "startTime"
+                ? "Data și ora de început sunt obligatorii!"
+                : "Data și ora de sfârșit sunt obligatorii!";
+        }
+        if (err?.message === "Invalid date") {
+            return field === "startTime"
+                ? "Data și ora de început sunt obligatorii!"
+                : "Data și ora de sfârșit sunt obligatorii!";
+        }
+        return err?.message;
+    };
 
     return (
         <form className="flex flex-col gap-8" onSubmit={onSubmit}>
@@ -100,7 +114,7 @@ const EventForm = ({
                     name="startTime"
                     defaultValue={data?.startTime ? new Date(data.startTime).toISOString().slice(0, 16) : undefined}
                     register={register}
-                    error={errors?.startTime}
+                    error={getDateError("startTime")}
                     type="datetime-local"
                 />
 
@@ -109,7 +123,7 @@ const EventForm = ({
                     name="endTime"
                     defaultValue={data?.endTime ? new Date(data.endTime).toISOString().slice(0, 16) : undefined}
                     register={register}
-                    error={errors?.endTime}
+                    error={getDateError("endTime")}
                     type="datetime-local"
                 />
 

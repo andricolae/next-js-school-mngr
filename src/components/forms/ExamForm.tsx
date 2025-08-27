@@ -26,7 +26,7 @@ const ExamForm = ({
     const {
         register,
         handleSubmit,
-        formState: { errors },
+        formState: { errors, touchedFields, isSubmitted },
         setValue
     } = useForm<ExamSchema>({
         resolver: zodResolver(examSchema),
@@ -61,8 +61,22 @@ const ExamForm = ({
         }
     }, [state, router, type, setOpen]);
 
+    const getDateError = (field: "startTime" | "endTime") => {
+        const err = errors[field];
+        if (isSubmitted && !touchedFields[field] && !err) {
+            return field === "startTime"
+                ? "Data și ora de început sunt obligatorii!"
+                : "Data și ora de sfârșit sunt obligatorii!";
+        }
+        if (err?.message === "Invalid date") {
+            return field === "startTime"
+                ? "Data și ora de început sunt obligatorii!"
+                : "Data și ora de sfârșit sunt obligatorii!";
+        }
+        return err?.message;
+    };
+
     const { lessons } = relatedData;
-    console.log("lessons", lessons)
     return (
         <form className="flex flex-col gap-6 " onSubmit={onSubmit}>
             <h1 className="text-xl font-semibold ">
@@ -83,7 +97,7 @@ const ExamForm = ({
                     name="startTime"
                     defaultValue={data?.startTime ? new Date(data.startTime).toISOString().slice(0, 16) : undefined}
                     register={register}
-                    error={errors?.startTime}
+                    error={getDateError("startTime")}
                     type="datetime-local"
                 />
 
@@ -92,7 +106,7 @@ const ExamForm = ({
                     name="endTime"
                     defaultValue={data?.endTime ? new Date(data.endTime).toISOString().slice(0, 16) : undefined}
                     register={register}
-                    error={errors?.endTime}
+                    error={getDateError("endTime")}
                     type="datetime-local"
                 />
 
