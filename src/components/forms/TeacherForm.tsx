@@ -102,7 +102,6 @@ const MultiSelect = ({
                 {label}
             </label>
 
-
             {selectedIds?.length > 0 && (
                 <div className="flex flex-wrap gap-1 mb-2">
                     {getSelectedOptions().map((option) => (
@@ -195,7 +194,7 @@ const TeacherForm = ({
         register,
         handleSubmit,
         control,
-        formState: { errors },
+        formState: { errors, touchedFields, isSubmitted },
         setValue,
         watch,
     } = useForm<TeacherSchema>({
@@ -253,6 +252,16 @@ const TeacherForm = ({
 
     let openUploadWidget: () => void = () => { };
 
+    const getDateError = (field: "birthday") => {
+        const err = errors[field];
+        if (isSubmitted && !touchedFields[field] && !err) {
+            return "Data nașterii este obligatorie!";
+        }
+        if (err?.message === "Invalid date") {
+            return "Data nașterii este obligatorie!";
+        }
+        return err?.message;
+    };
 
     return (
         <form className="flex flex-col gap-8" onSubmit={onSubmit}>
@@ -366,7 +375,7 @@ const TeacherForm = ({
                     type="date"
                     defaultValue={data?.birthday}
                     register={register}
-                    error={errors?.birthday}
+                    error={getDateError("birthday")}
                 />
                 <div className="flex flex-col gap-2">
                     <label className="text-xs text-gray-400 font-medium">Gen</label>

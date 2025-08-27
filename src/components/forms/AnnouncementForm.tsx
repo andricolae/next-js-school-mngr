@@ -26,7 +26,7 @@ const AnnouncementForm = ({
     const {
         register,
         handleSubmit,
-        formState: { errors },
+        formState: { errors, touchedFields, isSubmitted },
     } = useForm<AnnouncementSchema>({
         resolver: zodResolver(announcementSchema),
     });
@@ -61,6 +61,17 @@ const AnnouncementForm = ({
             setIsSubmitting(true);
         }
     }, [state, router, type, setOpen]);
+
+    const getDateError = (field: "date") => {
+        const err = errors[field];
+        if (isSubmitted && !touchedFields[field] && !err) {
+            return "Data este obligatorie!";
+        }
+        if (err?.message === "Invalid date") {
+            return "Data este obligatorie!";
+        }
+        return err?.message;
+    };
 
     const { classes } = relatedData || {};
 
@@ -98,7 +109,7 @@ const AnnouncementForm = ({
                     name="date"
                     defaultValue={data?.date ? new Date(data.date).toISOString().split('T')[0] : undefined}
                     register={register}
-                    error={errors?.date}
+                    error={getDateError("date")}
                     type="date"
                     className="w-full"
                 />
