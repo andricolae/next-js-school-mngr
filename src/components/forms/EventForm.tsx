@@ -54,12 +54,12 @@ const EventForm = ({
 
     useEffect(() => {
         if (state.success) {
-            toast(`Event has been ${type === "create" ? "created" : "updated"} successfully!`);
+            toast(`Eveniment ${type === "create" ? "creat" : "actualizat"} cu succes!`);
             setOpen(false);
             router.refresh();
         }
         if (state.error) {
-            const errorMessage = state.message || "Something went wrong!";
+            const errorMessage = state.message || "A apărut o eroare. Încearcă mai târziu.";
             setIsSubmitting(false);
         }
     }, [state, router, type, setOpen]);
@@ -69,11 +69,11 @@ const EventForm = ({
 
     return (
         <form className="flex flex-col gap-8" onSubmit={onSubmit}>
-            <h1 className="text-xl font-semibold">{type === "create" ? "Create a new event" : "Update the event"}</h1>
+            <h1 className="text-xl font-semibold">{type === "create" ? "Adaugă un nou eveniment" : "Actualizează evenimentul"}</h1>
 
             <div className="flex-col gap-4">
                 <InputField
-                    label="Event Title"
+                    label="Titlul evenimentului"
                     name="title"
                     defaultValue={data?.title}
                     register={register}
@@ -81,7 +81,7 @@ const EventForm = ({
                 />
 
                 <div className="flex flex-col gap-2 pt-2 w-full">
-                    <label className="text-xs text-gray-400">Description</label>
+                    <label className="text-xs text-gray-400">Descriere</label>
                     <textarea
                         className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
                         placeholder="Event description..."
@@ -96,7 +96,7 @@ const EventForm = ({
                 </div>
 
                 <InputField
-                    label="Start Time"
+                    label="Data și ora de început"
                     name="startTime"
                     defaultValue={data?.startTime ? new Date(data.startTime).toISOString().slice(0, 16) : undefined}
                     register={register}
@@ -105,7 +105,7 @@ const EventForm = ({
                 />
 
                 <InputField
-                    label="End Time"
+                    label="Data și ora de sfârșit"
                     name="endTime"
                     defaultValue={data?.endTime ? new Date(data.endTime).toISOString().slice(0, 16) : undefined}
                     register={register}
@@ -124,13 +124,13 @@ const EventForm = ({
                 )}
 
                 <div className="flex flex-col gap-2 w-full pt-2">
-                    <label className="text-xs text-gray-400">Class (Optional)</label>
+                    <label className="text-xs text-gray-400">Clasa (Opțional)</label>
                     <select
                         className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
                         defaultValue={data?.classId ?? ""}
                         {...register("classId")}
                     >
-                        <option value="">School-wide event</option>
+                        <option value="">Eveniment pentru întreaga școală</option>
                         {classes?.map(
                             (classItem: { id: number; name: string; grade: { level: number } }) => (
                                 <option value={classItem.id} key={classItem.id}>
@@ -148,12 +148,12 @@ const EventForm = ({
             </div>
 
             <div className="text-xs text-gray-500">
-                Leave class empty to create a school-wide event visible to everyone.
+                Important: Pentru a crea un eveniment pentru întreaga școală, lăsați câmpul „clasă” liber!
             </div>
 
             {state.error && (
                 <span className="text-red-500">
-                    {state.message || "Something went wrong!"}
+                    {state.message || "A apărut o eroare. Încearcă din nou."}
                 </span>
             )}
             <div className="flex justify-center mt-6 mb-8">
@@ -162,7 +162,7 @@ const EventForm = ({
                     className={`bg-blue-500 transition ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""} text-white px-8 py-2 rounded-md text-sm w-max`}
                     disabled={isSubmitting}
                 >
-                    {type === "create" ? "Create" : "Update"}
+                    {type === "create" ? "Adaugă eveniment" : "Actualizează evenimentul"}
                 </button>
             </div>
             {isPending && <LoadingPopup />}

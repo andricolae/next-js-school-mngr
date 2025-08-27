@@ -9,7 +9,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Smart Class",
-  description: "Next.js Smart Class",
+  description: "Aplicație pentru gestionarea instituțiilor de învățământ",
 };
 
 export default function RootLayout({
@@ -20,7 +20,7 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en">
-        <body className={inter.className}>{children} <ToastContainer position="bottom-right" theme="light"/></body>
+        <body className={inter.className}>{children} <ToastContainer position="bottom-right" theme="light" /></body>
       </html>
     </ClerkProvider>
   );

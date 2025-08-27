@@ -53,13 +53,13 @@ const AssignmentForm = ({
 
     useEffect(() => {
         if (state.success) {
-            toast(`Assignment has been ${type === "create" ? "created" : "updated"} successfully!`);
+            toast(`Temă ${type === "create" ? "creată" : "actualizată"} cu succes!`);
             setOpen(false);
             router.refresh();
         }
 
         if (state.error) {
-            const errorMessage = state.message || "Something went wrong!";
+            const errorMessage = state.message || "Ceva nu a funcționat. Încearcă mai târziu.";
             setIsSubmitting(true);
         }
     }, [state, router, type, setOpen]);
@@ -68,25 +68,25 @@ const AssignmentForm = ({
 
     return (
         <form className="flex flex-col gap-4 max-auto" onSubmit={onSubmit}>
-            <h1 className="text-xl font-semibold">{type === "create" ? "Create a new assignment" : "Update the assignment"}</h1>
+            <h1 className="text-xl font-semibold">{type === "create" ? "Adaugă o nouă temă" : "Actualizează tema"}</h1>
 
             <div className="flex flex-col gap-6">
                 <InputField
-                    label="Assignment Title"
+                    label="Titlu temă"
                     name="title"
                     defaultValue={data?.title}
                     register={register}
                     error={errors?.title}
                 />
                 <InputField
-                    label="Assignment Description"
+                    label="Descriere"
                     name="description"
                     defaultValue={data?.description}
                     register={register}
                     error={errors?.description}
                 />
                 <InputField
-                    label="Start Date"
+                    label="Dată începere"
                     name="startDate"
                     defaultValue={data?.startDate ? new Date(data.startDate).toISOString().split('T')[0] : undefined}
                     register={register}
@@ -94,7 +94,7 @@ const AssignmentForm = ({
                     type="date"
                 />
                 <InputField
-                    label="Due Date"
+                    label="Dată limită"
                     name="dueDate"
                     defaultValue={data?.dueDate ? new Date(data.dueDate).toISOString().split('T')[0] : undefined}
                     register={register}
@@ -112,13 +112,13 @@ const AssignmentForm = ({
                     />
                 )}
                 <div className="flex flex-col gap-2 w-full">
-                    <label className="text-xs text-gray-400">Lesson</label>
+                    <label className="text-xs text-gray-400">Ore</label>
                     <select
                         className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
                         {...register("lessonId")}
                         defaultValue={data?.lessonId}
                     >
-                        <option value="">Select lesson</option>
+                        <option value="">Alege ora</option>
                         {lessons.map(
                             (lesson: { id: number; name: string; }) => (
                                 <option value={lesson.id} key={lesson.id}>
@@ -136,7 +136,7 @@ const AssignmentForm = ({
             </div>
             {state.error && (
                 <span className="text-red-500">
-                    {state.message || "Something went wrong!"}
+                    {state.message || "Ceva nu a funcționat. Încearcă mai târziu."}
                 </span>
             )}
             <div className="flex justify-center mt-4 mb-8">
@@ -145,7 +145,7 @@ const AssignmentForm = ({
                     className={`bg-blue-500 text-white px-8 py-2 rounded-md text-sm w-max mx-auto hover:bg-blue-600 transition ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
                     disabled={isSubmitting}
                 >
-                    {type === "create" ? "Create" : "Update"}
+                    {type === "create" ? "Adaugă tema" : "Actualizează tema"}
                 </button>
             </div>
             {isPending && <LoadingPopup />}

@@ -55,12 +55,12 @@ const AttendanceForm = ({
 
     useEffect(() => {
         if (state.success) {
-            toast(`Attendance has been ${type === "create" ? "created" : "updated"} successfully!`);
+            toast(`Prezență ${type === "create" ? "adăugată" : "actualizată"} cu succes!`);
             setOpen(false);
             router.refresh();
         }
         if (state.error) {
-            const errorMessage = state.message || "Something went wrong!";
+            const errorMessage = state.message || "Ceva nu a funcționat. Încearcă mai târziu.";
             setIsSubmitting(true);
         }
     }, [state, router, type, setOpen]);
@@ -86,11 +86,11 @@ const AttendanceForm = ({
             onSubmit={onSubmit}
         >
 
-            <h1 className="text-xl font-semibold">{type === "create" ? "Create attendance record" : "Update attendance record"}</h1>
+            <h1 className="text-xl font-semibold">{type === "create" ? "Adaugă o nouă prezență" : "Actualizează prezența"}</h1>
 
             <div className="flex flex-col gap-4 w-full">
                 <InputField
-                    label="Date"
+                    label="Data"
                     name="date"
                     type="date"
                     defaultValue={data?.date ? new Date(data.date).toISOString().split('T')[0] : undefined}
@@ -105,7 +105,7 @@ const AttendanceForm = ({
                         {...register("present")}
                         defaultValue={data?.present !== undefined ? String(data.present) : "true"}
                     >
-                        <option value="true">Present</option>
+                        <option value="true">Prezent</option>
                         <option value="false">Absent</option>
                     </select>
                     {errors.present?.message && (
@@ -127,7 +127,7 @@ const AttendanceForm = ({
                 )}
 
                 <div className="flex flex-col gap-2 w-full">
-                    <label className="text-xs text-gray-400">Student</label>
+                    <label className="text-xs text-gray-400">Elev</label>
                     <select
                         className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
                         {...register("studentId")}
@@ -140,7 +140,7 @@ const AttendanceForm = ({
                             }
                         }}
                     >
-                        <option value="">Select a student</option>
+                        <option value="">Alege un elev</option>
                         {filteredStudents?.map(
                             (student: { id: string; name: string; surname: string; username: string }) => (
                                 <option value={student.id} key={student.id}>
@@ -157,7 +157,7 @@ const AttendanceForm = ({
                 </div>
 
                 <div className="flex flex-col gap-2 w-full">
-                    <label className="text-xs text-gray-400">Lesson</label>
+                    <label className="text-xs text-gray-400">Ora</label>
                     <select
                         className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
                         {...register("lessonId")}
@@ -170,22 +170,25 @@ const AttendanceForm = ({
                             }
                         }}
                     >
-                        <option value="">Select a lesson</option>
+                        <option value="">Alege o oră</option>
                         {filteredLessons?.map(
                             (lesson: { id: number; name: string; subject: { name: string }; class: { name: string } }) => (
                                 <option value={lesson.id} key={lesson.id}>
                                     {lesson.subject.name} - {lesson.class.name} ({lesson.name})
                                 </option>
                             )
-                        )}
-                    </select>
-                    {errors.lessonId?.message && (
-                        <p className="text-xs text-red-400">
-                            {errors.lessonId.message.toString()}
-                        </p>
-                    )}
-                </div>
-            </div>
+                        )
+                        }
+                    </select >
+                    {
+                        errors.lessonId?.message && (
+                            <p className="text-xs text-red-400">
+                                {errors.lessonId.message.toString()}
+                            </p>
+                        )
+                    }
+                </div >
+            </div >
 
             {state.error && (
                 <span className="text-red-500">
@@ -198,11 +201,11 @@ const AttendanceForm = ({
                     className={`bg-blue-500 text-white px-8 py-2 rounded-md text-sm w-max mx-auto hover:bg-blue-600 transition ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
                     disabled={isSubmitting}
                 >
-                    {type === "create" ? "Create" : "Update"}
+                    {type === "create" ? "Adaugă prezența" : "Actualizează prezența"}
                 </button>
-            </div>
+            </div >
             {isPending && <LoadingPopup />}
-        </form>
+        </form >
     )
 };
 

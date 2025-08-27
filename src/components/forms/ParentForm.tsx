@@ -60,12 +60,12 @@ const ParentForm = ({
 
     useEffect(() => {
         if (state.success) {
-            toast(`Parent has been ${type === "create" ? "created" : "updated"} successfully!`);
+            toast(`Părinte ${type === "create" ? "adăugat" : "actualizat"} cu succes!`);
             setOpen(false);
             router.refresh();
         }
         if (state.error) {
-            const errorMessage = state.message || "Something went wrong!";
+            const errorMessage = state.message || "Ceva nu a funcționat. Încearcă mai târziu.";
             toast.error(errorMessage);
             setIsSubmitting(false);
         }
@@ -75,13 +75,13 @@ const ParentForm = ({
         <form className="flex flex-col gap-8 mx-auto " onSubmit={onSubmit}>
 
             <h1 className="text-xl font-semibold">
-                {type === "create" ? "Create a new parent" : "Update the parent"}
+                {type === "create" ? "Adaugă un nou părinte" : "Actualizează părintele"}
             </h1>
 
 
             <div className="flex gap-8">
-                <span className="text-xs text-gray-400 font-medium flex-1">Authentication Information</span>
-                <span className="text-xs text-gray-400 font-medium flex-1">Personal Information</span>
+                <span className="text-xs text-gray-400 font-medium flex-1">Informații de autentificare</span>
+                <span className="text-xs text-gray-400 font-medium flex-1">Informații personale</span>
             </div>
 
 
@@ -89,7 +89,7 @@ const ParentForm = ({
                 {/* Coloana 1 */}
                 <div className="flex flex-col gap-2 flex-1">
                     <InputField
-                        label="Username"
+                        label="Nume de utilizator"
                         name="username"
                         defaultValue={data?.username}
                         register={register}
@@ -104,7 +104,7 @@ const ParentForm = ({
                         error={errors?.email}
                     />
                     <InputField
-                        label="Password"
+                        label="Parolă"
                         name="password"
                         type="password"
                         defaultValue={data?.password}
@@ -116,21 +116,21 @@ const ParentForm = ({
                 {/* Coloana 2 */}
                 <div className="flex flex-col gap-2 flex-1">
                     <InputField
-                        label="First Name"
+                        label="Prenume"
                         name="name"
                         defaultValue={data?.name}
                         register={register}
                         error={errors?.name}
                     />
                     <InputField
-                        label="Last Name"
+                        label="Nume"
                         name="surname"
                         defaultValue={data?.surname}
                         register={register}
                         error={errors?.surname}
                     />
                     <InputField
-                        label="Phone"
+                        label="Telefon"
                         name="phone"
                         defaultValue={data?.phone}
                         register={register}
@@ -141,7 +141,7 @@ const ParentForm = ({
 
 
             <InputField
-                label="Address"
+                label="Adresă"
                 name="address"
                 defaultValue={data?.address}
                 register={register}
@@ -149,7 +149,7 @@ const ParentForm = ({
             />
 
             <div className="text-xs text-gray-500">
-                Note: Student assignments are managed through the student creation/update forms.
+                Important: Asocierea elevului se realizează prin formularul de student.
             </div>
 
             <div className="flex justify-center mt-1 mb-8">
@@ -157,7 +157,7 @@ const ParentForm = ({
                     className={`bg-blue-500 text-white px-8 py-2 rounded-md text-sm w-max ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
                     disabled={isSubmitting}
                 >
-                    {type === "create" ? "Create" : "Update"}
+                    {type === "create" ? "Adaugă" : "Actualizează"} părinte
                 </button>
             </div>
             {isPending && <LoadingPopup />}

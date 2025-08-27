@@ -51,12 +51,12 @@ const ExamForm = ({
 
     useEffect(() => {
         if (state.success) {
-            toast(`Exam has been ${type === "create" ? "created" : "updated"} successfully!`);
+            toast(`Test ${type === "create" ? "creat" : "actualizat"} cu succes!`);
             setOpen(false);
             router.refresh();
         }
         if (state.error) {
-            const errorMessage = state.message || "Something went wrong!";
+            const errorMessage = state.message || "Ceva nu a funcționat. Încearcă mai târziu.";
             setIsSubmitting(false);
         }
     }, [state, router, type, setOpen]);
@@ -66,12 +66,12 @@ const ExamForm = ({
     return (
         <form className="flex flex-col gap-6 " onSubmit={onSubmit}>
             <h1 className="text-xl font-semibold ">
-                {type === "create" ? "Create a new exam" : "Update the exam"}
+                {type === "create" ? "Adaugă un nou test" : "Actualizează testul"}
             </h1>
 
             <div className="flex flex-col gap-6 w-full">
                 <InputField
-                    label="Exam Title"
+                    label="Titlu test"
                     name="title"
                     defaultValue={data?.title}
                     register={register}
@@ -79,7 +79,7 @@ const ExamForm = ({
                 />
 
                 <InputField
-                    label="Start Time"
+                    label="Dată și oră început"
                     name="startTime"
                     defaultValue={data?.startTime ? new Date(data.startTime).toISOString().slice(0, 16) : undefined}
                     register={register}
@@ -88,7 +88,7 @@ const ExamForm = ({
                 />
 
                 <InputField
-                    label="End Time"
+                    label="Dată și oră sfârșit"
                     name="endTime"
                     defaultValue={data?.endTime ? new Date(data.endTime).toISOString().slice(0, 16) : undefined}
                     register={register}
@@ -108,13 +108,13 @@ const ExamForm = ({
                 )}
 
                 <div className="flex flex-col gap-1 w-full">
-                    <label className="text-xs text-gray-400">Lesson</label>
+                    <label className="text-xs text-gray-400">Ora</label>
                     <select
                         className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
                         {...register("lessonId")}
                         defaultValue={data?.lessonId || ""}
                     >
-                        <option value="">Select lesson</option>
+                        <option value="">Selectează o oră</option>
                         {lessons.map((lesson: { id: number; name: string }) => (
                             <option value={lesson.id} key={lesson.id}>
                                 {lesson.name}
@@ -139,7 +139,7 @@ const ExamForm = ({
                     className={`bg-blue-500 transition ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""} text-white px-8 py-2 rounded-md text-sm w-max`}
                     disabled={isSubmitting}
                 >
-                    {type === "create" ? "Create" : "Update"}
+                    {type === "create" ? "Adaugă testul" : "Actualizează testul"}
                 </button>
             </div>
             {isPending && <LoadingPopup />}

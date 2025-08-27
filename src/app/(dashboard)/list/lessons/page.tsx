@@ -37,24 +37,24 @@ const LessonListPage = async ({ searchParams }: { searchParams: { [key: string]:
 
     const columns = [
         {
-            header: "Subject Name",
+            header: "Materie",
             accessor: "name",
         },
         {
-            header: "Class",
+            header: "Clasă",
             accessor: "class",
         },
         {
-            header: "Teacher",
+            header: "Profesor",
             accessor: "teacher",
             className: "hidden md:table-cell",
         },
         {
-            header: "Start Time",
+            header: "Ora de început",
             accessor: "startTime",
         },
         ...(role === "admin" || role === "teacher" ? [{
-            header: "Actions",
+            header: "Acțiuni",
             accessor: "actions",
         }] : []),
     ]
@@ -183,7 +183,7 @@ const LessonListPage = async ({ searchParams }: { searchParams: { [key: string]:
     ]);
 
 
-    const title = hasSpecificFilters ? "All Lessons (Filtered)" : "Lessons for Today";
+    const title = hasSpecificFilters ? "Ore filtrate" : "Orele de azi";
     const selectedIds = data.map(item => item.id);
 
     return (

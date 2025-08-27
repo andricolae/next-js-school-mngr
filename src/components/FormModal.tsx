@@ -131,14 +131,31 @@ const FormModal = ({ table, type, data, id, results, relatedData, title, student
 
         const router = useRouter();
 
+        const tableMap: Record<string, string> = {
+            subject: "această materie",
+            class: "această clasă",
+            lesson: "această oră",
+            exam: "acest test",
+            assignment: "această temă",
+            result: "acest rezultat",
+            attendance: "această prezență",
+            event: "acest eveniment",
+            announcement: "acest anunț",
+            parent: "acest părinte",
+            teacher: "acest profesor",
+            student: "acest elev",
+        };
+
+        const translatedTable = tableMap[table] ?? table;
+
         useEffect(() => {
             if (state.success) {
-                toast(`${table} has been deleted successfully!`);
+                toast(`${translatedTable} a fost șters cu succes!`);
                 setOpen(false);
                 router.refresh();
             }
             if (state.error) {
-                toast(`${table} nu a putut fi sters.`);
+                toast(`${translatedTable} nu a putut fi șters.`);
                 setOpen(false);
             }
         }, [state, router]);
@@ -146,8 +163,8 @@ const FormModal = ({ table, type, data, id, results, relatedData, title, student
         return type === "delete" && id ? (
             <form action={formActionWrapper} className="p-4 flex flex-col gap-4">
                 <input type="text|number" name="id" value={id} hidden readOnly />
-                <span className="text-center font-medium">All data will be lost. Are you sure you want to delete this {table}?</span>
-                <button className="bg-red-600 text-white py-3 px-4 rounded-md border-none w-max self-center">Delete</button>
+                <span className="text-center font-medium">Toate datele vor fi pierdute. Ești sigur/ă că vrei să ștergi {translatedTable}?</span>
+                <button className="bg-red-600 text-white py-3 px-4 rounded-md border-none w-max self-center">Șterge</button>
                 {isPending && <LoadingPopup />}
             </form>
         ) : type === "create" || type === "update" ? (

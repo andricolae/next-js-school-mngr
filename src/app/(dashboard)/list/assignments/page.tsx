@@ -21,37 +21,37 @@ const AssignmentListPage = async ({ searchParams }: { searchParams: { [key: stri
 
     const columns = [
         {
-            header: "Subject Name",
+            header: "Materie",
             accessor: "name",
         },
         ...(role === "parent"
             ? [
                 {
-                    header: "Student",
+                    header: "Elev",
                     accessor: "student",
                 },
             ]
             : []),
         {
-            header: "Description",
+            header: "Descriere",
             accessor: "description",
         },
         {
-            header: "Class",
+            header: "Clasa",
             accessor: "class",
         },
         {
-            header: "Teacher",
+            header: "Profesor",
             accessor: "teacher",
             className: "hidden md:table-cell",
         },
         {
-            header: "Due Date",
+            header: "Termen limită",
             accessor: "dueDate",
             className: "hidden md:table-cell",
         },
         ...(role === "admin" || role === "teacher" ? [{
-            header: "Actions",
+            header: "Acțiuni",
             accessor: "actions",
         }] : []),
     ]
@@ -142,43 +142,43 @@ const AssignmentListPage = async ({ searchParams }: { searchParams: { [key: stri
     }
 
     const [data, count] = await prisma.$transaction([
-            prisma.assignment.findMany({
-                where: query,
-                include: {
-                    lesson: {
-                        select: {
-                            subject: { select: { name: true } },
-                            teacher: { select: { name: true, surname: true } },
-                            class: {
-                                select: {
-                                    id: true,
-                                    name: true,
-                                    students: {
-                                        where: {
-                                            parentId: `${userId}`,
-                                        },
-                                        select: {
-                                            id: true,
-                                            name: true,
-                                            surname: true,
-                                        },
+        prisma.assignment.findMany({
+            where: query,
+            include: {
+                lesson: {
+                    select: {
+                        subject: { select: { name: true } },
+                        teacher: { select: { name: true, surname: true } },
+                        class: {
+                            select: {
+                                id: true,
+                                name: true,
+                                students: {
+                                    where: {
+                                        parentId: `${userId}`,
+                                    },
+                                    select: {
+                                        id: true,
+                                        name: true,
+                                        surname: true,
                                     },
                                 },
                             },
                         },
                     },
                 },
-                orderBy,
-                take: ITEM_PER_PAGE,
-                skip: ITEM_PER_PAGE * (p - 1),
-            }),
-            prisma.assignment.count({ where: query }),
-        ]);
+            },
+            orderBy,
+            take: ITEM_PER_PAGE,
+            skip: ITEM_PER_PAGE * (p - 1),
+        }),
+        prisma.assignment.count({ where: query }),
+    ]);
 
     return (
         <div className='bg-white p-4 rounded-md flex-1 m-4 mt-0'>
             <div className='flex items-center justify-between'>
-                <h1 className='hidden md:block text-lg font-semibold'>All Assignments</h1>
+                <h1 className='hidden md:block text-lg font-semibold'>Teme</h1>
                 <div className='flex flex-col md:flex-row items-center gap-4 w-full md:w-auto'>
                     <TableSearch />
                     <div className='flex items-center gap-4 self-end'>

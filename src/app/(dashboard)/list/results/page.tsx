@@ -75,41 +75,41 @@ const ResultListPage = async ({
 
     const columns = [
         {
-            header: "Title",
+            header: "Titlu",
             accessor: "title",
         },
         {
-            header: "Subject",
+            header: "Materie",
             accessor: "subject",
         },
         {
-            header: "Student",
+            header: "Elev",
             accessor: "student",
         },
         {
-            header: "Score",
+            header: "Nota",
             accessor: "score",
             className: "hidden md:table-cell",
         },
         {
-            header: "Teacher",
+            header: "Profesor",
             accessor: "teacher",
             className: "hidden md:table-cell",
         },
         {
-            header: "Class",
+            header: "Clasa",
             accessor: "class",
             className: "hidden md:table-cell",
         },
         {
-            header: "Date",
+            header: "Data",
             accessor: "date",
             className: "hidden md:table-cell",
         },
         ...(role === "admin" || role === "teacher"
             ? [
                 {
-                    header: "Actions",
+                    header: "Acțiuni",
                     accessor: "action",
                 },
             ]
@@ -472,7 +472,7 @@ const ResultListPage = async ({
     return (
         <div className="bg-white p-4 rounded-md flex-1 m-4 mt-0">
             <div className="flex items-center justify-between">
-                <h1 className="hidden md:block text-lg font-semibold">All Results</h1>
+                <h1 className="hidden md:block text-lg font-semibold">Rezultate</h1>
                 <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
                     <TableSearch />
                     <div className="flex items-center gap-4 self-end">

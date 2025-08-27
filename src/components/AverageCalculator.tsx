@@ -5,7 +5,6 @@ interface ScoreData {
     [key: string]: any;
 }
 
-
 interface AverageCalculatorProps<T extends ScoreData> {
     data: T[];
     className?: string;
@@ -15,7 +14,6 @@ interface AverageCalculatorProps<T extends ScoreData> {
     emptyMessage?: string;
     containerStyle?: 'default' | 'success' | 'info' | 'warning' | 'error';
 }
-
 
 const useAverageCalculation = <T extends ScoreData>(
     data: T[],
@@ -49,7 +47,6 @@ const useAverageCalculation = <T extends ScoreData>(
     }, [data, precision]);
 };
 
-
 const getContainerStyles = (style: string) => {
     const styles = {
         default: "bg-blue-50 border-blue-200 text-blue-800",
@@ -65,10 +62,10 @@ const getContainerStyles = (style: string) => {
 const AverageCalculator = <T extends ScoreData>({
     data,
     className = "",
-    title = "General average",
+    title = "Media generală",
     precision = 2,
     showCount = true,
-    emptyMessage = "There are no grades for calculating the average.",
+    emptyMessage = "Nu există date pentru calculul mediei",
     containerStyle = 'default'
 }: AverageCalculatorProps<T>) => {
     const { average, totalWithScores, hasValidData } = useAverageCalculation(data, precision);

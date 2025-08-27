@@ -29,7 +29,7 @@ const Pagination = ({ page, count }: { page: number; count: number }) => {
                 className="py-2 px-4 rounded-md bg-slate-200 text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
                 onClick={() => changePage(page - 1)}
             >
-                Prev
+                Înapoi
             </button>
             {isPending && <LoadingPopup />}
             <div className="flex items-center gap-2">
@@ -54,7 +54,7 @@ const Pagination = ({ page, count }: { page: number; count: number }) => {
                 className="py-2 px-4 rounded-md bg-slate-200 text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
                 onClick={() => changePage(page + 1)}
             >
-                Next
+                Înainte
             </button>
         </div>
     )

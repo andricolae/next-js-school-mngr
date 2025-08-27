@@ -233,12 +233,12 @@ const TeacherForm = ({
     useEffect(() => {
         if (state.success) {
             toast(
-                `Teacher has been ${type === "create" ? "created" : "updated"} successfully!`
+                `Profesor ${type === "create" ? "adăugat" : "actualizat"} cu succes!`
             );
             setOpen(false);
             router.refresh();
         } else if (state.error) {
-            const errorMessage = state.message || "Something went wrong!";
+            const errorMessage = state.message || "Ceva nu a funcționat. Încearcă mai târziu.";
             toast.error(errorMessage);
             setIsSubmitting(false);
         }
@@ -257,17 +257,17 @@ const TeacherForm = ({
     return (
         <form className="flex flex-col gap-8" onSubmit={onSubmit}>
             <h1 className="text-xl font-semibold">
-                {type === "create" ? "Create a new teacher" : "Update the teacher"}
+                {type === "create" ? "Adaugă un nou profesor" : "Actualizează profesorul"}
             </h1>
 
             {/* Authentication Information */}
             <span className="text-xs text-gray-400 font-medium -mb-4 mt-2">
-                Authentication Information
+                Informații de autentificare
             </span>
 
             <div className="grid grid-cols-2 gap-4">
                 <InputField
-                    label="Username"
+                    label="Nume de utilizator"
                     name="username"
                     defaultValue={data?.username}
                     register={register}
@@ -282,7 +282,7 @@ const TeacherForm = ({
                     error={errors?.email}
                 />
                 <InputField
-                    label="Password"
+                    label="Parolă"
                     name="password"
                     type="password"
                     defaultValue={data?.password}
@@ -294,7 +294,7 @@ const TeacherForm = ({
                     onClick={() => openUploadWidget()}
                 >
                     <label className="text-sm font-medium text-gray-700 cursor-pointer select-none">
-                        Upload a Photo
+                        Încară o imagine
                     </label>
                     <div className="flex items-center gap-2">
                         <Image
@@ -313,7 +313,7 @@ const TeacherForm = ({
                                 className="rounded-full object-cover relative top-[2px]"
                             />
                         ) : (
-                            <span className="text-xs text-gray-500">Click to upload</span>
+                            <span className="text-xs text-gray-500">Click pentru a încărca</span>
                         )}
                     </div>
                 </div>
@@ -321,47 +321,47 @@ const TeacherForm = ({
 
             {/* Personal Information */}
             <span className="text-xs text-gray-400 font-medium -mb-4 mt-2">
-                Personal Information
+                Informații personale
             </span>
 
             <div className="grid grid-cols-2 gap-4">
                 <InputField
-                    label="First Name"
+                    label="Prenume"
                     name="name"
                     defaultValue={data?.name || ""}
                     register={register}
                     error={errors?.name}
                 />
                 <InputField
-                    label="Last Name"
+                    label="Nume"
                     name="surname"
                     defaultValue={data?.surname || ""}
                     register={register}
                     error={errors?.surname}
                 />
                 <InputField
-                    label="Phone"
+                    label="Telefon"
                     name="phone"
                     defaultValue={data?.phone || ""}
                     register={register}
                     error={errors?.phone}
                 />
                 <InputField
-                    label="Address"
+                    label="Adresă"
                     name="address"
                     defaultValue={data?.address}
                     register={register}
                     error={errors?.address}
                 />
-                <InputField
+                {/* <InputField
                     label="Blood Type"
                     name="bloodType"
                     defaultValue={data?.bloodType}
                     register={register}
                     error={errors?.bloodType}
-                />
+                /> */}
                 <InputField
-                    label="Birthday"
+                    label="Data nașterii"
                     name="birthday"
                     type="date"
                     defaultValue={data?.birthday}
@@ -369,16 +369,16 @@ const TeacherForm = ({
                     error={errors?.birthday}
                 />
                 <div className="flex flex-col gap-2">
-                    <label className="text-xs text-gray-400 font-medium">Gender</label>
+                    <label className="text-xs text-gray-400 font-medium">Gen</label>
                     <select
                         className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
                         {...register("gender")}
                         defaultValue={data?.gender || ""}
                     >
-                        <option value="">Select gender</option>
-                        <option value="FEMALE">Female</option>
-                        <option value="MALE">Male</option>
-                        <option value="OTHER">Other</option>
+                        <option value="">Selectează genul</option>
+                        <option value="FEMALE">Femeie</option>
+                        <option value="MALE">Bărbat</option>
+                        <option value="OTHER">Altul</option>
                     </select>
                     {errors.gender?.message && (
                         <p className="text-xs text-red-400">
@@ -395,9 +395,9 @@ const TeacherForm = ({
                         render={({ field }) => (
                             <MultiSelect
                                 id="subjects"
-                                label="Subjects"
+                                label="Materii"
                                 options={subjects}
-                                placeholder="Select subjects..."
+                                placeholder="Selectează materiile"
                                 selectedIds={field.value}
                                 onSelectionChange={(ids) => field.onChange(ids)}
                             />
@@ -412,7 +412,7 @@ const TeacherForm = ({
                     className={`bg-blue-500 transition ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""} text-white px-8 py-2 rounded-md text-sm w-max`}
                     disabled={isSubmitting}
                 >
-                    {type === "create" ? "Create" : "Update"}
+                    {type === "create" ? "Adaugă" : "Actualizează"} profesorul
                 </button>
             </div>
 
