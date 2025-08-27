@@ -1,6 +1,6 @@
 "use server"
 import { auth, clerkClient } from "@clerk/nextjs/server";
-import { AnnouncementSchema, AssignmentSchema, AttendanceActionData, ClassSchema, EventSchema, ExamSchema, LessonSchema, ParentSchema, ResultSchema, StudentSchema, SubjectSchema, TeacherSchema } from "./formValidationSchemas";
+import { CreateAnnouncementSchema, UpdateAnnouncementSchema, AssignmentSchema, AttendanceActionData, ClassSchema, EventSchema, ExamSchema, LessonSchema, ParentSchema, ResultSchema, StudentSchema, SubjectSchema, TeacherSchema } from "./formValidationSchemas";
 import prisma from "./prisma";
 import { TokenData } from "@/lib/utils";
 
@@ -849,7 +849,7 @@ export const deleteEvent = async (currentState: CurrentState, data: FormData) =>
     }
 }
 
-export const createAnnouncement = async (currentState: CurrentState, data: AnnouncementSchema) => {
+export const createAnnouncement = async (currentState: CurrentState, data: CreateAnnouncementSchema) => {
     const { userId, sessionClaims } = await auth();
     let tokenData;
     if (sessionClaims !== null) {
@@ -890,7 +890,7 @@ export const createAnnouncement = async (currentState: CurrentState, data: Annou
     }
 }
 
-export const updateAnnouncement = async (currentState: CurrentState, data: AnnouncementSchema) => {
+export const updateAnnouncement = async (currentState: CurrentState, data: UpdateAnnouncementSchema) => {
     const { userId, sessionClaims } = await auth();
     let tokenData;
     if (sessionClaims !== null) {

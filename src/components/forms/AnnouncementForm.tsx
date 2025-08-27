@@ -4,13 +4,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import InputField from "../InputField";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { AnnouncementSchema, announcementSchema } from "@/lib/formValidationSchemas";
 import { useFormState } from "react-dom";
 import { createAnnouncement, updateAnnouncement } from "@/lib/actions";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import LoadingPopup from "@/components/LoadingPopup";
 import { useTransition } from "react";
+import { createAnnouncementSchema, updateAnnouncementSchema } from "@/lib/formValidationSchemas";
+import z from "zod";
 
 const AnnouncementForm = ({
     type,
@@ -23,12 +24,16 @@ const AnnouncementForm = ({
     setOpen: Dispatch<SetStateAction<boolean>>;
     relatedData?: any;
 }) => {
+
+    const schema = type === "create" ? createAnnouncementSchema : updateAnnouncementSchema;
+
+    type FormValues = z.infer<typeof schema>;
     const {
         register,
         handleSubmit,
         formState: { errors },
-    } = useForm<AnnouncementSchema>({
-        resolver: zodResolver(announcementSchema),
+    } = useForm<FormValues>({
+        resolver: zodResolver(schema),
     });
 
     const [state, formAction] = useFormState(type === "create"
@@ -42,7 +47,7 @@ const AnnouncementForm = ({
             setIsSubmitting(true);
             const formattedData = {
                 ...data,
-                date: new Date(data.date)
+                date: data.date ? new Date(data.date) : new Date(),
             };
             formAction(formattedData);
         });
@@ -96,7 +101,7 @@ const AnnouncementForm = ({
                 <InputField
                     label="Data"
                     name="date"
-                    defaultValue={data?.date ? new Date(data.date).toISOString().split('T')[0] : undefined}
+                    defaultValue={data?.date ? new Date(data?.date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]}
                     register={register}
                     error={errors?.date}
                     type="date"

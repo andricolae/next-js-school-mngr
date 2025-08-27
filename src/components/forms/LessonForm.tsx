@@ -209,8 +209,11 @@ const LessonForm = ({
     const [filteredSubjects, setFilteredSubjects] = useState(subjects || []);
     const [filteredClasses, setFilteredClasses] = useState(classes || []);
     const [filteredTeachers, setFilteredTeachers] = useState(teachers || []);
+    const [selectedTeacher, setSelectedTeacher] = useState<string>(data?.teacherId || data?.teacher?.id || "");
+    const [selectedSubject, setSelectedSubject] = useState<number | "">(data?.subjectId || data?.subject?.id || "");
 
-    const updateSelect = async (selectedOption: "subjects" | "teachers", teacherIdOrSubjectName: string) => {
+    const updateSelect = async (selectedOption: "subjects" | "teachers", teacherIdOrSubjectName: string, id: any) => {
+        console.log(id);
         startTransition(async () => {
             if (selectedOption === "subjects") {
                 const newTeachers = teachers?.filter((t: any) => t.subjects?.some((sub: any) => sub.name === teacherIdOrSubjectName));
@@ -274,8 +277,10 @@ const LessonForm = ({
                                 onChange={(e) => {
                                     const selectedId = e.target.value;
                                     const teacher = filteredTeachers?.find((s: any) => s.id === selectedId);
+                                    const selectedSubject = document.querySelector<HTMLSelectElement>('select[name="subjectId"]');
+                                    setSelectedTeacher(selectedId);
                                     if (teacher) {
-                                        updateSelect("teachers", teacher.id);
+                                        updateSelect("teachers", teacher.id, selectedSubject);
                                     }
                                 }}
                             >
@@ -356,8 +361,10 @@ const LessonForm = ({
                                 onChange={(e) => {
                                     const selectedId = Number(e.target.value);
                                     const subject = filteredSubjects?.find((s: any) => s.id === selectedId);
+                                    const selectedTeacher = document.querySelector<HTMLSelectElement>('select[name="teacherId"]');
+                                    setSelectedSubject(subject.id);
                                     if (subject) {
-                                        updateSelect("subjects", subject.name);
+                                        updateSelect("subjects", subject.name, selectedTeacher);
                                     }
                                 }}
                             >
