@@ -73,13 +73,20 @@ const LessonForm = ({
         register,
         handleSubmit,
         formState: { errors },
+        setValue,
+        watch,
     } = useForm<LessonSchema>({
         resolver: zodResolver(lessonSchema),
         defaultValues: {
             startTime: data?.startTime ? new Date(data.startTime) : undefined,
             endTime: data?.endTime ? new Date(data.endTime) : undefined,
+            isRecurring: false,
         }
     });
+
+    useEffect(() => {
+        setValue("isRecurring", isRecurring);
+    }, [isRecurring, setValue]);
 
     const [state, formAction] = useFormState(
         type === "create" ? createLesson : updateLesson,
@@ -152,6 +159,7 @@ const LessonForm = ({
                         subjectId: lessonData.subjectId,
                         classId: lessonData.classId,
                         teacherId: lessonData.teacherId,
+                        isRecurring: false,
                     });
                 }
             }

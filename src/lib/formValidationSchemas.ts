@@ -250,7 +250,7 @@ export type AnnouncementSchema = z.infer<typeof announcementSchema>;
 export const lessonSchema = z.object({
     id: z.coerce.number().optional(),
     name: z.string().min(1, { message: "Titlul orei este obligatoriu!" }),
-    day: z.enum(["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY"], { message: "Ziua este obligtorie!" }),
+    day: z.enum(["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", ""]).optional(),
     startTime: z.coerce.date({ message: "Data și ora de început sunt obligatorii!" }).refine(
         (val) => {
             const hour = val.getHours();
@@ -276,7 +276,22 @@ export const lessonSchema = z.object({
     subjectId: z.coerce.number({ message: "Materia este obligatorie!" }),
     classId: z.coerce.number({ message: "Clasa este obligatorie!" }),
     teacherId: z.string().min(1, { message: "Profesorul este obligatoriu!" }),
-});
+    isRecurring: z.boolean(),
+}).refine(
+    (data) => {
+        if (!data.isRecurring) {
+            return (
+                data.startTime.getFullYear() === data.endTime.getFullYear() &&
+                data.startTime.getMonth() === data.endTime.getMonth() &&
+                data.startTime.getDate() === data.endTime.getDate()
+            );
+        }
+        return true;
+    },
+    {
+        message: "Pentru o lecție singulară, începutul și sfârșitul trebuie să fie în aceeași zi",
+        path: ["endTime"],
+    });
 
 export type LessonSchema = z.infer<typeof lessonSchema>;
 
