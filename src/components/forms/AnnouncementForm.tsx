@@ -31,7 +31,7 @@ const AnnouncementForm = ({
     const {
         register,
         handleSubmit,
-        formState: { errors },
+        formState: { errors, touchedFields, isSubmitted },
     } = useForm<FormValues>({
         resolver: zodResolver(schema),
     });
