@@ -11,6 +11,8 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import LoadingPopup from "@/components/LoadingPopup";
 import { useTransition } from "react";
+import { availableModules } from "@/lib/modules";
+import { nationalHolidays } from "@/lib/holidays";
 
 type ModuleType = {
     id: number;
@@ -19,11 +21,11 @@ type ModuleType = {
     endDate: string;
 };
 
-const holidays = [
-    { name: "National Day Test1", date: "2025-07-01" },
-    { name: "National Day Test2", date: "2025-07-15" },
-    { name: "National Day Test3", date: "2025-07-21" },
-];
+// const holidays = [
+//     { name: "National Day Test1", date: "2025-07-01" },
+//     { name: "National Day Test2", date: "2025-07-15" },
+//     { name: "National Day Test3", date: "2025-07-21" },
+// ];
 
 const LessonForm = ({
     type,
@@ -41,26 +43,26 @@ const LessonForm = ({
     };
 }) => {
 
-    const availableModules: ModuleType[] = [
-        {
-            id: 1,
-            name: "Semester 1",
-            startDate: "2025-07-01",
-            endDate: "2025-07-31"
-        },
-        {
-            id: 2,
-            name: "Semester 2 ",
-            startDate: "2025-08-01",
-            endDate: "2025-08-31"
-        },
-        {
-            id: 3,
-            name: "Semester 3",
-            startDate: "2025-09-01",
-            endDate: "2025-09-30"
-        }
-    ];
+    // const availableModules: ModuleType[] = [
+    //     {
+    //         id: 1,
+    //         name: "Semester 1",
+    //         startDate: "2025-07-01",
+    //         endDate: "2025-07-31"
+    //     },
+    //     {
+    //         id: 2,
+    //         name: "Semester 2 ",
+    //         startDate: "2025-08-01",
+    //         endDate: "2025-08-31"
+    //     },
+    //     {
+    //         id: 3,
+    //         name: "Semester 3",
+    //         startDate: "2025-09-01",
+    //         endDate: "2025-09-30"
+    //     }
+    // ];
 
     const [isRecurring, setIsRecurring] = useState(false);
     const [selectedModuleId, setSelectedModuleId] = useState<number | null>(null);
@@ -98,7 +100,7 @@ const LessonForm = ({
     };
 
     const isHoliday = (date: Date): boolean => {
-        return holidays.some(holiday => {
+        return nationalHolidays.some(holiday => {
             const holidayDate = new Date(holiday.date);
             return date.getFullYear() === holidayDate.getFullYear() &&
                 date.getMonth() === holidayDate.getMonth() &&

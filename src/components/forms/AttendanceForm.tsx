@@ -26,7 +26,7 @@ const AttendanceForm = ({
     const {
         register,
         handleSubmit,
-        formState: { errors },
+        formState: { errors, touchedFields, isSubmitted },
     } = useForm<AttendanceFormData>({
         resolver: zodResolver(attendanceSchema),
     });
@@ -79,6 +79,17 @@ const AttendanceForm = ({
         }
     };
 
+    const getDateError = (field: "date") => {
+        const err = errors[field];
+        if (isSubmitted && !touchedFields[field] && !err) {
+            return "Data este obligatorie!";
+        }
+        if (err?.message === "Invalid date") {
+            return "Data este obligatorie!";
+        }
+        return err?.message;
+    };
+
     return (
 
         <form
@@ -95,7 +106,7 @@ const AttendanceForm = ({
                     type="date"
                     defaultValue={data?.date ? new Date(data.date).toISOString().split('T')[0] : undefined}
                     register={register}
-                    error={errors?.date}
+                    error={getDateError("date")}
                 />
 
                 <div className="flex flex-col gap-4 w-full">

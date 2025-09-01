@@ -26,7 +26,7 @@ const AssignmentForm = ({
     const {
         register,
         handleSubmit,
-        formState: { errors },
+        formState: { errors, touchedFields, isSubmitted },
     } = useForm<AssignmentSchema>({
         resolver: zodResolver(assignmentSchema),
     });
@@ -64,6 +64,21 @@ const AssignmentForm = ({
         }
     }, [state, router, type, setOpen]);
 
+    const getDateError = (field: "startDate" | "dueDate") => {
+        const err = errors[field];
+        if (isSubmitted && !touchedFields[field] && !err) {
+            return field === "startDate"
+                ? "Data de început este obligatorie!"
+                : "Data limită este obligatorie!";
+        }
+        if (err?.message === "Invalid date") {
+            return field === "startDate"
+                ? "Data de început este obligatorie!!"
+                : "Data limită este obligatorie!!";
+        }
+        return err?.message;
+    };
+
     const { lessons } = relatedData;
 
     return (
@@ -90,7 +105,7 @@ const AssignmentForm = ({
                     name="startDate"
                     defaultValue={data?.startDate ? new Date(data.startDate).toISOString().split('T')[0] : undefined}
                     register={register}
-                    error={errors?.startDate}
+                    error={getDateError("startDate")}
                     type="date"
                 />
                 <InputField
@@ -98,7 +113,7 @@ const AssignmentForm = ({
                     name="dueDate"
                     defaultValue={data?.dueDate ? new Date(data.dueDate).toISOString().split('T')[0] : undefined}
                     register={register}
-                    error={errors?.dueDate}
+                    error={getDateError("dueDate")}
                     type="date"
                 />
                 {data && (

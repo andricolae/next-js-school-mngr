@@ -144,8 +144,15 @@ export const examSchema = z
             .string()
             .min(1, { message: 'Denumirea materiei este obligatorie!' }),
         startTime: z
-            .coerce.date({ message: "Data și ora de început sunt obligatorii!" }),
-        endTime: z.coerce.date({ message: "Data și ora de sfârșit sunt obligatorii!" }),
+            .coerce.date()
+            .refine((date) => !isNaN(date.getTime()), {
+                message: "Data și ora de început sunt obligatorii!",
+            }),
+        endTime: z
+            .coerce.date()
+            .refine((date) => !isNaN(date.getTime()), {
+                message: "Data și ora de sfârșit sunt obligatorii!",
+            }),
         lessonId: z.coerce.number({ message: "Ora asociată este obligatorie!" }),
     })
     .refine((data) => data.endTime > data.startTime, {

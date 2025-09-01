@@ -28,7 +28,7 @@ const StudentForm = ({
     const {
         register,
         handleSubmit,
-        formState: { errors },
+        formState: { errors, isSubmitted, touchedFields },
     } = useForm<StudentSchema>({
         resolver: zodResolver(studentSchema(type === "update")),
     });
@@ -74,6 +74,17 @@ const StudentForm = ({
     };
 
     let openUploadWidget: () => void = () => { };
+
+    const getDateError = (field: "birthday") => {
+        const err = errors[field];
+        if (isSubmitted && !touchedFields[field] && !err) {
+            return "Data nașterii este obligatorie!";
+        }
+        if (err?.message === "Invalid date") {
+            return "Data nașterii este obligatorie!";
+        }
+        return err?.message;
+    };
 
     return (
         <form className="flex flex-col gap-1" onSubmit={onSubmit}>
@@ -189,7 +200,7 @@ const StudentForm = ({
                         data?.birthday ? data.birthday.toISOString().split("T")[0] : ""
                     }
                     register={register}
-                    error={errors?.birthday}
+                    error={getDateError("birthday")}
 
                 />
                 <div className="flex flex-col gap-2">
