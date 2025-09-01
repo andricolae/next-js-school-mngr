@@ -1445,52 +1445,6 @@ export const deleteSelectedLessons = async (currentState: CurrentState, formData
     }
 }
 
-export const teacherClasses = async (teacherId: string) => {
-    const newClasses = await prisma.class.findMany({
-        where: {
-            lessons: {
-                some: {
-                    teacherId: teacherId,
-                },
-            },
-        },
-        select: {
-            id: true,
-            name: true,
-            grade: {
-                select: {
-                    level: true,
-                },
-            },
-        },
-    });
-    return newClasses;
-}
-
-export const classesOfSubject = async (subjectName: string) => {
-    const newClasses = await prisma.class.findMany({
-        where: {
-            lessons: {
-                some: {
-                    subject: {
-                        name: subjectName,
-                    },
-                },
-            },
-        },
-        select: {
-            id: true,
-            name: true,
-            grade: {
-                select: {
-                    level: true,
-                },
-            },
-        },
-    });
-    return newClasses;
-}
-
 export const studentsAssignedToAnExam = async (examId: number) => {
     const examStudents = await prisma.student.findMany({
         where: {

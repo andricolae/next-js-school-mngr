@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import InputField from "../InputField";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { lessonSchema, LessonSchema } from "@/lib/formValidationSchemas";
-import { createLesson, updateLesson, createRecurringLessons, classesOfSubject, teacherClasses } from "@/lib/actions";
+import { createLesson, updateLesson, createRecurringLessons } from "@/lib/actions";
 import { useFormState } from "react-dom";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
@@ -209,22 +209,16 @@ const LessonForm = ({
 
     const { subjects, classes, teachers } = relatedData || {};
     const [filteredSubjects, setFilteredSubjects] = useState(subjects || []);
-    const [filteredClasses, setFilteredClasses] = useState(classes || []);
     const [filteredTeachers, setFilteredTeachers] = useState(teachers || []);
 
-    const updateSelect = async (selectedOption: "subjects" | "teachers", teacherIdOrSubjectName: string, id: any) => {
-        console.log(id);
+    const updateSelect = async (selectedOption: "subjects" | "teachers", teacherIdOrSubjectName: string) => {
         startTransition(async () => {
             if (selectedOption === "subjects") {
                 const newTeachers = teachers?.filter((t: any) => t.subjects?.some((sub: any) => sub.name === teacherIdOrSubjectName));
                 setFilteredTeachers(newTeachers || []);
-                const newClasses = await classesOfSubject(teacherIdOrSubjectName); // subjectName
-                setFilteredClasses(newClasses || []);
             } else if (selectedOption === "teachers") {
                 const newSubjects = teachers?.find((s: any) => String(s.id) === String(teacherIdOrSubjectName))?.subjects;
                 setFilteredSubjects(newSubjects || []);
-                const newClasses = await teacherClasses(teacherIdOrSubjectName); // teacherId
-                setFilteredClasses(newClasses || []);
             }
         });
     };
@@ -277,13 +271,12 @@ const LessonForm = ({
                                 onChange={(e) => {
                                     const selectedId = e.target.value;
                                     const teacher = filteredTeachers?.find((s: any) => s.id === selectedId);
-                                    const selectedSubject = document.querySelector<HTMLSelectElement>('select[name="subjectId"]');
                                     if (teacher) {
-                                        updateSelect("teachers", teacher.id, selectedSubject);
+                                        updateSelect("teachers", teacher.id);
                                     }
                                 }}
                             >
-                                <option value="">Alege un profesor</option>
+                                <option value="abc">Alege un profesor</option>
                                 {filteredTeachers?.map(
                                     (teacher: { id: string; name: string; surname: string }) => (
                                         <option value={teacher.id} key={teacher.id}>
@@ -306,8 +299,8 @@ const LessonForm = ({
                                 defaultValue={data?.classId || data?.class?.id || ""}
                                 {...register("classId")}
                             >
-                                <option value="abc">Select class</option>
-                                {filteredClasses?.map(
+                                <option value="abc">Alege o clasa</option>
+                                {classes?.map(
                                     (classItem: { id: number; name: string; grade: { level: number } }) => (
                                         <option value={classItem.id} key={classItem.id}>
                                             {classItem.name} - Grade {classItem.grade.level}
@@ -360,13 +353,12 @@ const LessonForm = ({
                                 onChange={(e) => {
                                     const selectedId = Number(e.target.value);
                                     const subject = filteredSubjects?.find((s: any) => s.id === selectedId);
-                                    const selectedTeacher = document.querySelector<HTMLSelectElement>('select[name="teacherId"]');
                                     if (subject) {
-                                        updateSelect("subjects", subject.name, selectedTeacher);
+                                        updateSelect("subjects", subject.name);
                                     }
                                 }}
                             >
-                                <option value="abc">Select subject</option>
+                                <option value="abc">Alege o materie</option>
                                 {filteredSubjects?.map(
                                     (subject: { id: number; name: string }) => (
                                         <option value={subject.id} key={subject.id}>
