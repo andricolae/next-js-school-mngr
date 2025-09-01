@@ -9,7 +9,10 @@ import { createLesson, updateLesson, createRecurringLessons } from "@/lib/action
 import { useFormState } from "react-dom";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
-
+import LoadingPopup from "@/components/LoadingPopup";
+import { useTransition } from "react";
+import { availableModules } from "@/lib/modules";
+import { nationalHolidays } from "@/lib/holidays";
 
 type ModuleType = {
     id: number;
@@ -18,12 +21,11 @@ type ModuleType = {
     endDate: string;
 };
 
-
-const holidays = [
-    { name: "National Day Test1", date: "2025-07-01" },
-    { name: "National Day Test2", date: "2025-07-15" },
-    { name: "National Day Test3", date: "2025-07-21" },
-];
+// const holidays = [
+//     { name: "National Day Test1", date: "2025-07-01" },
+//     { name: "National Day Test2", date: "2025-07-15" },
+//     { name: "National Day Test3", date: "2025-07-21" },
+// ];
 
 const LessonForm = ({
     type,
@@ -41,30 +43,31 @@ const LessonForm = ({
     };
 }) => {
 
-    const availableModules: ModuleType[] = [
-        {
-            id: 1,
-            name: "Semester 1",
-            startDate: "2025-07-01",
-            endDate: "2025-07-31"
-        },
-        {
-            id: 2,
-            name: "Semester 2 ",
-            startDate: "2025-08-01",
-            endDate: "2025-08-31"
-        },
-        {
-            id: 3,
-            name: "Semester 3",
-            startDate: "2025-09-01",
-            endDate: "2025-09-30"
-        }
-    ];
+    // const availableModules: ModuleType[] = [
+    //     {
+    //         id: 1,
+    //         name: "Semester 1",
+    //         startDate: "2025-07-01",
+    //         endDate: "2025-07-31"
+    //     },
+    //     {
+    //         id: 2,
+    //         name: "Semester 2 ",
+    //         startDate: "2025-08-01",
+    //         endDate: "2025-08-31"
+    //     },
+    //     {
+    //         id: 3,
+    //         name: "Semester 3",
+    //         startDate: "2025-09-01",
+    //         endDate: "2025-09-30"
+    //     }
+    // ];
 
     const [isRecurring, setIsRecurring] = useState(false);
     const [selectedModuleId, setSelectedModuleId] = useState<number | null>(null);
     const [isCreatingRecurring, setIsCreatingRecurring] = useState(false);
+    const [isPending, startTransition] = useTransition();
 
     const {
         register,
@@ -85,7 +88,6 @@ const LessonForm = ({
 
     const router = useRouter();
 
-
     const getDayOfWeek = (dayString: LessonSchema['day']): number => {
         switch (dayString) {
             case "MONDAY": return 1;
@@ -97,16 +99,14 @@ const LessonForm = ({
         }
     };
 
-
     const isHoliday = (date: Date): boolean => {
-        return holidays.some(holiday => {
+        return nationalHolidays.some(holiday => {
             const holidayDate = new Date(holiday.date);
             return date.getFullYear() === holidayDate.getFullYear() &&
                 date.getMonth() === holidayDate.getMonth() &&
                 date.getDate() === holidayDate.getDate();
         });
     };
-
 
     const generateRecurringLessons = async (lessonData: LessonSchema, moduleId: number) => {
         const selectedModule = availableModules.find(mod => mod.id === moduleId);
@@ -131,13 +131,11 @@ const LessonForm = ({
                 if (!isHoliday(currentDate)) {
                     const lessonDate = new Date(currentDate);
 
-
                     lessonDate.setHours(baseStartTime.getHours());
                     lessonDate.setMinutes(baseStartTime.getMinutes());
                     lessonDate.setSeconds(0);
                     lessonDate.setMilliseconds(0);
                     const newLessonStartTime = new Date(lessonDate);
-
 
                     lessonDate.setHours(baseEndTime.getHours());
                     lessonDate.setMinutes(baseEndTime.getMinutes());
@@ -163,67 +161,79 @@ const LessonForm = ({
         const result = await createRecurringLessons(lessonsToCreate);
 
         if (result.success) {
-
             return { total: lessonsToCreate.length, success: result.successCount || 0 };
         } else {
-
             console.error("Error from createRecurringLessons action:", result.message || "Unknown error");
             return { total: lessonsToCreate.length, success: 0 };
         }
-
     };
 
     const onSubmit = handleSubmit(async (formData) => {
-        if (isRecurring && selectedModuleId) {
-            setIsCreatingRecurring(true);
-            try {
-                const result = await generateRecurringLessons(formData, selectedModuleId);
-                if (result && result.success > 0) {
-                    toast.success(`Successfully created ${result.success} out of ${result.total} recurring lessons!`);
-                    setOpen(false);
-                    router.refresh();
-                } else {
-                    toast.error("Error creating recurring lessons!");
+        startTransition(async () => {
+            if (isRecurring && selectedModuleId) {
+                setIsCreatingRecurring(true);
+                try {
+                    const result = await generateRecurringLessons(formData, selectedModuleId);
+                    if (result && result.success > 0) {
+                        toast.success(`Au fost create cu succes ${result.success} din ${result.total} ore recurente!`);
+                        setOpen(false);
+                        router.refresh();
+                    } else {
+                        toast.error("A intervenit o eroare la crearea orelor recurente. Încearcă mai târziu.");
+                    }
+                } catch (error) {
+                    console.error("A intervenit o eroare la generarea orelor recurente:", error);
+                    toast.error("A intervenit o eroare la crearea orelor recurente. Încearcă mai târziu.");
+                } finally {
+                    setIsCreatingRecurring(false);
                 }
-            } catch (error) {
-                console.error("Error generating recurring lessons:", error);
-                toast.error("Error creating recurring lessons!");
-            } finally {
-                setIsCreatingRecurring(false);
+            } else {
+                const submissionData = {
+                    ...formData,
+                    ...(type === "update" && data?.id && { id: data.id }),
+                    startTime: new Date(new Date(formData.startTime).getTime() + (3 * 60 * 60 * 1000)),
+                    endTime: new Date(new Date(formData.endTime).getTime() + (3 * 60 * 60 * 1000)),
+                };
+                formAction(submissionData);
             }
-        } else {
-
-            const submissionData = {
-                ...formData,
-                ...(type === "update" && data?.id && { id: data.id }),
-                startTime: new Date(new Date(formData.startTime).getTime() + (3 * 60 * 60 * 1000)),
-                endTime: new Date(new Date(formData.endTime).getTime() + (3 * 60 * 60 * 1000)),
-            };
-            formAction(submissionData);
-        }
+        });
     });
 
     useEffect(() => {
         if (state.success && !isRecurring) {
-            toast(`Lesson has been ${type === "create" ? "created" : "updated"} successfully!`);
+            toast(`Oră ${type === "create" ? "creată" : "actualizată"} cu succes!`);
             setOpen(false);
             router.refresh();
         }
     }, [state, router, type, setOpen, isRecurring]);
 
     const { subjects, classes, teachers } = relatedData || {};
+    const [filteredSubjects, setFilteredSubjects] = useState(subjects || []);
+    const [filteredTeachers, setFilteredTeachers] = useState(teachers || []);
+
+    const updateSelect = async (selectedOption: "subjects" | "teachers", teacherIdOrSubjectName: string) => {
+        startTransition(async () => {
+            if (selectedOption === "subjects") {
+                const newTeachers = teachers?.filter((t: any) => t.subjects?.some((sub: any) => sub.name === teacherIdOrSubjectName));
+                setFilteredTeachers(newTeachers || []);
+            } else if (selectedOption === "teachers") {
+                const newSubjects = teachers?.find((s: any) => String(s.id) === String(teacherIdOrSubjectName))?.subjects;
+                setFilteredSubjects(newSubjects || []);
+            }
+        });
+    };
 
     return (
         <form className="flex flex-col gap-6" onSubmit={onSubmit}>
             <h1 className="text-xl font-semibold">
-                {type === "create" ? "Create a new lesson" : "Update the lesson"}
+                {type === "create" ? "Adaugă o nouă oră" : "Actualizează ora"}
             </h1>
             <div className="h-fit w-full">
                 <div className="w-full flex">
                     <div className="flex flex-col flex-1 mx-1 mt-7 gap-4">
                         <div className="mt-1">
                             <InputField
-                                label="Lesson Name"
+                                label="Denumire oră"
                                 name="name"
                                 defaultValue={data?.name}
                                 register={register}
@@ -232,18 +242,18 @@ const LessonForm = ({
                         </div>
 
                         <div className="flex flex-col gap-2 w-full mt-4">
-                            <label className="text-xs text-gray-400">Day</label>
+                            <label className="text-xs text-gray-400">Ziua</label>
                             <select
                                 className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
                                 defaultValue={data?.day || ""}
                                 {...register("day")}
                             >
-                                <option value="">Select day</option>
-                                <option value="MONDAY">Monday</option>
-                                <option value="TUESDAY">Tuesday</option>
-                                <option value="WEDNESDAY">Wednesday</option>
-                                <option value="THURSDAY">Thursday</option>
-                                <option value="FRIDAY">Friday</option>
+                                <option value="">Alege o zi</option>
+                                <option value="MONDAY">Luni</option>
+                                <option value="TUESDAY">Marți</option>
+                                <option value="WEDNESDAY">Miercuri</option>
+                                <option value="THURSDAY">Joi</option>
+                                <option value="FRIDAY">Vineri</option>
                             </select>
                             {errors.day?.message && (
                                 <p className="text-xs text-red-400">
@@ -253,14 +263,21 @@ const LessonForm = ({
                         </div>
 
                         <div className="flex flex-col gap-2 w-full mt-3">
-                            <label className="text-xs text-gray-400">Teacher</label>
+                            <label className="text-xs text-gray-400">Profesor</label>
                             <select
                                 className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
                                 defaultValue={data?.teacherId || data?.teacher?.id || ""}
                                 {...register("teacherId")}
+                                onChange={(e) => {
+                                    const selectedId = e.target.value;
+                                    const teacher = filteredTeachers?.find((s: any) => s.id === selectedId);
+                                    if (teacher) {
+                                        updateSelect("teachers", teacher.id);
+                                    }
+                                }}
                             >
-                                <option value="">Select teacher</option>
-                                {teachers?.map(
+                                <option value="abc">Alege un profesor</option>
+                                {filteredTeachers?.map(
                                     (teacher: { id: string; name: string; surname: string }) => (
                                         <option value={teacher.id} key={teacher.id}>
                                             {teacher.name} {teacher.surname}
@@ -276,13 +293,13 @@ const LessonForm = ({
                         </div>
 
                         <div className="flex flex-col gap-2 w-full mt-4">
-                            <label className="text-xs text-gray-400">Class</label>
+                            <label className="text-xs text-gray-400">Clasa</label>
                             <select
                                 className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
                                 defaultValue={data?.classId || data?.class?.id || ""}
                                 {...register("classId")}
                             >
-                                <option value="abc">Select class</option>
+                                <option value="abc">Alege o clasa</option>
                                 {classes?.map(
                                     (classItem: { id: number; name: string; grade: { level: number } }) => (
                                         <option value={classItem.id} key={classItem.id}>
@@ -302,7 +319,7 @@ const LessonForm = ({
                     <div className="flex flex-col flex-1 mx-1 mt-7 gap-4">
                         <div className="mt-1">
                             <InputField
-                                label="Start Time"
+                                label="Începutul orei"
                                 name="startTime"
                                 defaultValue={data?.startTime ?
                                     new Date(data.startTime).toISOString().slice(0, 16) :
@@ -315,7 +332,7 @@ const LessonForm = ({
                         </div>
                         <div className="mt-1">
                             <InputField
-                                label="End Time"
+                                label="Sfârșitul orei"
                                 name="endTime"
                                 defaultValue={data?.endTime ?
                                     new Date(data.endTime).toISOString().slice(0, 16) :
@@ -328,14 +345,21 @@ const LessonForm = ({
                         </div>
 
                         <div className="flex flex-col gap-2 w-full mt-3">
-                            <label className="text-xs text-gray-400">Subject</label>
+                            <label className="text-xs text-gray-400">Materie</label>
                             <select
                                 className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
                                 defaultValue={data?.subjectId || data?.subject?.id || ""}
                                 {...register("subjectId")}
+                                onChange={(e) => {
+                                    const selectedId = Number(e.target.value);
+                                    const subject = filteredSubjects?.find((s: any) => s.id === selectedId);
+                                    if (subject) {
+                                        updateSelect("subjects", subject.name);
+                                    }
+                                }}
                             >
-                                <option value="abc">Select subject</option>
-                                {subjects?.map(
+                                <option value="abc">Alege o materie</option>
+                                {filteredSubjects?.map(
                                     (subject: { id: number; name: string }) => (
                                         <option value={subject.id} key={subject.id}>
                                             {subject.name}
@@ -361,21 +385,21 @@ const LessonForm = ({
                                         className="w-4 h-4"
                                     />
                                     <label htmlFor="isRecurring" className="text-sm font-medium">
-                                        Create recurring lessons
+                                        Crează ore recurente
                                     </label>
                                 </div>
 
                                 {isRecurring && (
                                     <div className="flex flex-col gap-2">
                                         <label className="text-xs text-gray-400">
-                                            Select module for recurring lessons
+                                            Selectează modulul pentru care vrei să creezi orele recurente
                                         </label>
                                         <select
                                             className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
                                             value={selectedModuleId || ""}
                                             onChange={(e) => setSelectedModuleId(Number(e.target.value) || null)}
                                         >
-                                            <option value="">Select module</option>
+                                            <option value="">Alege modulul</option>
                                             {availableModules.map((module) => (
                                                 <option key={module.id} value={module.id}>
                                                     {module.name}
@@ -384,9 +408,9 @@ const LessonForm = ({
                                         </select>
                                         {selectedModuleId && (
                                             <div className="3 p-2 bg-blue-50 rounded text-xs">
-                                                <p><strong>Selected Module:</strong> {availableModules.find(m => m.id === selectedModuleId)?.name}</p>
-                                                <p><strong>Period:</strong> {availableModules.find(m => m.id === selectedModuleId)?.startDate} - {availableModules.find(m => m.id === selectedModuleId)?.endDate}</p>
-                                                <p><strong>Note:</strong> Lessons will be created for each selected day within this period, excluding holidays.</p>
+                                                <p><strong>Modul selectat:</strong> {availableModules.find(m => m.id === selectedModuleId)?.name}</p>
+                                                <p><strong>Perioada:</strong> {availableModules.find(m => m.id === selectedModuleId)?.startDate} - {availableModules.find(m => m.id === selectedModuleId)?.endDate}</p>
+                                                <p><strong>Important:</strong> Lecțiile vor fi create pentru fiecare zi selectată din intervalul ales, exceptând zilele libere naționale!</p>
                                             </div>
                                         )}
                                     </div>
@@ -396,21 +420,22 @@ const LessonForm = ({
                     </div>
                 </div>
 
-                <div className="w-full h-fit flex items-center justify-center mt-12">
-                    {state.error && <span className="text-red-500">Something went wrong!</span>}
+                <div className="w-full h-fit flex flex-col items-center justify-center mt-12 mb-8">
+                    {state.error && <span className="text-red-500">Ceva nu a funcționat. Încearcă mai târziu.</span>}
 
                     <button
                         type="submit"
                         disabled={isCreatingRecurring}
                         className="bg-blue-500 text-white py-2 px-8 rounded-md disabled:bg-gray-400 w-fit"
                     >
-                        {isCreatingRecurring ? "Creating lessons..." :
+                        {isCreatingRecurring ? "Creez orele..." :
                             type === "create" ?
-                                (isRecurring ? "Create recurring lessons" : "Create") :
-                                "Update"}
+                                (isRecurring ? "Adaugă ore recurente" : "Adaugă ora") :
+                                "Actualizează ora"}
                     </button>
                 </div>
             </div>
+            {isPending && <LoadingPopup />}
         </form>
     );
 };

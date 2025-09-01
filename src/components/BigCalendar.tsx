@@ -3,8 +3,10 @@
 import { Calendar, momentLocalizer, View, Views } from 'react-big-calendar'
 import moment from 'moment'
 import "react-big-calendar/lib/css/react-big-calendar.css"
+import 'moment/locale/ro';
 import { useEffect, useState } from 'react';
 
+moment.locale("ro");
 const localizer = momentLocalizer(moment)
 
 const BigCalendar = ({
@@ -46,7 +48,7 @@ const BigCalendar = ({
             style={{ height: "98%" }}
             onView={handleOnChangeView}
             min={new Date(2025, 1, 1, 8, 0, 0)}
-            max={new Date(2025, 1, 1, 17, 0, 0)}
+            max={new Date(2025, 1, 1, 19, 0, 0)}
         />
     );
 }

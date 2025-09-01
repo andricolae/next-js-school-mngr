@@ -11,6 +11,8 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { useFormState } from "react-dom";
 import { CldUploadWidget } from "next-cloudinary";
+import LoadingPopup from "@/components/LoadingPopup";
+import { useTransition } from "react";
 
 const StudentForm = ({
     type,
@@ -26,9 +28,9 @@ const StudentForm = ({
     const {
         register,
         handleSubmit,
-        formState: { errors },
+        formState: { errors, isSubmitted, touchedFields },
     } = useForm<StudentSchema>({
-        resolver: zodResolver(studentSchema),
+        resolver: zodResolver(studentSchema(type === "update")),
     });
 
     const [img, setImg] = useState<any>();
@@ -41,21 +43,28 @@ const StudentForm = ({
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const onSubmit = handleSubmit((data) => {
-        formAction({ ...data, img: img?.secure_url });
-        setIsSubmitting(true);
+        startTransition(() => {
+            formAction({ ...data, img: img?.secure_url });
+            setIsSubmitting(true);
+        });
     });
+
+    const [isPending, startTransition] = useTransition();
 
     const router = useRouter();
 
     useEffect(() => {
         if (state.success) {
             toast(
-                `Student has been ${type === "create" ? "created" : "updated"} successfully!`
+                `Elev ${type === "create" ? "adăugat" : "actualizat"} cu succes!`
             );
             setOpen(false);
             router.refresh();
+        } else if (state.error) {
+            const errorMessage = state.message || "Ceva nu a funcționat. Încearcă mai târziu.";
+            toast.error(errorMessage);
+            setIsSubmitting(false);
         }
-        else setIsSubmitting(false);
     }, [state, router, type, setOpen]);
 
     const { grades, classes, parents } = relatedData || {
@@ -66,20 +75,31 @@ const StudentForm = ({
 
     let openUploadWidget: () => void = () => { };
 
+    const getDateError = (field: "birthday") => {
+        const err = errors[field];
+        if (isSubmitted && !touchedFields[field] && !err) {
+            return "Data nașterii este obligatorie!";
+        }
+        if (err?.message === "Invalid date") {
+            return "Data nașterii este obligatorie!";
+        }
+        return err?.message;
+    };
+
     return (
         <form className="flex flex-col gap-1" onSubmit={onSubmit}>
             <h1 className="text-xl font-semibold">
-                {type === "create" ? "Create a new student" : "Update the student"}
+                {type === "create" ? "Adaugă un nou elev" : "Actualizează elevul"}
             </h1>
 
             {/* --- Authentication Information --- */}
             <span className="text-xs text-gray-400 font-medium mb-3 mt-5">
-                Authentication Information
+                Informații de autentificare
             </span>
 
             <div className="grid grid-cols-2 gap-4">
                 <InputField
-                    label="Username"
+                    label="Nume de utilizator"
                     name="username"
                     defaultValue={data?.username}
                     register={register}
@@ -94,7 +114,7 @@ const StudentForm = ({
                     error={errors?.email}
                 />
                 <InputField
-                    label="Password"
+                    label="Parolă"
                     name="password"
                     type="password"
                     defaultValue={data?.password}
@@ -106,7 +126,7 @@ const StudentForm = ({
                     onClick={() => openUploadWidget()}
                 >
                     <label className="text-sm font-medium text-gray-700 cursor-pointer select-none">
-                        Upload a Photo
+                        Încarcă o imagine
                     </label>
                     <div className="flex items-center gap-2">
                         <Image
@@ -125,7 +145,7 @@ const StudentForm = ({
                                 className="rounded-full object-cover relative top-[2px]"
                             />
                         ) : (
-                            <span className="text-xs text-gray-500">Click to upload</span>
+                            <span className="text-xs text-gray-500">Click pentru a încărca</span>
                         )}
                     </div>
                 </div>
@@ -133,67 +153,67 @@ const StudentForm = ({
 
             {/* --- Personal Information --- */}
             <span className="text-xs text-gray-400 font-medium mb-3 mt-5">
-                Personal Information
+                Informații personale
             </span>
 
             <div className="grid grid-cols-2 gap-4">
                 <InputField
-                    label="First Name"
+                    label="Prenume"
                     name="name"
                     defaultValue={data?.name || ""}
                     register={register}
                     error={errors?.name}
                 />
                 <InputField
-                    label="Last Name"
+                    label="Nume"
                     name="surname"
                     defaultValue={data?.surname || ""}
                     register={register}
                     error={errors?.surname}
                 />
                 <InputField
-                    label="Phone"
+                    label="Telefon"
                     name="phone"
                     defaultValue={data?.phone || ""}
                     register={register}
                     error={errors?.phone}
                 />
-                <InputField
+                {/* <InputField
                     label="Blood Type"
                     name="bloodType"
                     defaultValue={data?.bloodType}
                     register={register}
                     error={errors?.bloodType}
-                />
+                /> */}
                 <InputField
-                    label="Address"
+                    label="Adresă"
                     name="address"
                     defaultValue={data?.address || ""}
                     register={register}
                     error={errors?.address}
                 />
                 <InputField
-                    label="Birthday"
+                    label="Data nașterii"
                     name="birthday"
                     type="date"
                     defaultValue={
                         data?.birthday ? data.birthday.toISOString().split("T")[0] : ""
                     }
                     register={register}
-                    error={errors?.birthday}
+                    error={getDateError("birthday")}
 
                 />
                 <div className="flex flex-col gap-2">
-                    <label className="text-xs text-gray-400 font-medium">Gender</label>
+                    <label className="text-xs text-gray-400 font-medium">Gen</label>
                     <select
                         className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
                         {...register("gender")}
                         defaultValue={data?.gender || ""}
                     >
-                        <option value="">Select gender</option>
-                        <option value="FEMALE">Female</option>
-                        <option value="MALE">Male</option>
-                        <option value="OTHER">Other</option>
+                        <option value="">Selectează genul</option>
+                        <option value="FEMALE">Femeie</option>
+                        <option value="MALE">Bărbat</option>
+                        <option value="OTHER">Altul</option>
                     </select>
                     {errors.gender?.message && (
                         <p className="text-xs text-red-400">
@@ -202,13 +222,13 @@ const StudentForm = ({
                     )}
                 </div>
                 <div className="flex flex-col gap-2">
-                    <label className="text-xs text-gray-400 font-medium">Grade</label>
+                    <label className="text-xs text-gray-400 font-medium">Nivel</label>
                     <select
                         className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
                         {...register("gradeId")}
                         defaultValue={data?.gradeId || ""}
                     >
-                        <option value="">Select grade</option>
+                        <option value="">Selectează nivelul</option>
                         {grades.map((grade: { id: number; level: number }) => (
                             <option value={grade.id} key={grade.id}>
                                 {grade.level}
@@ -222,13 +242,13 @@ const StudentForm = ({
                     )}
                 </div>
                 <div className="flex flex-col gap-2">
-                    <label className="text-xs text-gray-400 font-medium">Parent</label>
+                    <label className="text-xs text-gray-400 font-medium">Părinte</label>
                     <select
                         className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
                         {...register("parentId")}
                         defaultValue={data?.parentId || ""}
                     >
-                        <option value="">Select a parent</option>
+                        <option value="">Alege un părinte</option>
                         {parents.map((parent: { id: string; name: string; surname: string }) => (
                             <option value={parent.id} key={parent.id}>
                                 {parent.name} {parent.surname}
@@ -242,13 +262,13 @@ const StudentForm = ({
                     )}
                 </div>
                 <div className="flex flex-col gap-2">
-                    <label className="text-xs text-gray-400 font-medium">Class</label>
+                    <label className="text-xs text-gray-400 font-medium">Clasa</label>
                     <select
                         className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
                         {...register("classId")}
                         defaultValue={data?.classId || ""}
                     >
-                        <option value="">Select class</option>
+                        <option value="">Selectează o clasă</option>
                         {classes.map((c: any) => (
                             <option key={c.id} value={c.id}>
                                 ({c.name} - {c._count.students}/{c.capacity} places filled)
@@ -274,20 +294,16 @@ const StudentForm = ({
                 />
             )}
 
-            {state.error && (
-                <span className="text-red-500">
-                    {state.message || "Something went wrong!"}
-                </span>
-            )}
-
-            <div className="flex justify-center mt-6">
+            <div className="flex justify-center mt-6 mb-8">
                 <button
                     className={`bg-blue-500 text-white px-8 py-2 rounded-md text-sm w-max ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
                     disabled={isSubmitting}
                 >
-                    {type === "create" ? "Create" : "Update"}
+                    {type === "create" ? "Adaugă" : "Actualizează"} elevul
                 </button>
             </div>
+
+            {isPending && <LoadingPopup />}
 
             <CldUploadWidget
                 uploadPreset="school-mgmt"

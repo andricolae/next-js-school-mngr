@@ -28,7 +28,7 @@ const AdminPage = ({
                     </div>
                 </div>
                 <div className="w-full h-[500px]">
-                    <FinanceChartContainer />
+                    {/* <FinanceChartContainer /> */}
                 </div>
             </div>
             <div className="w-full lg:w-1/3 flex flex-col gap-8">

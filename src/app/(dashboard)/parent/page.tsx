@@ -1,5 +1,4 @@
 import Announcements from "@/components/Announcements"
-import BigCalendar from "@/components/BigCalendar"
 import BigCalendarContainer from "@/components/BigCalendarContainer";
 import EventCalendarContainer from "@/components/EventCalendarContainer";
 import prisma from "@/lib/prisma";
@@ -35,15 +34,15 @@ const ParentPage = async ({
             <div className="w-full xl:w-2/3">
                 <div className="h-full bg-white p-4 rounded-md">
                     <div className="flex items-center gap-2 mb-4">
-                        <h1 className="text-xl font-semibold">Schedule</h1>
+                        <h1 className="text-xl font-semibold">Orar</h1>
                         <div className="flex gap-2 ml-4">
                             {studentsWithClasses.map((student, index) => (
                                 <Link
                                     key={student.id}
                                     href={`/parent?studentId=${student.id}`}
                                     className={`px-3 py-1 rounded-md text-sm transition-colors ${selectedStudent?.id === student.id
-                                            ? 'bg-orange text-white'
-                                            : 'bg-orangeLight text-gray-700 hover:bg-gray-300'
+                                        ? 'bg-orange text-white'
+                                        : 'bg-orangeLight text-gray-700 hover:bg-gray-300'
                                         }`}
                                 >
                                     {student.name}
@@ -55,7 +54,7 @@ const ParentPage = async ({
                         <BigCalendarContainer type="classId" id={selectedStudent.class.id} />
                     ) : (
                         <div className="flex items-center justify-center h-96 text-gray-500">
-                            No student or class found
+                            Nu a fost găsit niciun student sau nicio clasă
                         </div>
                     )}
                 </div>

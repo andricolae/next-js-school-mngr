@@ -2,6 +2,9 @@
 
 import { ITEM_PER_PAGE } from "@/lib/settings";
 import { useRouter } from "next/navigation";
+import { useTransition } from "react";
+import LoadingPopup from "@/components/LoadingPopup";
+
 
 const Pagination = ({ page, count }: { page: number; count: number }) => {
 
@@ -9,11 +12,14 @@ const Pagination = ({ page, count }: { page: number; count: number }) => {
 
     const hasPrev = ITEM_PER_PAGE * (page - 1) > 0;
     const hasNext = ITEM_PER_PAGE * (page - 1) + ITEM_PER_PAGE < count;
+    const [isPending, startTransition] = useTransition();
 
     const changePage = (newPage: number) => {
-        const params = new URLSearchParams(window.location.search);
-        params.set("page", newPage.toString());
-        router.push(`${window.location.pathname}?${params}`);
+        startTransition(() => {
+            const params = new URLSearchParams(window.location.search);
+            params.set("page", newPage.toString());
+            router.push(`${window.location.pathname}?${params}`);
+        });
     }
 
     return (
@@ -23,8 +29,9 @@ const Pagination = ({ page, count }: { page: number; count: number }) => {
                 className="py-2 px-4 rounded-md bg-slate-200 text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
                 onClick={() => changePage(page - 1)}
             >
-                Prev
+                Înapoi
             </button>
+            {isPending && <LoadingPopup />}
             <div className="flex items-center gap-2">
                 {Array.from(
                     { length: Math.ceil(count / ITEM_PER_PAGE) },
@@ -47,7 +54,7 @@ const Pagination = ({ page, count }: { page: number; count: number }) => {
                 className="py-2 px-4 rounded-md bg-slate-200 text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
                 onClick={() => changePage(page + 1)}
             >
-                Next
+                Înainte
             </button>
         </div>
     )

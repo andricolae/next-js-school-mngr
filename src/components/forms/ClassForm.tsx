@@ -9,6 +9,8 @@ import { useFormState } from "react-dom";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
+import LoadingPopup from "@/components/LoadingPopup";
+import { useTransition } from "react";
 
 const ClassForm = ({
     type,
@@ -41,24 +43,27 @@ const ClassForm = ({
     );
 
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isPending, startTransition] = useTransition();
 
     const onSubmit = handleSubmit(data => {
-        setIsSubmitting(true);
-        formAction(data);
+        startTransition(() => {
+            setIsSubmitting(true);
+            formAction(data);
+        });
     });
 
     const router = useRouter();
 
     useEffect(() => {
         if (state.success) {
-            toast(`Class has been ${type === "create" ? "created" : "updated"} successfully!`);
+            toast(`Clasă ${type === "create" ? "creată" : "actualizată"} cu succes!`);
             setOpen(false);
             router.refresh();
         }
 
         if (state.error) {
+            toast.error(state.message || "Ceva nu a funcționat. Încearcă mai târziu.");
             setIsSubmitting(false);
-            // poți trata eroarea aici dacă vrei
         }
     }, [state, router, type, setOpen]);
 
@@ -67,19 +72,19 @@ const ClassForm = ({
     return (
         <form className="flex flex-col gap-8 mx-auto" onSubmit={onSubmit}>
             <h1 className="text-xl font-semibold text-left mb-6">
-                {type === "create" ? "Create a new class" : "Update the class"}
+                {type === "create" ? "Adaugă o nouă clasă" : "Actualizează clasa"}
             </h1>
 
             <div className="flex flex-col gap-6 w-full">
                 <InputField
-                    label="Class Name"
+                    label="Denumire clasă"
                     name="name"
                     defaultValue={data?.name}
                     register={register}
                     error={errors?.name}
                 />
                 <InputField
-                    label="Capacity"
+                    label="Capacitate"
                     name="capacity"
                     type="number"
                     defaultValue={data?.capacity}
@@ -99,13 +104,13 @@ const ClassForm = ({
 
                 {/* Supervisor */}
                 <div className="flex flex-col gap-1 w-full">
-                    <label className="text-xs text-gray-400">Supervisor</label>
+                    <label className="text-xs text-gray-400">Diriginte</label>
                     <select
                         className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
                         {...register("supervisorId")}
                         defaultValue={data?.supervisorId || ""}
                     >
-                        <option value="">Select a teacher</option>
+                        <option value="">Alege un profesor</option>
                         {teachers?.map(
                             (teacher: { id: string; name: string; surname: string }) => (
                                 <option key={teacher.id} value={teacher.id}>
@@ -121,13 +126,13 @@ const ClassForm = ({
 
                 {/* Grade */}
                 <div className="flex flex-col gap-1 w-full">
-                    <label className="text-xs text-gray-400">Grade</label>
+                    <label className="text-xs text-gray-400">Nivel</label>
                     <select
                         className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
                         {...register("gradeId")}
                         defaultValue={data?.gradeId || ""}
                     >
-                        <option value="">Select a grade</option>
+                        <option value="">Alege un nivel</option>
                         {grades?.map(
                             (grade: { id: number; level: number }) => (
                                 <option key={grade.id} value={grade.id}>
@@ -144,18 +149,19 @@ const ClassForm = ({
 
             {state.error && (
                 <span className="text-red-500 text-center">
-                    {state.message || "Something went wrong!"}
+                    {state.message || "Ceva nu a funcționat. Încearcă mai târziu."}
                 </span>
             )}
 
-            <div className="flex justify-center mt-6">
+            <div className="flex justify-center mt-6 mb-8">
                 <button
                     className={`bg-blue-500 text-white px-4 py-2 rounded-md mx-auto hover:bg-blue-600 transition ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
                     disabled={isSubmitting}
                 >
-                    {type === "create" ? "Create" : "Update"}
+                    {type === "create" ? "Adaugă clasa" : "Actualizează clasa"}
                 </button>
             </div>
+            {isPending && <LoadingPopup />}
         </form>
     );
 };

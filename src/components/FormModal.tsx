@@ -8,6 +8,8 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useFormState } from "react-dom";
 import { toast } from "react-toastify";
 import { FormContainerProps } from "./FormContainer";
+import LoadingPopup from "@/components/LoadingPopup";
+import { useTransition } from "react";
 
 const deleteActionMap = {
     subject: deleteSubject,
@@ -22,47 +24,59 @@ const deleteActionMap = {
     parent: deleteParent,
     teacher: deleteTeacher,
     student: deleteStudent,
+    adeverinta: deleteStudent,
+    matricola: deleteStudent,
+    absente: deleteStudent,
 }
 
 const TeacherForm = dynamic(() => import("./forms/TeacherForm"), {
-    loading: () => <h1>Loading...</h1>,
+    loading: () => <LoadingPopup />,
 });
 const StudentForm = dynamic(() => import("./forms/StudentForm"), {
-    loading: () => <h1>Loading...</h1>,
+    loading: () => <LoadingPopup />,
 });
 const SubjectForm = dynamic(() => import("./forms/SubjectForm"), {
-    loading: () => <h1>Loading...</h1>,
+    loading: () => <LoadingPopup />,
 });
 const ClassForm = dynamic(() => import("./forms/ClassForm"), {
-    loading: () => <h1>Loading...</h1>,
+    loading: () => <LoadingPopup />,
 });
 const ExamForm = dynamic(() => import("./forms/ExamForm"), {
-    loading: () => <h1>Loading...</h1>
+    loading: () => <LoadingPopup />
 });
 const AssignmentForm = dynamic(() => import("./forms/AssignmentForm"), {
-    loading: () => <h1>Loading...</h1>
+    loading: () => <LoadingPopup />
 });
 const ResultForm = dynamic(() => import("./forms/ResultForm"), {
-    loading: () => <h1>Loading...</h1>
+    loading: () => <LoadingPopup />
 });
 const EventForm = dynamic(() => import("./forms/EventForm"), {
-    loading: () => <h1>Loading...</h1>
+    loading: () => <LoadingPopup />
 });
 const ParentForm = dynamic(() => import("./forms/ParentForm"), {
-    loading: () => <h1>Loading...</h1>
+    loading: () => <LoadingPopup />
 });
 const LessonForm = dynamic(() => import("./forms/LessonForm"), {
-    loading: () => <h1>Loading...</h1>
+    loading: () => <LoadingPopup />
 });
 const AttendanceForm = dynamic(() => import("./forms/AttendanceForm"), {
-    loading: () => <h1>Loading...</h1>
+    loading: () => <LoadingPopup />
 });
 const AnnouncementForm = dynamic(() => import("./forms/AnnouncementForm"), {
-    loading: () => <h1>Loading...</h1>
+    loading: () => <LoadingPopup />
+});
+const AdeverintaElevForm = dynamic(() => import("./forms/AdeverintaElevForm"), {
+    loading: () => <LoadingPopup />,
+});
+const FoaieMatricolaForm = dynamic(() => import("./forms/FoaieMatricolaForm"), {
+    loading: () => <LoadingPopup />,
+});
+const RaportAbsenteForm = dynamic(() => import("./forms/RaportAbsenteForm"), {
+    loading: () => <LoadingPopup />,
 });
 
 const forms: {
-    [key: string]: (setOpen: Dispatch<SetStateAction<boolean>>, type: "create" | "update", data?: any, relatedData?: any) => JSX.Element;
+    [key: string]: (setOpen: Dispatch<SetStateAction<boolean>>, type: "create" | "update", data?: any, relatedData?: any, student?: any, results?: any) => JSX.Element;
 } = {
     teacher: (setOpen, type, data, relatedData) => <TeacherForm type={type} data={data} setOpen={setOpen} relatedData={relatedData} />,
     student: (setOpen, type, data, relatedData) => <StudentForm type={type} data={data} setOpen={setOpen} relatedData={relatedData} />,
@@ -76,9 +90,12 @@ const forms: {
     attendance: (setOpen, type, data, relatedData) => <AttendanceForm type={type} data={data} setOpen={setOpen} relatedData={relatedData} />,
     event: (setOpen, type, data, relatedData) => <EventForm type={type} data={data} setOpen={setOpen} relatedData={relatedData} />,
     announcement: (setOpen, type, data, relatedData) => <AnnouncementForm type={type} data={data} setOpen={setOpen} relatedData={relatedData} />,
+    adeverinta: (setOpen, type, data, relatedData, student) => <AdeverintaElevForm type={type} data={data} setOpen={setOpen} relatedData={relatedData} student={student} />,
+    matricola: (setOpen, type, data, relatedData, student, results) => <FoaieMatricolaForm type={type} data={data} setOpen={setOpen} relatedData={relatedData} student={student} results={results} />,
+    absente: (setOpen, type, data, relatedData, student) => <RaportAbsenteForm type={type} data={data} setOpen={setOpen} relatedData={relatedData} student={student} />,
 };
 
-const FormModal = ({ table, type, data, id, relatedData }: FormContainerProps & { relatedData?: any }) => {
+const FormModal = ({ table, type, data, id, results, relatedData, title, student }: FormContainerProps & { relatedData?: any, title?: any, student?: any }) => {
     const size = type === "create" ? "w-8 h-8" : "w-7 h-7"
     const bgColor =
         type === "create" ? "bg-yellow"
@@ -89,10 +106,10 @@ const FormModal = ({ table, type, data, id, relatedData }: FormContainerProps & 
     const [open, setOpen] = useState(false);
 
     const modalWidthClass =
-        (table === "teacher" || table === "student") && type === "create"
-            ? "w-[40%] p-3 h-[70%]"
-            : table === "subject"
-                ? "w-[30%] p-5 h-fit"
+        (table === "teacher" || table === "student") && (type === "create" || type === "update")
+            ? "w-[40%] p-3 h-[80%]"
+            : table === "subject" && (type === "create" || type === "update")
+                ? "w-[30%] p-5 h-[70%]"
                 : ["exam", "assignment", "result", "attendance"].includes(table)
                     ? "w-[40%] p-6 h-fit"
                     : ["announcement", "event", "lesson", "class", "teacher", "student", "parent"].includes(table)
@@ -100,39 +117,68 @@ const FormModal = ({ table, type, data, id, relatedData }: FormContainerProps & 
                         : "w-[50%] p-4 h-fit";
 
     const Form = () => {
-
+        const [isPending, startTransition] = useTransition();
         const [state, formAction] = useFormState(deleteActionMap[table], {
             success: false,
             error: false,
         });
 
+        const formActionWrapper = (formData: FormData) => {
+            startTransition(() => {
+                formAction(formData);
+            });
+        };
+
         const router = useRouter();
+
+        const tableMap: Record<string, string> = {
+            subject: "această materie",
+            class: "această clasă",
+            lesson: "această oră",
+            exam: "acest test",
+            assignment: "această temă",
+            result: "acest rezultat",
+            attendance: "această prezență",
+            event: "acest eveniment",
+            announcement: "acest anunț",
+            parent: "acest părinte",
+            teacher: "acest profesor",
+            student: "acest elev",
+        };
+
+        const translatedTable = tableMap[table] ?? table;
 
         useEffect(() => {
             if (state.success) {
-                toast(`${table} has been deleted successfully!`);
+                toast(`${translatedTable} a fost șters cu succes!`);
                 setOpen(false);
                 router.refresh();
+            }
+            if (state.error) {
+                toast(`${translatedTable} nu a putut fi șters.`);
+                setOpen(false);
             }
         }, [state, router]);
 
         return type === "delete" && id ? (
-            <form action={formAction} className="p-4 flex flex-col gap-4">
-                <input type="text|number" name="id" value={id} hidden />
-                <span className="text-center font-medium">All data will be lost. Are you sure you want to delete this {table}?</span>
-                <button className="bg-red-600 text-white py-3 px-4 rounded-md border-none w-max self-center">Delete</button>
+            <form action={formActionWrapper} className="p-4 flex flex-col gap-4">
+                <input type="text|number" name="id" value={id} hidden readOnly />
+                <span className="text-center font-medium">Toate datele vor fi pierdute. Ești sigur/ă că vrei să ștergi {translatedTable}?</span>
+                <button className="bg-red-600 text-white py-3 px-4 rounded-md border-none w-max self-center">Șterge</button>
+                {isPending && <LoadingPopup />}
             </form>
         ) : type === "create" || type === "update" ? (
-            forms[table](setOpen, type, data, relatedData)
+            forms[table](setOpen, type, data, relatedData, student, results)
         ) : "Form not found";
     };
 
     return <>
         <button
-            className={`${size} flex items-center justify-center rounded-full ${bgColor}`}
+            className={title !== undefined ? `p-3 rounded-md bg-skyLight` : `${size} flex items-center justify-center rounded-full ${bgColor}`}
             onClick={() => { setOpen(true); }}
+            title={type === "create" ? "Adauga" : type === "delete" ? "Sterge" : "Editeaza"}
         >
-            <Image src={`/${type}.png`} alt="" width={16} height={16} />
+            {title !== undefined ? <div>{title}</div> : <Image src={`/${type}.png`} alt="" width={16} height={16} />}
         </button>
         {open && (
             <div className="w-screen h-screen absolute left-0 top-0 bg-black bg-opacity-60 z-50 flex items-center justify-center">

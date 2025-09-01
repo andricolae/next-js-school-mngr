@@ -1,6 +1,5 @@
 import prisma from "@/lib/prisma"
 import AttendanceChart from "./AttendanceChart"
-import Image from "next/image"
 const AttendanceChartContainer = async () => {
 
     const today = new Date();
@@ -20,6 +19,14 @@ const AttendanceChartContainer = async () => {
             present: true,
         },
     });
+
+    const dayMap: Record<string, string> = {
+        Mon: "Luni",
+        Tue: "Marți",
+        Wed: "Miercuri",
+        Thu: "Joi",
+        Fri: "Vineri"
+    }
 
     const daysOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri"];
     const attendanceMap: { [key: string]: { present: number; absent: number } } = {
@@ -45,7 +52,7 @@ const AttendanceChartContainer = async () => {
     });
 
     const data = daysOfWeek.map((day) => ({
-        name: day,
+        name: dayMap[day],
         present: attendanceMap[day].present,
         absent: attendanceMap[day].absent
     }));
@@ -53,7 +60,7 @@ const AttendanceChartContainer = async () => {
     return (
         <div className='bg-white rounded-lg p-4 h-full'>
             <div className='flex justify-between items-center'>
-                <h1 className='text-lg font-semibold'>Attendance</h1>
+                <h1 className='text-lg font-semibold'>Prezențe</h1>
                 {/* <Image src="/moreDark.png" alt="" width={20} height={20} /> */}
             </div>
             <AttendanceChart data={data} />

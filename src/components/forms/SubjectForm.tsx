@@ -9,6 +9,8 @@ import { useFormState } from "react-dom";
 import { Dispatch, SetStateAction, useEffect, useState, useRef } from "react";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
+import LoadingPopup from "@/components/LoadingPopup";
+import { useTransition } from "react";
 
 interface FilterOption {
     id: string;
@@ -214,32 +216,36 @@ const SubjectForm = ({
         name: teacher.name + " " + teacher.surname,
     })) || [];
 
+    const [isPending, startTransition] = useTransition();
+
     useEffect(() => {
         if (state.success) {
-            toast(`Subject has been ${type === "create" ? "created" : "updated"} successfully!`);
+            toast(`Materie ${type === "create" ? "creată" : "actualizată"} cu succes!`);
             setOpen(false);
             router.refresh();
         }
 
         if (state.error) {
-            toast.error(state.message || "Something went wrong!");
+            toast.error(state.message || "Ceva nu a funcționat. Încearcă mai târziu.");
             setIsSubmitting(false);
         }
     }, [state, router, type, setOpen]);
 
     const onSubmit = handleSubmit((formData) => {
-        setIsSubmitting(true);
-        formAction(formData);
+        startTransition(() => {
+            setIsSubmitting(true);
+            formAction(formData);
+        });
     });
 
     return (
         <form className="flex flex-col gap-8 mx-auto w-full max-w-lg" onSubmit={onSubmit}>
             <h1 className="text-xl font-semibold text-left mb-6">
-                {type === "create" ? "Create a new subject" : "Update the subject"}
+                {type === "create" ? "Adaugă o nouă materie" : "Actualizează materia"}
             </h1>
 
             <InputField
-                label="Subject Name"
+                label="Denumire materie"
                 name="name"
                 defaultValue={data?.name}
                 register={register}
@@ -253,29 +259,35 @@ const SubjectForm = ({
                 render={({ field }) => (
                     <MultiSelect
                         id="teachers"
-                        label="Teachers"
+                        label="Profesori"
                         options={teachers}
-                        placeholder="Select teachers..."
+                        placeholder="Alege profesori..."
                         selectedIds={field.value}
                         onSelectionChange={field.onChange}
                     />
                 )}
             />
-
-            {state.error && (
-                <span className="text-red-500 text-center">{state.message || "Something went wrong!"}</span>
+            {errors.teachers && (
+                <p className="text-red-500 text-sm mt-1">
+                    {errors.teachers.message as string}
+                </p>
             )}
 
-            <div className="flex justify-center mt-2">
+            {state.error && (
+                <span className="text-red-500 text-center">{state.message || "Ceva nu a funcționat. Încearcă mai târziu."}</span>
+            )}
+
+            <div className="flex justify-center mt-2 mb-8">
                 <button
                     type="submit"
                     disabled={isSubmitting}
                     className={`bg-blue-500 text-white px-8 py-2 rounded-md text-sm w-max ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""
                         }`}
                 >
-                    {type === "create" ? "Create" : "Update"}
+                    {type === "create" ? "Adaugă" : "Actualizează"} materia
                 </button>
             </div>
+            {isPending && <LoadingPopup />}
         </form>
     );
 };

@@ -3,14 +3,14 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import InputField from "../InputField";
-import Image from "next/image";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { resultSchema, ResultSchema } from "@/lib/formValidationSchemas";
 import { useFormState } from "react-dom";
-import { createResult, updateResult } from "@/lib/actions";
+import { createResult, studentsOfClassAssignedToAnAssignment, updateResult } from "@/lib/actions";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
-
+import LoadingPopup from "@/components/LoadingPopup";
+import { useTransition } from "react";
 
 const ResultForm = ({
     type,
@@ -44,45 +44,61 @@ const ResultForm = ({
     const [state, formAction] = useFormState(type === "create"
         ? createResult : updateResult, { success: false, error: false })
 
-    const [isSubmitting, setIsSubmitting] = useState(false); // added to avoid multiple submitions
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isPending, startTransition] = useTransition();
 
     const onSubmit = handleSubmit(formData => {
-        setIsSubmitting(true); // added to avoid multiple submitions
-        const submissionData = {
-            ...formData,
-            ...(type === "update" && data?.id && { id: data.id }),
-        };
-        formAction(submissionData);
+        startTransition(() => {
+            setIsSubmitting(true);
+            const submissionData = {
+                ...formData,
+                ...(type === "update" && data?.id && { id: data.id }),
+            };
+            formAction(submissionData);
+        });
     })
 
     const router = useRouter();
 
     useEffect(() => {
         if (state.success) {
-            toast(`Result has been ${type === "create" ? "created" : "updated"} successfully!`);
+            toast(`Notă ${type === "create" ? "adăugată" : "actualizată"} cu succes!`);
             setOpen(false);
             router.refresh();
         }
         if (state.error) {
-            const errorMessage = state.message || "Something went wrong!";
-            setIsSubmitting(true); // added to re-enable button if error happens
+            const errorMessage = state.message || "Ceva nu a funcționat. Încearcă mai târziu.";
+            setIsSubmitting(true);
         }
     }, [state, router, type, setOpen]);
 
     const { students, exams, assignments } = relatedData;
+    const [filteredStudents, setFilteredStudents] = useState(students || []);
+
+    const updateSelect = async (selectedOption: "exam" | "assignment", id: number) => {
+        startTransition(async () => {
+            if (selectedOption === "exam") {
+                const newStudents = students?.filter((t: any) => t.subjects?.some((sub: any) => sub.name === id));
+                setFilteredStudents(newStudents || []);
+            } else if (selectedOption === "assignment") {
+                const newStudents = await studentsOfClassAssignedToAnAssignment(id);
+                setFilteredStudents(newStudents || []);
+            }
+        });
+    };
 
     return (
         <form className="flex flex-col gap-6 mx-auto" onSubmit={onSubmit}>
             <h1 className="text-xl font-semibold">
-                {type === "create" ? "Create a new result" : "Update the result"}</h1>
+                {type === "create" ? "Adaugă o nouă notă" : "Actualizează nota"}</h1>
 
             <div className=" mt-2 text-xs text-gray-500">
-                Note: Select either an exam OR an assignment, not both.
+                Important: Pentru a adăuga o notă, selectează un test sau o temă, nu ambele.
             </div>
 
             <div className="flex flex-col gap-4">
                 <InputField
-                    label="Score"
+                    label="Nota"
                     name="score"
                     type="number"
                     defaultValue={data?.score}
@@ -103,20 +119,26 @@ const ResultForm = ({
                 )}
 
                 <div className="flex flex-col gap-2 w-full">
-                    <label className="text-xs text-gray-400">Student</label>
+                    <label className="text-xs text-gray-400">Elev</label>
                     <select
                         className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
                         defaultValue={data?.studentId || ""}
                         {...register("studentId")}
                     >
-                        <option value="">Select a student</option>
-                        {students?.map(
-                            (student: { id: string; name: string; surname: string }) => (
-                                <option value={student.id} key={student.id}>
-                                    {student.name} {student.surname}
-                                </option>
-                            )
-                        )}
+                        <option value="">Alege un elev</option>
+                        {filteredStudents !== undefined ?
+                            <>
+                                {filteredStudents?.lesson?.class?.students?.map(
+                                    (student: { id: string; name: string; surname: string }) => (
+                                        <option value={student.id} key={student.id}>
+                                            {student.name} {student.surname}
+                                        </option>
+                                    )
+                                )}
+                            </>
+                            :
+                            <></>
+                        }
                     </select>
                     {errors.studentId?.message && (
                         <p className="text-xs text-red-400">
@@ -126,7 +148,7 @@ const ResultForm = ({
                 </div>
 
                 <div className="flex flex-col gap-2 w-full">
-                    <label className="text-xs text-gray-400">Exam (Optional)</label>
+                    <label className="text-xs text-gray-400">Test (Opțional)</label>
                     <select
                         className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
                         defaultValue={data?.examId || ""}
@@ -134,9 +156,14 @@ const ResultForm = ({
                         onChange={(e) => {
                             setValue("examId", parseInt(e.target.value));
                             setValue("assignmentId", undefined);
+                            // const selectedId = e.target.value;
+                            // const exam = exams?.find((s: any) => s.id === selectedId);
+                            // if (exam) {
+                            //     updateSelect("exam", exam.id);
+                            // }
                         }}
                     >
-                        <option value="">Select an exam</option>
+                        <option value="">Selectează un test</option>
                         {exams?.map(
                             (exam: { id: number; title: string; lesson: { subject: { name: string }, class: { name: string } } }) => (
                                 <option value={exam.id} key={exam.id}>
@@ -153,7 +180,7 @@ const ResultForm = ({
                 </div>
 
                 <div className="flex flex-col gap-2 w-full">
-                    <label className="text-xs text-gray-400">Assignment (Optional)</label>
+                    <label className="text-xs text-gray-400">Temă (Opțional)</label>
                     <select
                         className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
                         defaultValue={data?.assignmentId || ""}
@@ -161,9 +188,14 @@ const ResultForm = ({
                         onChange={(e) => {
                             setValue("assignmentId", parseInt(e.target.value));
                             setValue("examId", undefined);
+                            const selectedId = Number(e.target.value);
+                            const assignment = assignments?.find((s: any) => s.id === selectedId);
+                            if (assignment) {
+                                updateSelect("assignment", assignment.id);
+                            }
                         }}
                     >
-                        <option value="">Select an assignment</option>
+                        <option value="">Selectează o temă</option>
                         {assignments?.map(
                             (assignment: { id: number; title: string; lesson: { subject: { name: string }, class: { name: string } } }) => (
                                 <option value={assignment.id} key={assignment.id}>
@@ -182,19 +214,19 @@ const ResultForm = ({
 
             {state.error && (
                 <span className="text-red-500">
-                    {state.message || "Something went wrong!"}
+                    {state.message || "Ceva nu a funcționat. Încearcă mai târziu."}
                 </span>
             )}
-            <div className="flex justify-center mt-2">
+            <div className="flex justify-center mt-2 mb-8">
                 <button
                     type="submit"
                     className={`bg-blue-500 text-white px-8 py-2 rounded-md text-sm w-max mx-auto hover:bg-blue-600 transition ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
                     disabled={isSubmitting}
                 >
-                    {type === "create" ? "Create" : "Update"}
+                    {type === "create" ? "Adaugă nota" : "Actualizează nota"}
                 </button>
             </div>
-
+            {isPending && <LoadingPopup />}
         </form>
     )
 };

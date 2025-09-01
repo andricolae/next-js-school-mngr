@@ -16,7 +16,7 @@ const CountChartContainer = async () => {
     return (
         <div className="bg-white rounded-xl w-full h-full p-4">
             <div className="flex justify-between items-center">
-                <h1 className="text-lg font-semibold">Students</h1>
+                <h1 className="text-lg font-semibold">Elevi</h1>
                 {/* <Image src="/moreDark.png" alt="" width={20} height={20} /> */}
             </div>
             <CountChart girls={girls} others={others} boys={boys} />
@@ -25,21 +25,21 @@ const CountChartContainer = async () => {
                     <div className="w-5 h-5 bg-skyLight rounded-full" />
                     <h1 className="font-bold">{girls}</h1>
                     <h2 className="text-xs text-gray-300">
-                        Girls ({Math.round((girls / (girls + boys + others)) * 100)}%)
+                        Fete ({Math.round((girls / (girls + boys + others)) * 100)}%)
                     </h2>
                 </div>
                 <div className="flex flex-col gap-1">
                     <div className="w-5 h-5 bg-yellowLight rounded-full" />
                     <h1 className="font-bold">{boys}</h1>
                     <h2 className="text-xs text-gray-300">
-                        Boys ({Math.round((boys / (girls + boys + others)) * 100)}%)
+                        Băieți ({Math.round((boys / (girls + boys + others)) * 100)}%)
                     </h2>
                 </div>
                 <div className="flex flex-col gap-1">
                     <div className="w-5 h-5 bg-orangeLight rounded-full" />
                     <h1 className="font-bold">{others}</h1>
                     <h2 className="text-xs text-gray-300">
-                        Others ({Math.round((others / (girls + boys + others)) * 100)}%)
+                        Prefer să nu spun ({Math.round((others / (girls + boys + others)) * 100)}%)
                     </h2>
                 </div>
             </div>

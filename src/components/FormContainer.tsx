@@ -1,7 +1,6 @@
 import prisma from "@/lib/prisma";
 import FormModal from "./FormModal";
 import { auth } from "@clerk/nextjs/server";
-import { useEffect } from "react";
 import { TokenData } from "@/lib/utils";
 
 export type FormContainerProps = {
@@ -17,13 +16,17 @@ export type FormContainerProps = {
     | "result"
     | "attendance"
     | "event"
-    | "announcement";
+    | "announcement"
+    | "adeverinta"
+    | "matricola"
+    | "absente";
     type:
     "create"
     | "update"
     | "delete";
     data?: any;
     id?: number | string;
+    results?: any;
 }
 const FormContainer = async ({ table, type, data, id }: FormContainerProps) => {
 
@@ -247,7 +250,7 @@ const FormContainer = async ({ table, type, data, id }: FormContainerProps) => {
                             }
                         } : {}),
                     },
-                    select: { id: true, name: true, surname: true, username: true },
+                    select: { id: true, name: true, surname: true, username: true, classId: true },
                 });
                 const attendanceLessons = await prisma.lesson.findMany({
                     where: {
@@ -257,7 +260,8 @@ const FormContainer = async ({ table, type, data, id }: FormContainerProps) => {
                         id: true,
                         name: true,
                         subject: { select: { name: true } },
-                        class: { select: { name: true } }
+                        class: { select: { name: true } },
+                        classId: true
                     },
                 });
                 relatedData = {

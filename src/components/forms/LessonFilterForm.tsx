@@ -5,6 +5,8 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { ModuleType } from "@/lib/modules"; // Asigură-te că acest import este corect și că fișierul lib/modules.ts există
+import LoadingPopup from "@/components/LoadingPopup";
+import { useTransition } from "react";
 
 interface FilterOption {
     id: string;
@@ -203,6 +205,7 @@ const LessonFilterForm: React.FC<LessonFilterFormProps> = ({
     const [teacherFilters, setTeacherFilters] = useState<string[]>([]);
     const [classFilters, setClassFilters] = useState<string[]>([]);
     const [moduleFilter, setModuleFilter] = useState<string>(""); // <--- Stare nouă pentru modul
+    const [isPending, startTransition] = useTransition();
 
     useEffect(() => {
         setSubjectFilters(currentFilters.subjectId ? currentFilters.subjectId.split(',') : []);
@@ -220,28 +223,30 @@ const LessonFilterForm: React.FC<LessonFilterFormProps> = ({
     };
 
     const handleApplyFilters = () => {
-        const newSearchParams = new URLSearchParams();
+        startTransition(() => {
+            const newSearchParams = new URLSearchParams();
 
-        // Păstrează parametrii 'search' și 'sort' existenți
-        const existingSearchParam = searchParams.get("search");
-        if (existingSearchParam) {
-            newSearchParams.set("search", existingSearchParam);
-        }
+            // Păstrează parametrii 'search' și 'sort' existenți
+            const existingSearchParam = searchParams.get("search");
+            if (existingSearchParam) {
+                newSearchParams.set("search", existingSearchParam);
+            }
 
-        const existingSortParam = searchParams.get("sort");
-        if (existingSortParam) {
-            newSearchParams.set("sort", existingSortParam);
-        }
+            const existingSortParam = searchParams.get("sort");
+            if (existingSortParam) {
+                newSearchParams.set("sort", existingSortParam);
+            }
 
-        if (subjectFilters.length > 0) newSearchParams.set("subjectId", subjectFilters.join(','));
-        if (teacherFilters.length > 0) newSearchParams.set("teacherId", teacherFilters.join(','));
-        if (classFilters.length > 0) newSearchParams.set("classId", classFilters.join(','));
-        if (moduleFilter) newSearchParams.set("moduleId", moduleFilter); // <--- Adaugă filtrul de modul
+            if (subjectFilters.length > 0) newSearchParams.set("subjectId", subjectFilters.join(','));
+            if (teacherFilters.length > 0) newSearchParams.set("teacherId", teacherFilters.join(','));
+            if (classFilters.length > 0) newSearchParams.set("classId", classFilters.join(','));
+            if (moduleFilter) newSearchParams.set("moduleId", moduleFilter); // <--- Adaugă filtrul de modul
 
-        newSearchParams.set("page", "1"); // Resetează pagina la aplicarea filtrelor
+            newSearchParams.set("page", "1"); // Resetează pagina la aplicarea filtrelor
 
-        router.push(`?${newSearchParams.toString()}`);
-        setIsOpen(false);
+            router.push(`?${newSearchParams.toString()}`);
+            setIsOpen(false);
+        });
     };
 
     const handleClearFilters = () => {
@@ -286,6 +291,7 @@ const LessonFilterForm: React.FC<LessonFilterFormProps> = ({
                     </span>
                 )}
             </button>
+            {isPending && <LoadingPopup />}
 
             {isOpen && (
                 <div className="filter-modal-overlay fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -361,7 +367,7 @@ const LessonFilterForm: React.FC<LessonFilterFormProps> = ({
                             {/* END NOU: Filtru pentru Modul */}
                         </div>
 
-                        <div className="filter-modal-footer flex justify-center gap-4 pt-4 border-t mt-4">
+                        <div className="filter-modal-footer flex justify-center gap-4 pt-4 border-t mt-4 mb-8">
                             <button
                                 className="filter-button-clear px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50"
                                 onClick={handleClearFilters}

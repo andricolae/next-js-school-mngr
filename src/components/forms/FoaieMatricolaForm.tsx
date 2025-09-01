@@ -179,7 +179,7 @@ const AdeverintaElevForm = ({
         }
 
         generateTranscriptPDF("10101010", `${student.surname} ${student.name}`, "cnp 5010526388915",
-            `loc nastere damaroaia ${new Date(student.birthday).toLocaleDateString('en-GB').replace(/\//g, '.')}`,
+            `loc nastere damaroaia ${new Date(student.birthday).toLocaleDateString('ro-RO').replace(/\//g, '.')}`,
             "nationalitate ungur", "numeTata Ion", "numeMama Ioana", "domiciliuParinti Ungaria", `${student.address}`, materiiSiNote);
         setOpen(false);
         setIsSubmitting(false);
@@ -188,13 +188,6 @@ const AdeverintaElevForm = ({
     const router = useRouter();
 
     useEffect(() => {
-        // console.log(data);
-        // console.log(relatedData);
-        // console.log(student);
-        // console.log(results);
-
-        // console.log(subjectFilters);
-        // console.log(allSubjects);
         if (state.success) {
             toast(`Assignment has been ${type === "create" ? "created" : "updated"} successfully!`);
             setOpen(false);

@@ -10,6 +10,9 @@ import { createTeacher, updateTeacher } from "@/lib/actions";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { useFormState } from "react-dom";
+import { CldUploadWidget } from "next-cloudinary";
+import LoadingPopup from "@/components/LoadingPopup";
+import { useTransition } from "react";
 
 interface FilterOption {
     id: string;
@@ -44,11 +47,11 @@ const MultiSelect = ({
             const filtered = options.filter(
                 (option) =>
                     option.name.toLowerCase().includes(searchText.toLowerCase()) &&
-                    !selectedIds.includes(option.id)
+                    !selectedIds?.includes(option.id)
             );
             setFilteredOptions(filtered);
         } else {
-            setFilteredOptions(options.filter((option) => !selectedIds.includes(option.id)));
+            setFilteredOptions(options.filter((option) => !selectedIds?.includes(option.id)));
         }
     }, [searchText, options, selectedIds]);
 
@@ -99,8 +102,7 @@ const MultiSelect = ({
                 {label}
             </label>
 
-
-            {selectedIds.length > 0 && (
+            {selectedIds?.length > 0 && (
                 <div className="flex flex-wrap gap-1 mb-2">
                     {getSelectedOptions().map((option) => (
                         <span
@@ -129,11 +131,11 @@ const MultiSelect = ({
                     value={searchText}
                     onChange={handleInputChange}
                     onFocus={handleInputFocus}
-                    placeholder={selectedIds.length > 0 ? "Add another..." : placeholder}
+                    placeholder={selectedIds?.length > 0 ? "Add another..." : placeholder}
                     className="block w-full px-3 py-2 pr-20 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 />
                 <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center gap-1">
-                    {selectedIds.length > 0 && (
+                    {selectedIds?.length > 0 && (
                         <button
                             type="button"
                             onClick={handleClearAll}
@@ -150,7 +152,7 @@ const MultiSelect = ({
             {isOpen && filteredOptions.length > 0 && (
                 <div
                     ref={dropdownRef}
-                    className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-48 overflow-y-auto"
+                    className="absolute bottom-full mb-1 z-10 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto"
                 >
                     {filteredOptions.map((option) => (
                         <div
@@ -192,11 +194,11 @@ const TeacherForm = ({
         register,
         handleSubmit,
         control,
-        formState: { errors },
+        formState: { errors, touchedFields, isSubmitted },
         setValue,
         watch,
     } = useForm<TeacherSchema>({
-        resolver: zodResolver(teacherSchema),
+        resolver: zodResolver(teacherSchema(type === "update")),
         defaultValues: {
             id: data?.id,
             username: data?.username,
@@ -225,66 +227,56 @@ const TeacherForm = ({
         name: sub.name,
     })) || [];
 
-    const selectedSubjects = watch("subjects") || [];
+    const [isPending, startTransition] = useTransition();
 
     useEffect(() => {
         if (state.success) {
             toast(
-                `Teacher has been ${type === "create" ? "created" : "updated"} successfully!`
+                `Profesor ${type === "create" ? "adăugat" : "actualizat"} cu succes!`
             );
             setOpen(false);
             router.refresh();
-        }
-        if (state.error) {
-            const errorMessage = state.message || "Something went wrong!";
+        } else if (state.error) {
+            const errorMessage = state.message || "Ceva nu a funcționat. Încearcă mai târziu.";
             toast.error(errorMessage);
             setIsSubmitting(false);
         }
     }, [state, router, type, setOpen]);
 
     const onSubmit = handleSubmit((formData) => {
-        formAction({ ...formData, img: img?.secure_url });
-        setIsSubmitting(true);
+        startTransition(() => {
+            formAction({ ...formData, img: img?.secure_url });
+            setIsSubmitting(true);
+        });
     });
 
-    function openUploadWidget() {
-        // @ts-ignore
-        const cloudinary = (window as any).cloudinary;
-        if (!cloudinary) {
-            alert("Cloudinary widget is not loaded");
-            return;
+    let openUploadWidget: () => void = () => { };
+
+    const getDateError = (field: "birthday") => {
+        const err = errors[field];
+        if (isSubmitted && !touchedFields[field] && !err) {
+            return "Data nașterii este obligatorie!";
         }
-
-        const widget = cloudinary.createUploadWidget(
-            {
-                cloudName: "YOUR_CLOUD_NAME",
-                uploadPreset: "YOUR_UPLOAD_PRESET",
-            },
-            (error: any, result: any) => {
-                if (!error && result && result.event === "success") {
-                    setImg(result.info);
-                }
-            }
-        );
-
-        widget.open();
-    }
-
+        if (err?.message === "Invalid date") {
+            return "Data nașterii este obligatorie!";
+        }
+        return err?.message;
+    };
 
     return (
         <form className="flex flex-col gap-8" onSubmit={onSubmit}>
             <h1 className="text-xl font-semibold">
-                {type === "create" ? "Create a new teacher" : "Update the teacher"}
+                {type === "create" ? "Adaugă un nou profesor" : "Actualizează profesorul"}
             </h1>
 
             {/* Authentication Information */}
             <span className="text-xs text-gray-400 font-medium -mb-4 mt-2">
-                Authentication Information
+                Informații de autentificare
             </span>
 
             <div className="grid grid-cols-2 gap-4">
                 <InputField
-                    label="Username"
+                    label="Nume de utilizator"
                     name="username"
                     defaultValue={data?.username}
                     register={register}
@@ -299,7 +291,7 @@ const TeacherForm = ({
                     error={errors?.email}
                 />
                 <InputField
-                    label="Password"
+                    label="Parolă"
                     name="password"
                     type="password"
                     defaultValue={data?.password}
@@ -311,7 +303,7 @@ const TeacherForm = ({
                     onClick={() => openUploadWidget()}
                 >
                     <label className="text-sm font-medium text-gray-700 cursor-pointer select-none">
-                        Upload a Photo
+                        Încară o imagine
                     </label>
                     <div className="flex items-center gap-2">
                         <Image
@@ -330,7 +322,7 @@ const TeacherForm = ({
                                 className="rounded-full object-cover relative top-[2px]"
                             />
                         ) : (
-                            <span className="text-xs text-gray-500">Click to upload</span>
+                            <span className="text-xs text-gray-500">Click pentru a încărca</span>
                         )}
                     </div>
                 </div>
@@ -338,60 +330,71 @@ const TeacherForm = ({
 
             {/* Personal Information */}
             <span className="text-xs text-gray-400 font-medium -mb-4 mt-2">
-                Personal Information
+                Informații personale
             </span>
 
             <div className="grid grid-cols-2 gap-4">
                 <InputField
-                    label="First Name"
+                    label="Prenume"
                     name="name"
                     defaultValue={data?.name || ""}
                     register={register}
                     error={errors?.name}
                 />
                 <InputField
-                    label="Last Name"
+                    label="Nume"
                     name="surname"
                     defaultValue={data?.surname || ""}
                     register={register}
                     error={errors?.surname}
                 />
                 <InputField
-                    label="Phone"
+                    label="Telefon"
                     name="phone"
                     defaultValue={data?.phone || ""}
                     register={register}
                     error={errors?.phone}
                 />
                 <InputField
-                    label="Address"
+                    label="Adresă"
                     name="address"
                     defaultValue={data?.address}
                     register={register}
                     error={errors?.address}
                 />
-                <InputField
+                {/* <InputField
                     label="Blood Type"
                     name="bloodType"
                     defaultValue={data?.bloodType}
                     register={register}
                     error={errors?.bloodType}
-                />
+                /> */}
                 <InputField
-                    label="Birthday"
+                    label="Data nașterii"
                     name="birthday"
                     type="date"
                     defaultValue={data?.birthday}
                     register={register}
-                    error={errors?.birthday}
+                    error={getDateError("birthday")}
                 />
-                <InputField
-                    label="Gender"
-                    name="gender"
-                    defaultValue={data?.gender}
-                    register={register}
-                    error={errors?.gender}
-                />
+                <div className="flex flex-col gap-2 pt-2">
+                    <label className="text-xs text-gray-400 font-medium">Gen</label>
+                    <select
+                        className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
+                        {...register("gender")}
+                        defaultValue={data?.gender || ""}
+                    >
+                        <option value="">Selectează genul</option>
+                        <option value="FEMALE">Femeie</option>
+                        <option value="MALE">Bărbat</option>
+                        <option value="OTHER">Altul</option>
+                    </select>
+                    {errors.gender?.message && (
+                        <p className="text-xs text-red-400">
+                            {errors.gender.message.toString()}
+                        </p>
+                    )}
+                </div>
 
                 <div className="mt-3 ">
                     {/* Subjects MultiSelect */}
@@ -401,9 +404,9 @@ const TeacherForm = ({
                         render={({ field }) => (
                             <MultiSelect
                                 id="subjects"
-                                label="Subjects"
+                                label="Materii"
                                 options={subjects}
-                                placeholder="Select subjects..."
+                                placeholder="Selectează materiile"
                                 selectedIds={field.value}
                                 onSelectionChange={(ids) => field.onChange(ids)}
                             />
@@ -412,15 +415,30 @@ const TeacherForm = ({
                 </div>
             </div>
 
-            <div className="flex justify-center mt-2">
+            <div className="flex justify-center mt-2 mb-8">
                 <button
                     type="submit"
                     className={`bg-blue-500 transition ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""} text-white px-8 py-2 rounded-md text-sm w-max`}
                     disabled={isSubmitting}
                 >
-                    {type === "create" ? "Create" : "Update"}
+                    {type === "create" ? "Adaugă" : "Actualizează"} profesorul
                 </button>
             </div>
+
+            {isPending && <LoadingPopup />}
+
+            <CldUploadWidget
+                uploadPreset="school-mgmt"
+                onSuccess={(result, { widget }) => {
+                    setImg(result.info);
+                    widget.close();
+                }}
+            >
+                {({ open }) => {
+                    openUploadWidget = open;
+                    return <></>;
+                }}
+            </CldUploadWidget>
         </form>
     );
 };

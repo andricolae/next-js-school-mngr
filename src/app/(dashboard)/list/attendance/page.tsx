@@ -8,7 +8,6 @@ import prisma from "@/lib/prisma"
 import { ITEM_PER_PAGE } from "@/lib/settings"
 import { auth } from "@clerk/nextjs/server"
 import { Attendance, Lesson, Prisma, Student } from "@prisma/client"
-import Image from "next/image"
 import { TokenData } from "@/lib/utils";
 
 type AttendanceList = Attendance & {
@@ -32,30 +31,30 @@ const AttendanceListPage = async ({ searchParams }: { searchParams: { [key: stri
 
     const columns = [
         {
-            header: "Student",
+            header: "Elev",
             accessor: "student",
         },
         {
-            header: "Lesson",
+            header: "Ora",
             accessor: "lesson",
             className: "hidden md:table-cell",
         },
         {
-            header: "Class",
+            header: "Clasa",
             accessor: "class",
             className: "hidden md:table-cell",
         },
         {
-            header: "Date",
+            header: "Data",
             accessor: "date",
             className: "hidden lg:table-cell",
         },
         {
-            header: "Status",
+            header: "Stare",
             accessor: "status",
         },
         ...(role === "admin" || role === "teacher" ? [{
-            header: "Actions",
+            header: "Acțiuni",
             accessor: "actions",
         }] : []),
     ]
@@ -70,7 +69,7 @@ const AttendanceListPage = async ({ searchParams }: { searchParams: { [key: stri
             </td>
             <td className="hidden md:table-cell">{item.lesson.subject.name}</td>
             <td className="hidden md:table-cell">{item.lesson.class.name}</td>
-            <td className="hidden lg:table-cell">{new Intl.DateTimeFormat("en-UK").format(item.date)}</td>
+            <td className="hidden lg:table-cell">{new Intl.DateTimeFormat("ro-RO").format(item.date)}</td>
             <td>
                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${item.present
                     ? "bg-green-100 text-green-800"
@@ -83,8 +82,8 @@ const AttendanceListPage = async ({ searchParams }: { searchParams: { [key: stri
                 <div className="flex items-center gap-2">
                     {(role === "admin" || role === "teacher") && (
                         <>
-                            <FormContainer table="attendance" type="delete" id={item.id} />
                             <FormContainer table="attendance" type="update" data={item} />
+                            <FormContainer table="attendance" type="delete" id={item.id} />
                         </>
                     )}
                 </div>
@@ -183,7 +182,7 @@ const AttendanceListPage = async ({ searchParams }: { searchParams: { [key: stri
     return (
         <div className='bg-white p-4 rounded-md flex-1 m-4 mt-0'>
             <div className='flex items-center justify-between'>
-                <h1 className='hidden md:block text-lg font-semibold'>Attendance Records</h1>
+                <h1 className='hidden md:block text-lg font-semibold'>Prezențe</h1>
                 <div className='flex flex-col md:flex-row items-center gap-4 w-full md:w-auto'>
                     <TableSearch />
                     <div className='flex items-center gap-4 self-end'>
