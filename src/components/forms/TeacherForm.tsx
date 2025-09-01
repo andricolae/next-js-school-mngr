@@ -152,7 +152,7 @@ const MultiSelect = ({
             {isOpen && filteredOptions.length > 0 && (
                 <div
                     ref={dropdownRef}
-                    className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-48 overflow-y-auto"
+                    className="absolute bottom-full mb-1 z-10 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto"
                 >
                     {filteredOptions.map((option) => (
                         <div
@@ -377,7 +377,7 @@ const TeacherForm = ({
                     register={register}
                     error={getDateError("birthday")}
                 />
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-2 pt-2">
                     <label className="text-xs text-gray-400 font-medium">Gen</label>
                     <select
                         className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
