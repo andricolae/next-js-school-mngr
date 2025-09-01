@@ -237,15 +237,30 @@ export const eventSchema = z.object({
 
 export type EventSchema = z.infer<typeof eventSchema>;
 
-export const announcementSchema = z.object({
+const baseAnnouncementSchema = {
     id: z.coerce.number().optional(),
     title: z.string().min(1, { message: "Titlul anunțului este obligatoriu!" }),
     description: z.string().min(1, { message: "Descrierea este obligatorie!" }),
-    date: z.coerce.date({ message: "Data este obligatorie" }).min(new Date(new Date().toDateString()), { message: "Data anunțului nu poate să fie în trecut!" }),
-    classId: z.union([z.coerce.number(), z.null()]).optional()
+    classId: z.union([z.coerce.number(), z.null()]).optional(),
+};
+
+// Schema for CREATE
+export const createAnnouncementSchema = z.object({
+    ...baseAnnouncementSchema,
+    date: z.coerce.date({ message: "Data este obligatorie" }).refine(
+        d => d.toDateString() === new Date().toDateString(),
+        { message: "Data trebuie să fie chiar astăzi!" }
+    ),
 });
 
-export type AnnouncementSchema = z.infer<typeof announcementSchema>;
+// Schema for UPDATE
+export const updateAnnouncementSchema = z.object({
+    ...baseAnnouncementSchema,
+    date: z.coerce.date().optional(), // ignored
+});
+
+export type CreateAnnouncementSchema = z.infer<typeof createAnnouncementSchema>;
+export type UpdateAnnouncementSchema = z.infer<typeof updateAnnouncementSchema>;
 
 export const lessonSchema = z.object({
     id: z.coerce.number().optional(),
