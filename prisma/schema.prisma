@@ -33,7 +33,7 @@ model Student {
   class       Class        @relation(fields: [classId], references: [id])
   grade       Grade        @relation(fields: [gradeId], references: [id])
   parent      Parent       @relation(fields: [parentId], references: [id])
-  birthday DateTime
+  birthday    DateTime
 }
 
 model Teacher {
@@ -51,7 +51,7 @@ model Teacher {
   classes   Class[]
   lessons   Lesson[]
   subjects  Subject[]  @relation("SubjectToTeacher")
-  birthday DateTime
+  birthday  DateTime
 }
 
 model Parent {
@@ -122,14 +122,14 @@ model Exam {
 }
 
 model Assignment {
-  id        Int      @id @default(autoincrement())
-  title     String
+  id          Int      @id @default(autoincrement())
+  title       String
   description String
-  startDate DateTime
-  dueDate   DateTime
-  lessonId  Int
-  lesson    Lesson   @relation(fields: [lessonId], references: [id])
-  results   Result[]
+  startDate   DateTime
+  dueDate     DateTime
+  lessonId    Int
+  lesson      Lesson   @relation(fields: [lessonId], references: [id])
+  results     Result[]
 }
 
 model Result {

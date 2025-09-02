@@ -283,7 +283,7 @@ const formatDate = (date: Date): string => {
 export const lessonSchema = z.object({
     id: z.coerce.number().optional(),
     name: z.string().min(1, { message: "Titlul orei este obligatoriu!" }),
-    day: z.enum(["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", ""]).optional(),
+    day: z.enum(["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY"]).optional(),
     startTime: z
         .coerce.date()
         .refine((date) => !isNaN(date.getTime()), {
@@ -357,7 +357,7 @@ export const lessonSchema = z.object({
     .refine((data) => data.startTime >= new Date(), {
         message: "Ora de început nu poate fi în trecut!",
         path: ["startTime"],
-    });;
+    });
 
 export type LessonSchema = z.infer<typeof lessonSchema>;
 

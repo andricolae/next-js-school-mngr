@@ -3,6 +3,7 @@ import { auth, clerkClient } from "@clerk/nextjs/server";
 import { CreateAnnouncementSchema, UpdateAnnouncementSchema, AssignmentSchema, AttendanceActionData, ClassSchema, EventSchema, ExamSchema, LessonSchema, ParentSchema, ResultSchema, StudentSchema, SubjectSchema, TeacherSchema } from "./formValidationSchemas";
 import prisma from "./prisma";
 import { TokenData } from "@/lib/utils";
+import { Day } from "@prisma/client";
 
 type CurrentState = { success: boolean; error: boolean | string };
 export const createSubject = async (currentState: CurrentState, data: SubjectSchema) => {
@@ -1206,6 +1207,16 @@ export const deleteAttendance = async (currentState: CurrentState, data: FormDat
     }
 }
 
+const getDayFromDate = (date: Date): LessonSchema["day"] => {
+    switch (date.getDay()) {
+        case 1: return "MONDAY";
+        case 2: return "TUESDAY";
+        case 3: return "WEDNESDAY";
+        case 4: return "THURSDAY";
+        case 5: return "FRIDAY";
+    }
+};
+
 export const createLesson = async (currentState: CurrentState, data: LessonSchema) => {
     const { userId, sessionClaims } = await auth();
     let tokenData;
@@ -1222,7 +1233,7 @@ export const createLesson = async (currentState: CurrentState, data: LessonSchem
         await prisma.lesson.create({
             data: {
                 name: data.name,
-                day: data.day,
+                day: (data.day ?? getDayFromDate(new Date(data.startTime))) as Day,
                 startTime: data.startTime,
                 endTime: data.endTime,
                 subjectId: data.subjectId,
@@ -1319,7 +1330,7 @@ export const createRecurringLessons = async (lessonsData: LessonSchema[]) => {
             await prisma.lesson.create({
                 data: {
                     name: lessonData.name,
-                    day: lessonData.day,
+                    day: (lessonData.day ?? getDayFromDate(new Date(lessonData.startTime))) as Day,
                     startTime: lessonData.startTime,
                     endTime: lessonData.endTime,
                     subjectId: lessonData.subjectId,
