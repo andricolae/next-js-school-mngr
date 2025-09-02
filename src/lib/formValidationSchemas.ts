@@ -244,7 +244,6 @@ const baseAnnouncementSchema = {
     classId: z.union([z.coerce.number(), z.null()]).optional(),
 };
 
-// Schema for CREATE
 export const createAnnouncementSchema = z.object({
     ...baseAnnouncementSchema,
     date: z.coerce.date({ message: "Data este obligatorie" }).refine(
@@ -253,7 +252,6 @@ export const createAnnouncementSchema = z.object({
     ),
 });
 
-// Schema for UPDATE
 export const updateAnnouncementSchema = z.object({
     ...baseAnnouncementSchema,
     date: z.coerce.date().optional(), // ignored
@@ -266,17 +264,26 @@ export const lessonSchema = z.object({
     id: z.coerce.number().optional(),
     name: z.string().min(1, { message: "Titlul orei este obligatoriu!" }),
     day: z.enum(["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", ""]).optional(),
-    startTime: z.coerce.date({ message: "Data și ora de început sunt obligatorii!" }).refine(
-        (val) => {
-            const hour = val.getHours();
-            const minute = val.getMinutes();
-            return (hour >= 8 && hour < 18) || (hour === 18 && minute === 0);
-        },
-        {
-            message: "Ora de început trebuie să fie între 08:00 și 18:00!",
-        }
-    ),
-    endTime: z.coerce.date({ message: "Ora de sfârșit este obligatorie!" })
+    startTime: z
+        .coerce.date()
+        .refine((date) => !isNaN(date.getTime()), {
+            message: "Data și ora de început sunt obligatorii!",
+        })
+        .refine(
+            (val) => {
+                const hour = val.getHours();
+                const minute = val.getMinutes();
+                return (hour >= 8 && hour < 18) || (hour === 18 && minute === 0);
+            },
+            {
+                message: "Ora de început trebuie să fie între 08:00 și 18:00!",
+            }
+        ),
+    endTime: z
+        .coerce.date()
+        .refine((date) => !isNaN(date.getTime()), {
+            message: "Data și ora de sfârșit sunt obligatorii!",
+        })
         .refine(
             (val) => {
                 const hour = val.getHours();
@@ -306,7 +313,15 @@ export const lessonSchema = z.object({
     {
         message: "Pentru o lecție singulară, începutul și sfârșitul trebuie să fie în aceeași zi",
         path: ["endTime"],
-    });
+    })
+    .refine((data) => data.endTime > data.startTime, {
+        message: "Ora de sfârșit trebuie să fie după ora de început!",
+        path: ["endTime"],
+    })
+    .refine((data) => data.startTime >= new Date(), {
+        message: "Ora de început nu poate fi în trecut!",
+        path: ["startTime"],
+    });;
 
 export type LessonSchema = z.infer<typeof lessonSchema>;
 

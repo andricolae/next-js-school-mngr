@@ -72,7 +72,7 @@ const LessonForm = ({
     const {
         register,
         handleSubmit,
-        formState: { errors },
+        formState: { errors, touchedFields, isSubmitted },
         setValue,
         watch,
     } = useForm<LessonSchema>({
@@ -219,6 +219,20 @@ const LessonForm = ({
     const [filteredSubjects, setFilteredSubjects] = useState(subjects || []);
     const [filteredTeachers, setFilteredTeachers] = useState(teachers || []);
 
+    const getDateError = (field: "startTime" | "endTime") => {
+        const err = errors[field];
+        if (isSubmitted && !touchedFields[field] && !err) {
+            return field === "startTime"
+                ? "Data și ora de început sunt obligatorii!"
+                : "Data și ora de sfârșit sunt obligatorii!";
+        }
+        if (err?.message === "Invalid date") {
+            return field === "startTime"
+                ? "Data și ora de început sunt obligatorii!"
+                : "Data și ora de sfârșit sunt obligatorii!";
+        }
+        return err?.message;
+    };
     const updateSelect = async (selectedOption: "subjects" | "teachers", teacherIdOrSubjectName: string) => {
         startTransition(async () => {
             if (selectedOption === "subjects") {
@@ -352,7 +366,7 @@ const LessonForm = ({
                                     undefined
                                 }
                                 register={register}
-                                error={errors?.startTime}
+                                error={getDateError("startTime")}
                                 type="datetime-local"
                             />
                         </div>
@@ -365,7 +379,7 @@ const LessonForm = ({
                                     undefined
                                 }
                                 register={register}
-                                error={errors?.endTime}
+                                error={getDateError("endTime")}
                                 type="datetime-local"
                             />
                         </div>
