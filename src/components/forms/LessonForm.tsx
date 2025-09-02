@@ -13,6 +13,7 @@ import LoadingPopup from "@/components/LoadingPopup";
 import { useTransition } from "react";
 import { availableModules } from "@/lib/modules";
 import { nationalHolidays } from "@/lib/holidays";
+import { formatDateForInput } from "@/lib/utils";
 
 type ModuleType = {
     id: number;
@@ -36,11 +37,7 @@ const LessonForm = ({
     type: "create" | "update";
     data?: any;
     setOpen: Dispatch<SetStateAction<boolean>>;
-    relatedData?: {
-        subjects: any[];
-        classes: any[];
-        teachers: any[];
-    };
+    relatedData?: any;
 }) => {
 
     // const availableModules: ModuleType[] = [
@@ -191,8 +188,8 @@ const LessonForm = ({
                 const submissionData = {
                     ...formData,
                     ...(type === "update" && data?.id && { id: data.id }),
-                    startTime: new Date(new Date(formData.startTime).getTime() + (3 * 60 * 60 * 1000)),
-                    endTime: new Date(new Date(formData.endTime).getTime() + (3 * 60 * 60 * 1000)),
+                    startTime: new Date(new Date(formData.startTime).getTime()),
+                    endTime: new Date(new Date(formData.endTime).getTime()),
                 };
                 formAction(submissionData);
             }
@@ -321,10 +318,7 @@ const LessonForm = ({
                             <InputField
                                 label="Începutul orei"
                                 name="startTime"
-                                defaultValue={data?.startTime ?
-                                    new Date(data.startTime).toISOString().slice(0, 16) :
-                                    undefined
-                                }
+                                defaultValue={data?.startTime ? formatDateForInput(data.startTime) : undefined}
                                 register={register}
                                 error={errors?.startTime}
                                 type="datetime-local"
@@ -334,10 +328,7 @@ const LessonForm = ({
                             <InputField
                                 label="Sfârșitul orei"
                                 name="endTime"
-                                defaultValue={data?.endTime ?
-                                    new Date(data.endTime).toISOString().slice(0, 16) :
-                                    undefined
-                                }
+                                defaultValue={data?.endTime ? formatDateForInput(data.endTime) : undefined}
                                 register={register}
                                 error={errors?.endTime}
                                 type="datetime-local"

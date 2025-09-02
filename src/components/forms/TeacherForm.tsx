@@ -13,6 +13,7 @@ import { useFormState } from "react-dom";
 import { CldUploadWidget } from "next-cloudinary";
 import LoadingPopup from "@/components/LoadingPopup";
 import { useTransition } from "react";
+import { formatDateForInput } from "@/lib/utils";
 
 interface FilterOption {
     id: string;
@@ -231,9 +232,7 @@ const TeacherForm = ({
 
     useEffect(() => {
         if (state.success) {
-            toast(
-                `Profesor ${type === "create" ? "adăugat" : "actualizat"} cu succes!`
-            );
+            toast(`Profesor ${type === "create" ? "adăugat" : "actualizat"} cu succes!`);
             setOpen(false);
             router.refresh();
         } else if (state.error) {
@@ -372,10 +371,10 @@ const TeacherForm = ({
                 <InputField
                     label="Data nașterii"
                     name="birthday"
-                    type="date"
-                    defaultValue={data?.birthday}
+                    defaultValue={data?.birthday ? new Date(data.birthday).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]}
                     register={register}
                     error={getDateError("birthday")}
+                    type="date"
                 />
                 <div className="flex flex-col gap-2 pt-2">
                     <label className="text-xs text-gray-400 font-medium">Gen</label>

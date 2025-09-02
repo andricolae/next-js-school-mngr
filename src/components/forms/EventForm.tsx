@@ -11,6 +11,7 @@ import { createEvent, updateEvent } from "@/lib/actions";
 import { toast } from "react-toastify";
 import LoadingPopup from "@/components/LoadingPopup";
 import { useTransition } from "react";
+import { formatDateForInput } from "@/lib/utils";
 
 const EventForm = ({
     type,
@@ -43,8 +44,8 @@ const EventForm = ({
             const submissionData = {
                 ...formData,
                 ...(type === "update" && data?.id && { id: data.id }),
-                startTime: new Date(new Date(formData.startTime).getTime() + (3 * 60 * 60 * 1000)),
-                endTime: new Date(new Date(formData.endTime).getTime() + (3 * 60 * 60 * 1000)),
+                startTime: new Date(new Date(formData.startTime).getTime()),
+                endTime: new Date(new Date(formData.endTime).getTime()),
             };
             formAction(submissionData);
         });
@@ -112,7 +113,7 @@ const EventForm = ({
                 <InputField
                     label="Data și ora de început"
                     name="startTime"
-                    defaultValue={data?.startTime ? new Date(data.startTime).toISOString().slice(0, 16) : undefined}
+                    defaultValue={data?.startTime ? formatDateForInput(data.startTime) : undefined}
                     register={register}
                     error={getDateError("startTime")}
                     type="datetime-local"
@@ -121,7 +122,7 @@ const EventForm = ({
                 <InputField
                     label="Data și ora de sfârșit"
                     name="endTime"
-                    defaultValue={data?.endTime ? new Date(data.endTime).toISOString().slice(0, 16) : undefined}
+                    defaultValue={data?.endTime ? formatDateForInput(data.endTime) : undefined}
                     register={register}
                     error={getDateError("endTime")}
                     type="datetime-local"
