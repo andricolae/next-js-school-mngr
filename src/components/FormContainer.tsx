@@ -259,6 +259,7 @@ const FormContainer = async ({ table, type, data, id }: FormContainerProps) => {
                     select: {
                         id: true,
                         name: true,
+                        startTime: true,
                         subject: { select: { name: true } },
                         class: { select: { name: true } },
                         classId: true
