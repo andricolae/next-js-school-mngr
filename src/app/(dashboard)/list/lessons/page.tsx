@@ -184,7 +184,7 @@ const LessonListPage = async ({ searchParams }: { searchParams: { [key: string]:
 
 
     const title = hasSpecificFilters ? "Ore filtrate" : "Orele de azi";
-    const selectedIds = data.map(item => item.id);
+    // const selectedIds = data.map(item => item.id);
 
     return (
         <div className='bg-white p-4 rounded-md flex-1 m-4 mt-0'>

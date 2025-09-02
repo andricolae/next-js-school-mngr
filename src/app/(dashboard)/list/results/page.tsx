@@ -502,7 +502,6 @@ const ResultListPage = async ({
                 </div>
             </div>
             <Table columns={columns} renderRow={renderRow} data={data} />
-            {/* <COMPONENTA data={data} dataRes={dataRes} /> */}
             <Pagination page={p} count={count} />
 
             {isSingleStudentSelected && (
