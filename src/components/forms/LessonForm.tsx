@@ -450,7 +450,7 @@ const LessonForm = ({
                                             <div className="3 p-2 bg-blue-50 rounded text-xs">
                                                 <p><strong>Modul selectat:</strong> {availableModules.find(m => m.id === selectedModuleId)?.name}</p>
                                                 <p><strong>Perioada:</strong> {availableModules.find(m => m.id === selectedModuleId)?.startDate} - {availableModules.find(m => m.id === selectedModuleId)?.endDate}</p>
-                                                <p><strong>Important:</strong> Lecțiile vor fi create pentru fiecare zi selectată din intervalul ales, exceptând zilele libere naționale!</p>
+                                                <p><strong>Important:</strong> Lecțiile vor fi create pentru fiecare zi selectată din intervalul ales, exceptând weekendurile și zilele libere naționale!</p>
                                             </div>
                                         )}
                                     </div>

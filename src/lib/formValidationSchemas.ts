@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { nationalHolidays } from "./holidays";
 
 export const subjectSchema = z.object({
     id: z.coerce.number().optional(),
@@ -248,17 +249,36 @@ export const createAnnouncementSchema = z.object({
     ...baseAnnouncementSchema,
     date: z.coerce.date({ message: "Data este obligatorie" }).refine(
         d => d.toDateString() === new Date().toDateString(),
-        { message: "Data trebuie să fie chiar astăzi!" }
+        { message: "Data trebuie să fie în ziua curentă!" }
     ),
 });
 
 export const updateAnnouncementSchema = z.object({
     ...baseAnnouncementSchema,
-    date: z.coerce.date().optional(), // ignored
+    date: z.coerce.date().optional(),
 });
 
 export type CreateAnnouncementSchema = z.infer<typeof createAnnouncementSchema>;
 export type UpdateAnnouncementSchema = z.infer<typeof updateAnnouncementSchema>;
+
+const isWeekend = (date: Date): boolean => {
+    const day = date.getDay();
+    return day === 0 || day === 6;
+};
+
+const isHoliday = (date: Date): boolean => {
+    const dateString = date.toISOString().split('T')[0];
+    return nationalHolidays.some(holiday => holiday.date === dateString);
+};
+
+const formatDate = (date: Date): string => {
+    return date.toLocaleDateString('ro-RO', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+    });
+};
 
 export const lessonSchema = z.object({
     id: z.coerce.number().optional(),
@@ -278,6 +298,14 @@ export const lessonSchema = z.object({
             {
                 message: "Ora de început trebuie să fie între 08:00 și 18:00!",
             }
+        )
+        .refine(
+            (date) => !isWeekend(date),
+            { message: "Nu puteți programa ore în zile de weekend!", }
+        )
+        .refine(
+            (date) => !isHoliday(date),
+            { message: `Nu puteți programa ore în zile libere naționale!`, }
         ),
     endTime: z
         .coerce.date()
@@ -294,6 +322,14 @@ export const lessonSchema = z.object({
             {
                 message: "Ora de sfârșit trebuie să fie între 09:00 și 19:00!",
             }
+        )
+        .refine(
+            (date) => !isWeekend(date),
+            { message: "Nu puteți programa ore în zile de weekend!", }
+        )
+        .refine(
+            (date) => !isHoliday(date),
+            { message: `Nu puteți programa ore în zile libere naționale!`, }
         ),
     subjectId: z.coerce.number({ message: "Materia este obligatorie!" }),
     classId: z.coerce.number({ message: "Clasa este obligatorie!" }),
