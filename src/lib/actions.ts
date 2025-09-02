@@ -1311,7 +1311,7 @@ export const deleteLesson = async (currentState: CurrentState, data: FormData) =
     }
 }
 
-export async function createRecurringLessons(lessonsData: LessonSchema[]) {
+export const createRecurringLessons = async (lessonsData: LessonSchema[]) => {
     try {
         let successCount = 0;
         for (const lessonData of lessonsData) {
@@ -1338,13 +1338,13 @@ export async function createRecurringLessons(lessonsData: LessonSchema[]) {
     }
 }
 
-export async function checkTeacherAvailability(
+export const checkTeacherAvailability = async (
     teacherId: string,
     day: string,
     startTime: Date,
     endTime: Date,
     lessonIdToExclude?: number
-): Promise<boolean> {
+): Promise<boolean> => {
     try {
 
         const startHour = startTime.getHours();
@@ -1394,7 +1394,7 @@ export async function checkTeacherAvailability(
     }
 }
 
-function getFriendlyErrorMessage(e: any): string {
+const getFriendlyErrorMessage = (e: any): string => {
     let friendlyMessage = "An unknown error occurred.";
 
     if (e.errors && Array.isArray(e.errors) && e.errors.length > 0) {
