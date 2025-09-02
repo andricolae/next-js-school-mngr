@@ -1230,10 +1230,10 @@ export const createLesson = async (currentState: CurrentState, data: LessonSchem
             return { success: false, error: true };
         }
 
-        await prisma.lesson.create({
+        const status = await prisma.lesson.create({
             data: {
                 name: data.name,
-                day: (data.day ?? getDayFromDate(new Date(data.startTime))) as Day,
+                day: getDayFromDate(new Date(data.startTime)) as Day,
                 startTime: data.startTime,
                 endTime: data.endTime,
                 subjectId: data.subjectId,
@@ -1282,7 +1282,7 @@ export const updateLesson = async (currentState: CurrentState, data: LessonSchem
             },
             data: {
                 name: data.name,
-                day: data.day,
+                day: getDayFromDate(new Date(data.startTime)) as Day,
                 startTime: data.startTime,
                 endTime: data.endTime,
                 subjectId: data.subjectId,
@@ -1345,7 +1345,7 @@ export const createRecurringLessons = async (lessonsData: LessonSchema[]) => {
     } catch (error: any) {
         console.error("Error creating recurring lessons:", error);
 
-        return { success: false, error: true, message: error.message || "Failed to create recurring lessons." };
+        return { success: false, error: true, message: error.message || "A intervenit o eroare în crearea orelor recurente." };
     }
 }
 
@@ -1406,22 +1406,22 @@ export const checkTeacherAvailability = async (
 }
 
 const getFriendlyErrorMessage = (e: any): string => {
-    let friendlyMessage = "An unknown error occurred.";
+    let friendlyMessage = "A intervenit o eroare neașteptată.";
 
     if (e.errors && Array.isArray(e.errors) && e.errors.length > 0) {
         friendlyMessage = e.errors[0].longMessage || e.errors[0].message;
         if (friendlyMessage.startsWith("Validation error: ")) {
-            friendlyMessage = friendlyMessage.replace("Validation error: ", "");
+            friendlyMessage = friendlyMessage.replace("Eroare de validare: ", "");
         }
         if (friendlyMessage.includes("username is already taken")) {
-            friendlyMessage = "The username is already taken.";
+            friendlyMessage = "Numele de utilizator este deja folosit.";
         } else if (friendlyMessage.includes("password must be at least")) {
-            friendlyMessage = "The password is too short. It must be at least 8 characters long.";
+            friendlyMessage = "Parola este prea scurtă. Trebuie să aibă minim 8 caractere.";
         }
     } else if (e.message) {
         friendlyMessage = e.message;
         if (e.message.includes("Unique constraint failed on the")) {
-            friendlyMessage = "This record already exists (duplicate).";
+            friendlyMessage = "Intrarea această există deja.";
         }
     } else if (typeof e === 'string') {
         friendlyMessage = e;
@@ -1461,7 +1461,7 @@ export const studentsAssignedToAnExam = async (examId: number) => {
         where: {
             results: {
                 some: {
-                    examId: examId, // only students who have a result for this exam
+                    examId: examId,
                 },
             },
         },
