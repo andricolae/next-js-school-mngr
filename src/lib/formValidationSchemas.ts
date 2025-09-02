@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { nationalHolidays } from "./holidays";
 
 export const subjectSchema = z.object({
     id: z.coerce.number().optional(),
@@ -244,39 +245,73 @@ const baseAnnouncementSchema = {
     classId: z.union([z.coerce.number(), z.null()]).optional(),
 };
 
-// Schema for CREATE
 export const createAnnouncementSchema = z.object({
     ...baseAnnouncementSchema,
     date: z.coerce.date({ message: "Data este obligatorie" }).refine(
         d => d.toDateString() === new Date().toDateString(),
-        { message: "Data trebuie să fie chiar astăzi!" }
+        { message: "Data trebuie să fie în ziua curentă!" }
     ),
 });
 
-// Schema for UPDATE
 export const updateAnnouncementSchema = z.object({
     ...baseAnnouncementSchema,
-    date: z.coerce.date().optional(), // ignored
+    date: z.coerce.date().optional(),
 });
 
 export type CreateAnnouncementSchema = z.infer<typeof createAnnouncementSchema>;
 export type UpdateAnnouncementSchema = z.infer<typeof updateAnnouncementSchema>;
 
+const isWeekend = (date: Date): boolean => {
+    const day = date.getDay();
+    return day === 0 || day === 6;
+};
+
+const isHoliday = (date: Date): boolean => {
+    const dateString = date.toISOString().split('T')[0];
+    return nationalHolidays.some(holiday => holiday.date === dateString);
+};
+
+const formatDate = (date: Date): string => {
+    return date.toLocaleDateString('ro-RO', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+    });
+};
+
 export const lessonSchema = z.object({
     id: z.coerce.number().optional(),
     name: z.string().min(1, { message: "Titlul orei este obligatoriu!" }),
-    day: z.enum(["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY"], { message: "Ziua este obligtorie!" }),
-    startTime: z.coerce.date({ message: "Data și ora de început sunt obligatorii!" }).refine(
-        (val) => {
-            const hour = val.getHours();
-            const minute = val.getMinutes();
-            return (hour >= 8 && hour < 18) || (hour === 18 && minute === 0);
-        },
-        {
-            message: "Ora de început trebuie să fie între 08:00 și 18:00!",
-        }
-    ),
-    endTime: z.coerce.date({ message: "Ora de sfârșit este obligatorie!" })
+    day: z.enum(["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", ""]).optional(),
+    startTime: z
+        .coerce.date()
+        .refine((date) => !isNaN(date.getTime()), {
+            message: "Data și ora de început sunt obligatorii!",
+        })
+        .refine(
+            (val) => {
+                const hour = val.getHours();
+                const minute = val.getMinutes();
+                return (hour >= 8 && hour < 18) || (hour === 18 && minute === 0);
+            },
+            {
+                message: "Ora de început trebuie să fie între 08:00 și 18:00!",
+            }
+        )
+        .refine(
+            (date) => !isWeekend(date),
+            { message: "Nu puteți programa ore în zile de weekend!", }
+        )
+        .refine(
+            (date) => !isHoliday(date),
+            { message: `Nu puteți programa ore în zile libere naționale!`, }
+        ),
+    endTime: z
+        .coerce.date()
+        .refine((date) => !isNaN(date.getTime()), {
+            message: "Data și ora de sfârșit sunt obligatorii!",
+        })
         .refine(
             (val) => {
                 const hour = val.getHours();
@@ -287,11 +322,42 @@ export const lessonSchema = z.object({
             {
                 message: "Ora de sfârșit trebuie să fie între 09:00 și 19:00!",
             }
+        )
+        .refine(
+            (date) => !isWeekend(date),
+            { message: "Nu puteți programa ore în zile de weekend!", }
+        )
+        .refine(
+            (date) => !isHoliday(date),
+            { message: `Nu puteți programa ore în zile libere naționale!`, }
         ),
     subjectId: z.coerce.number({ message: "Materia este obligatorie!" }),
     classId: z.coerce.number({ message: "Clasa este obligatorie!" }),
     teacherId: z.string().min(1, { message: "Profesorul este obligatoriu!" }),
-});
+    isRecurring: z.boolean(),
+}).refine(
+    (data) => {
+        if (!data.isRecurring) {
+            return (
+                data.startTime.getFullYear() === data.endTime.getFullYear() &&
+                data.startTime.getMonth() === data.endTime.getMonth() &&
+                data.startTime.getDate() === data.endTime.getDate()
+            );
+        }
+        return true;
+    },
+    {
+        message: "Pentru o lecție singulară, începutul și sfârșitul trebuie să fie în aceeași zi",
+        path: ["endTime"],
+    })
+    .refine((data) => data.endTime > data.startTime, {
+        message: "Ora de sfârșit trebuie să fie după ora de început!",
+        path: ["endTime"],
+    })
+    .refine((data) => data.startTime >= new Date(), {
+        message: "Ora de început nu poate fi în trecut!",
+        path: ["startTime"],
+    });
 
 export type LessonSchema = z.infer<typeof lessonSchema>;
 
