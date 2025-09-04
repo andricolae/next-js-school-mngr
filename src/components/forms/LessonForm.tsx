@@ -241,6 +241,8 @@ const LessonForm = ({
         });
     };
 
+    const isRecurringWatch = watch("isRecurring", isRecurring);
+
     return (
         <form className="flex flex-col gap-6" onSubmit={onSubmit}>
             <h1 className="text-xl font-semibold">
@@ -260,7 +262,6 @@ const LessonForm = ({
                         </div>
 
                         <div className="flex flex-col gap-2 w-full mt-4">
-                            {/* <label className="text-xs text-gray-400">Ziua</label> */}
                             <div className="flex items-center gap-1">
                                 <label
                                     className={`text-xs ${!isRecurring ? "text-gray-400" : "text-gray-600"}`}
@@ -277,7 +278,6 @@ const LessonForm = ({
                                 )}
                             </div>
                             <select
-                                // className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
                                 className={`ring-[1.5px] p-2 rounded-md text-sm w-full ${!isRecurring ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "ring-gray-300"
                                     }`}
                                 defaultValue={data?.day || ""}
@@ -360,7 +360,7 @@ const LessonForm = ({
                                 defaultValue={data?.startTime ? formatDateForInput(data.startTime) : undefined}
                                 register={register}
                                 error={getDateError("startTime")}
-                                type="datetime-local"
+                                type={isRecurringWatch ? "time" : "datetime-local"}
                             />
                         </div>
                         <div className="mt-1">
@@ -370,7 +370,7 @@ const LessonForm = ({
                                 defaultValue={data?.endTime ? formatDateForInput(data.endTime) : undefined}
                                 register={register}
                                 error={getDateError("endTime")}
-                                type="datetime-local"
+                                type={isRecurringWatch ? "time" : "datetime-local"}
                             />
                         </div>
 

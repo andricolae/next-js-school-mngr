@@ -82,29 +82,26 @@ const SingleStudentPage = async ({
                                 className="w-36 h-36 rounded-full object-cover"
                             />
                         </div>
-                        <div className="w-2/3 flex flex-col justify-between gap-4">
-                            <div className='flex items-center gap-4'>
-                                <h1 className='text-xl font-semibold'>{student.name + " " + student.surname}</h1>
+                        <div className="w-2/3 flex flex-col gap-6 p-6 bg-white rounded-lg shadow-sm border border-gray-100">
+                            <div className="flex items-center justify-between gap-4">
+                                <h1 className="text-2xl font-bold text-gray-800">{student.name + " " + student.surname}</h1>
                                 {role === "admin" && (
-                                    <FormContainer table="student" type="update" data={student} />
+                                    <div className="[&>button]:bg-gray-700 [&>button]:text-white [&>button]:px-4 [&>button]:py-2 [&>button]:rounded-md [&>button]:hover:bg-gray-800 [&>button]:transition-colors">
+                                        <FormContainer table="student" type="update" data={student} />
+                                    </div>
                                 )}
                             </div>
-                            <p className='text-sm text-gray-500'>Lorem ipsum, dolor sit amet consectetur adipisicing elit.</p>
-                            <div className='flex items-center justify-between gap-2 flex-wrap text-xs font-medium'>
-                                {/* <div className='w-full md:w-1/3 lg:w-full 2xl:w-1/3 flex items-center gap-2'>
-                                    <Image src='/blood.png' alt='' width={14} height={14} />
-                                    <span>{student.bloodType}</span>
-                                </div> */}
-                                <div className='w-full md:w-1/3 lg:w-full 2xl:w-1/3 flex items-center gap-2'>
-                                    <Image src='/date.png' alt='' width={14} height={14} />
+                            <div className="flex flex-col items-start gap-2 text-sm font-medium text-gray-600">
+                                <div className="flex items-center gap-3 w-full rounded-md hover:bg-gray-50 transition-colors">
+                                    <Image src="/date.png" alt="Date of birth" width={16} height={16} />
                                     <span>{new Intl.DateTimeFormat("ro-RO").format(student.birthday)}</span>
                                 </div>
-                                <div className='w-full md:w-1/3 lg:w-full  flex items-center gap-2'>
-                                    <Image src='/mail.png' alt='' width={14} height={14} />
+                                <div className="flex items-center gap-3 w-full rounded-md hover:bg-gray-50 transition-colors">
+                                    <Image src="/mail.png" alt="Email" width={16} height={16} />
                                     <span>{student.email || "-"}</span>
                                 </div>
-                                <div className='w-full md:w-1/3 lg:w-full  flex items-center gap-2'>
-                                    <Image src='/phone.png' alt='' width={14} height={14} />
+                                <div className="flex items-center gap-3 w-full rounded-md hover:bg-gray-50 transition-colors">
+                                    <Image src="/phone.png" alt="Phone" width={16} height={16} />
                                     <span>{student.phone || "-"}</span>
                                 </div>
                             </div>

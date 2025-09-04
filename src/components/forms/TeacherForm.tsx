@@ -302,7 +302,7 @@ const TeacherForm = ({
                     onClick={() => openUploadWidget()}
                 >
                     <label className="text-sm font-medium text-gray-700 cursor-pointer select-none">
-                        Încară o imagine
+                        Încarcă o imagine
                     </label>
                     <div className="flex items-center gap-2">
                         <Image
