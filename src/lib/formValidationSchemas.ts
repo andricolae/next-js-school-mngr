@@ -154,7 +154,9 @@ export const examSchema = z
             .refine((date) => !isNaN(date.getTime()), {
                 message: "Data și ora de sfârșit sunt obligatorii!",
             }),
-        lessonId: z.coerce.number({ message: "Ora asociată este obligatorie!" }),
+        lessonId: z
+            .coerce.number()
+            .refine((val) => val > 0, { message: "Ora asociată este obligatorie!" }),
     })
     .refine((data) => data.endTime > data.startTime, {
         message: "Ora de sfârșit trebuie să fie după ora de început!",
@@ -173,13 +175,12 @@ export const assignmentSchema = z.object({
         .string()
         .min(1, { message: 'Denumirea materiei este obligatorie!' }),
     description: z.coerce.string().min(1, { message: 'Descrierea este obligatorie!' }),
-    startDate: z.coerce.date({ message: "Data de început este obligatorie!" }).min(new Date(new Date().toDateString()), { message: "Ora de început nu poate să fie în trecut!" }),
+    startDate: z.coerce.date({ message: "Data de început este obligatorie!" }).min(new Date(new Date().toDateString()), { message: "Data de început nu poate să fie în trecut!" }),
     dueDate: z.coerce.date({ message: "Termenul limită este obligatoriu!" }),
     lessonId: z
         .coerce.number({ message: "Ora asociată este obligatorie!" })
         .refine((val) => val > 0, { message: "Ora asociată este obligatorie!" }),
 })
-
     .refine(
         data => data.dueDate >= data.startDate,
         {

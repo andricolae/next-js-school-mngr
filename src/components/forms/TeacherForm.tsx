@@ -210,7 +210,7 @@ const TeacherForm = ({
             address: data?.address,
             bloodType: data?.bloodType,
             gender: data?.gender,
-            birthday: data?.birthday,
+            // birthday: data?.birthday,
             subjects: data?.subjects?.map((subject: any) => subject.id.toString()) || [],
         },
     });
@@ -371,7 +371,7 @@ const TeacherForm = ({
                 <InputField
                     label="Data nașterii"
                     name="birthday"
-                    defaultValue={data?.birthday ? new Date(data.birthday).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]}
+                    defaultValue={data?.birthday ? data?.birthday.toISOString().split('T')[0] : ""}
                     register={register}
                     error={getDateError("birthday")}
                     type="date"

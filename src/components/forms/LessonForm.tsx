@@ -75,8 +75,8 @@ const LessonForm = ({
     } = useForm<LessonSchema>({
         resolver: zodResolver(lessonSchema),
         defaultValues: {
-            startTime: data?.startTime ? new Date(data.startTime) : undefined,
-            endTime: data?.endTime ? new Date(data.endTime) : undefined,
+            // startTime: data?.startTime ? new Date(data.startTime) : undefined,
+            // endTime: data?.endTime ? new Date(data.endTime) : undefined,
             isRecurring: false,
         }
     });
@@ -128,7 +128,6 @@ const LessonForm = ({
 
         let currentDate = new Date(moduleStartDate);
         const lessonsToCreate = [];
-
 
         while (currentDate.getTime() <= moduleEndDate.getTime()) {
             if (currentDate.getDay() === lessonDayOfWeek) {
