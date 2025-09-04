@@ -32,13 +32,14 @@ const ResultForm = ({
         reset
     } = useForm<ResultSchema>({
         resolver: zodResolver(resultSchema),
-        defaultValues: type === "update" && data ? {
-            id: data.id,
-            score: data.score,
-            studentId: data.studentId || "",
-            examId: data.examId || undefined,
-            assignmentId: data.assignmentId || undefined,
-        } : {}
+        // defaultValues: type === "update" && data ? {
+        //     id: data.id,
+        //     score: data.score,
+        //     studentId: data.studentId || "",
+        //     examId: data.examId || undefined,
+        //     assignmentId: data.assignmentId || undefined,
+        //     resultDate: data.resultDate,
+        // } : {}
     });
 
     const [state, formAction] = useFormState(type === "create"
@@ -73,7 +74,7 @@ const ResultForm = ({
     }, [state, router, type, setOpen]);
 
     const { students, exams, assignments } = relatedData;
-    const [filteredStudents, setFilteredStudents] = useState(students || []);
+    const [filteredStudents, setFilteredStudents] = useState(students);
 
     const updateSelect = async (selectedOption: "exam" | "assignment", id: number) => {
         startTransition(async () => {
@@ -118,7 +119,7 @@ const ResultForm = ({
                     />
                 )}
 
-                <div className="flex flex-col gap-2 w-full">
+                <div className="flex flex-col gap-1 w-full">
                     <label className="text-xs text-gray-400">Elev</label>
                     <select
                         className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
@@ -126,9 +127,9 @@ const ResultForm = ({
                         {...register("studentId")}
                     >
                         <option value="">Alege un elev</option>
-                        {filteredStudents !== undefined ?
+                        {filteredStudents !== null ?
                             <>
-                                {filteredStudents?.lesson?.class?.students?.map(
+                                {filteredStudents?.map(
                                     (student: { id: string; name: string; surname: string }) => (
                                         <option value={student.id} key={student.id}>
                                             {student.name} {student.surname}
@@ -146,6 +147,15 @@ const ResultForm = ({
                         </p>
                     )}
                 </div>
+
+                <InputField
+                    label="Data obtinerii notei"
+                    name="resultDate"
+                    type="date"
+                    defaultValue={data?.resultDate !== undefined ? new Date(data?.resultDate).toISOString().split("T")[0] : ""}
+                    register={register}
+                    error={errors.resultDate}
+                />
 
                 <div className="flex flex-col gap-2 w-full">
                     <label className="text-xs text-gray-400">Test (Opțional)</label>

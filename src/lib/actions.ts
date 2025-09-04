@@ -4,6 +4,7 @@ import { CreateAnnouncementSchema, UpdateAnnouncementSchema, AssignmentSchema, A
 import prisma from "./prisma";
 import { TokenData } from "@/lib/utils";
 import { Day } from "@prisma/client";
+import { translateClerkError } from "./clerkErrorMessage";
 
 type CurrentState = { success: boolean; error: boolean | string };
 export const createSubject = async (currentState: CurrentState, data: SubjectSchema) => {
@@ -136,7 +137,7 @@ export const createTeacher = async (currentState: CurrentState, data: TeacherSch
                     phone: data.phone,
                     address: data.address,
                     img: data.img,
-                    bloodType: data.bloodType ?? "",
+                    CNP: data.CNP ?? "",
                     gender: data.gender,
                     birthday: data.birthday,
                     subjects: {
@@ -194,7 +195,7 @@ export const updateTeacher = async (currentState: CurrentState, data: TeacherSch
                     phone: data.phone,
                     address: data.address,
                     img: data.img,
-                    bloodType: data.bloodType,
+                    CNP: data.CNP,
                     gender: data.gender,
                     birthday: data.birthday,
                     subjects: {
@@ -277,12 +278,13 @@ export const createStudent = async (currentState: CurrentState, data: StudentSch
                     phone: data.phone,
                     address: data.address,
                     img: data.img,
-                    bloodType: data.bloodType ?? "",
+                    CNP: data.CNP ?? "",
                     gender: data.gender,
                     birthday: data.birthday,
                     gradeId: data.gradeId,
                     classId: data.classId,
                     parentId: data.parentId,
+                    birthplace: data.birthplace,
                 }
             });
         } catch (err) {
@@ -336,12 +338,13 @@ export const updateStudent = async (currentState: CurrentState, data: StudentSch
                     phone: data.phone,
                     address: data.address,
                     img: data.img,
-                    bloodType: data.bloodType,
+                    CNP: data.CNP,
                     gender: data.gender,
                     birthday: data.birthday,
                     gradeId: data.gradeId,
                     classId: data.classId,
                     parentId: data.parentId,
+                    birthplace: data.birthplace,
                 }
             });
         } catch (err) {
@@ -351,13 +354,13 @@ export const updateStudent = async (currentState: CurrentState, data: StudentSch
                 lastName: existingUser.lastName ?? undefined,
                 publicMetadata: existingUser.publicMetadata,
             });
-
             throw err;
         }
         return { success: true, error: false }
     } catch (e: any) {
         console.error(e);
-        let errorMessage = "An error occurred while creating the student.";
+
+        let errorMessage = "A intervenit o eroare la actualizarea datelor.";
 
         if (e.errors && e.errors.length > 0) {
             errorMessage = e.errors[0].longMessage || e.errors[0].message;
@@ -365,7 +368,7 @@ export const updateStudent = async (currentState: CurrentState, data: StudentSch
             errorMessage = e.message;
         }
 
-        return { success: false, error: true, message: errorMessage }
+        return { success: false, error: true, message: translateClerkError(e.errors[0].code, e.message) }
     }
 }
 
@@ -618,6 +621,7 @@ export const createResult = async (currentState: CurrentState, data: ResultSchem
                 studentId: data.studentId,
                 ...(data.examId && { examId: data.examId }),
                 ...(data.assignmentId && { assignmentId: data.assignmentId }),
+                resultDate: data.resultDate
             },
         });
         return { success: true, error: false }
@@ -675,6 +679,7 @@ export const updateResult = async (currentState: CurrentState, data: ResultSchem
                 studentId: data.studentId,
                 ...(data.examId && { examId: data.examId }),
                 ...(data.assignmentId && { assignmentId: data.assignmentId }),
+                resultDate: data.resultDate
             },
         });
         return { success: true, error: false }
@@ -1124,11 +1129,14 @@ export const createAttendance = async (currentState: CurrentState, data: Attenda
                 return { success: false, error: true };
             }
         }
-
+        if (data.present === true && data.excused !== true) {
+            data.excused = true;
+        }
         await prisma.attendance.create({
             data: {
                 date: data.date,
                 present: data.present,
+                excused: data.excused,
                 studentId: data.studentId,
                 lessonId: data.lessonId,
             },
@@ -1161,7 +1169,9 @@ export const updateAttendance = async (currentState: CurrentState, data: Attenda
                 return { success: false, error: true };
             }
         }
-
+        if (data.present === true && data.excused !== true) {
+            data.excused = true;
+        }
         await prisma.attendance.update({
             where: {
                 id: data.id,
@@ -1169,6 +1179,7 @@ export const updateAttendance = async (currentState: CurrentState, data: Attenda
             data: {
                 date: data.date,
                 present: data.present,
+                excused: data.excused,
                 studentId: data.studentId,
                 lessonId: data.lessonId,
             },
@@ -1501,5 +1512,5 @@ export const studentsOfClassAssignedToAnAssignment = async (assignmentId: number
             },
         },
     });
-    return assignmentClassStudents;
+    return assignmentClassStudents?.lesson?.class?.students;
 }

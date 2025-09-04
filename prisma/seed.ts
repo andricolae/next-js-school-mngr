@@ -67,7 +67,7 @@ async function main() {
                 email: `teacher${i}@example.com`,
                 phone: `123-456-789${i}`,
                 address: `Address${i}`,
-                bloodType: "A+",
+                CNP: "1234567891234",
                 gender: i % 2 === 0 ? UserGender.MALE : UserGender.FEMALE,
                 subjects: { connect: [{ id: (i % 10) + 1 }] },
                 classes: { connect: [{ id: (i % 6) + 1 }] },
@@ -121,12 +121,13 @@ async function main() {
                 email: `student${i}@example.com`,
                 phone: `987-654-321${i}`,
                 address: `Address${i}`,
-                bloodType: "O-",
+                CNP: "1234567891234",
                 gender: i % 2 === 0 ? UserGender.MALE : UserGender.FEMALE,
                 parentId: `parentId${Math.ceil(i / 2) % 25 || 25}`,
                 gradeId: (i % 6) + 1,
                 classId: (i % 6) + 1,
                 birthday: new Date(new Date().setFullYear(new Date().getFullYear() - 10)),
+                birthplace: `birthplace${i}`
             },
         });
     }
@@ -163,6 +164,7 @@ async function main() {
                 score: 90,
                 studentId: `student${i}`,
                 ...(i <= 5 ? { examId: i } : { assignmentId: i - 5 }),
+                resultDate: new Date()
             },
         });
     }
@@ -173,6 +175,7 @@ async function main() {
             data: {
                 date: new Date(),
                 present: true,
+                excused: false,
                 studentId: `student${i}`,
                 lessonId: (i % 30) + 1,
             },
