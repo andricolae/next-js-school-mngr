@@ -74,7 +74,7 @@ const ResultForm = ({
     }, [state, router, type, setOpen]);
 
     const { students, exams, assignments } = relatedData;
-    const [filteredStudents, setFilteredStudents] = useState(students);
+    const [filteredStudents, setFilteredStudents] = useState(students || []);
 
     const updateSelect = async (selectedOption: "exam" | "assignment", id: number) => {
         startTransition(async () => {

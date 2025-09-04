@@ -131,7 +131,7 @@ export const studentSchema = (isUpdate = false) => z.object({
 
     img: z.string().optional(),
     phone: z.string().optional(),
-    birthday: z.coerce.date({ message: "Data nașterii este obligatorie!1" })
+    birthday: z.coerce.date({ message: "Data nașterii este obligatorie!" })
         .refine(
             (date) => {
                 const ageDifMs = new Date().getTime() - date.getTime();
