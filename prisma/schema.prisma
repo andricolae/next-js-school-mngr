@@ -22,7 +22,7 @@ model Student {
   phone       String?      @unique
   address     String
   img         String?
-  bloodType   String
+  CNP         String
   gender      UserGender
   createdAt   DateTime     @default(now())
   parentId    String
@@ -34,6 +34,7 @@ model Student {
   grade       Grade        @relation(fields: [gradeId], references: [id])
   parent      Parent       @relation(fields: [parentId], references: [id])
   birthday    DateTime
+  birthplace  String?
 }
 
 model Teacher {
@@ -45,7 +46,7 @@ model Teacher {
   phone     String?    @unique
   address   String
   img       String?
-  bloodType String
+  CNP       String
   gender    UserGender
   createdAt DateTime   @default(now())
   classes   Class[]
@@ -141,12 +142,14 @@ model Result {
   assignment   Assignment? @relation(fields: [assignmentId], references: [id])
   exam         Exam?       @relation(fields: [examId], references: [id])
   student      Student     @relation(fields: [studentId], references: [id])
+  resultDate   DateTime
 }
 
 model Attendance {
   id        Int      @id @default(autoincrement())
   date      DateTime
   present   Boolean
+  excused   Boolean
   studentId String
   lessonId  Int
   lesson    Lesson   @relation(fields: [lessonId], references: [id])

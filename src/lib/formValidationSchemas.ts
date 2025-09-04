@@ -77,7 +77,12 @@ export const teacherSchema = (isUpdate = false) => z.object({
     phone: z.string().min(1, { message: "Numărul de telefon este obligatoriu!" }),
     address: z.string(),
     img: z.string().optional(),
-    bloodType: z.string().optional(),
+    CNP: z.union([
+        z.literal(""),
+        z.string()
+            .refine(val => val.length === 13, { message: "CNP-ul trebuie sa aiba 13 cifre!" })
+            .refine(val => /^\d+$/.test(val), { message: "CNP-ul trebuie sa contina doar cifre!" })
+    ]),
     birthday: z.coerce.date({ message: "Data nașterii este obligatorie!" })
         .refine(
             (date) => {
@@ -116,7 +121,13 @@ export const studentSchema = (isUpdate = false) => z.object({
     email: z.string().min(1, { message: "Email-ul este obligatoriu!" }).email({ message: "Adresă de email invalidă!" }),
 
     address: z.string().min(1, { message: "Adresa este obligatorie!" }),
-    bloodType: z.string().optional(),
+
+    CNP: z.union([
+        z.literal(""),
+        z.string()
+            .refine(val => val.length === 13, { message: "CNP-ul trebuie sa aiba 13 cifre!" })
+            .refine(val => /^\d+$/.test(val), { message: "CNP-ul trebuie sa contina doar cifre!" })
+    ]),
 
     img: z.string().optional(),
     phone: z.string().optional(),
@@ -134,32 +145,31 @@ export const studentSchema = (isUpdate = false) => z.object({
     gradeId: z.coerce.number().min(1, { message: "Nivelul este obligatoriu!" }),
     classId: z.coerce.number().min(1, { message: "Clasa este obligatorie!" }),
     parentId: z.coerce.string().min(1, { message: "Părintele este obligatoriu!" }),
+    birthplace: z.string().optional(),
 });
 
 export type StudentSchema = z.infer<ReturnType<typeof studentSchema>>;
 
-export const examSchema = z
-    .object({
-        id: z.coerce.number().optional(),
-        title: z
-            .string()
-            .min(1, { message: 'Denumirea materiei este obligatorie!' }),
-        startTime: z
-            .coerce.date()
-            .refine((date) => !isNaN(date.getTime()), {
-                message: "Data și ora de început sunt obligatorii!",
-            }),
-        endTime: z
-            .coerce.date()
-            .refine((date) => !isNaN(date.getTime()), {
-                message: "Data și ora de sfârșit sunt obligatorii!",
-            }),
-        lessonId: z.coerce.number({ message: "Ora asociată este obligatorie!" }),
-    })
-    .refine((data) => data.endTime > data.startTime, {
-        message: "Ora de sfârșit trebuie să fie după ora de început!",
-        path: ["endTime"],
-    })
+export const examSchema = z.object({
+    id: z.coerce.number().optional(),
+    title: z
+        .string()
+        .min(1, { message: 'Denumirea materiei este obligatorie!' }),
+    startTime: z
+        .coerce.date()
+        .refine((date) => !isNaN(date.getTime()), {
+            message: "Data și ora de început sunt obligatorii!",
+        }),
+    endTime: z
+        .coerce.date()
+        .refine((date) => !isNaN(date.getTime()), {
+            message: "Data și ora de sfârșit sunt obligatorii!",
+        }),
+    lessonId: z.coerce.number({ message: "Ora asociată este obligatorie!" }),
+}).refine((data) => data.endTime > data.startTime, {
+    message: "Ora de sfârșit trebuie să fie după ora de început!",
+    path: ["endTime"],
+})
     .refine((data) => data.startTime >= new Date(), {
         message: "Ora de început nu poate fi în trecut!",
         path: ["startTime"],
@@ -178,15 +188,13 @@ export const assignmentSchema = z.object({
     lessonId: z
         .coerce.number({ message: "Ora asociată este obligatorie!" })
         .refine((val) => val > 0, { message: "Ora asociată este obligatorie!" }),
-})
-
-    .refine(
-        data => data.dueDate >= data.startDate,
-        {
-            message: "Termenul limită trebuie să fie după data de start!",
-            path: ["dueDate"]
-        }
-    );
+}).refine(
+    data => data.dueDate >= data.startDate,
+    {
+        message: "Termenul limită trebuie să fie după data de start!",
+        path: ["dueDate"]
+    }
+);
 
 export type AssignmentSchema = z.infer<typeof assignmentSchema>;
 
@@ -196,10 +204,11 @@ export const resultSchema = z.object({
         .coerce.number()
         .min(1)
         .max(10, { message: "Nota trebuie să fie între 1 și 10!" })
-        .refine((val) => val < 1, { message: "Nota trebuie să fie mai mare sau egală cu 1!" }),
+        .refine((val) => val >= 1, { message: "Nota trebuie să fie mai mare sau egală cu 1!" }),
     examId: z.coerce.number().optional(),
     assignmentId: z.coerce.number().optional(),
     studentId: z.string().min(1, { message: "Studentul este obligatoriu!" }),
+    resultDate: z.coerce.date({ message: "Data cand s-a obtinut nota este obligatorie!" })
 });
 
 export type ResultSchema = z.infer<typeof resultSchema>;
@@ -211,30 +220,25 @@ export const eventSchema = z.object({
     startTime: z.coerce.date({ message: "Data și ora de început sunt obligatorii!" }),
     endTime: z.coerce.date({ message: "Data și ora de sfârșit sunt obligatorii!" }),
     classId: z.union([z.coerce.number(), z.null()]).optional()
-})
-
-    .refine(
-        data => data.startTime >= new Date(),
-        {
-            message: "Data și ora de început nu pot fi în trecut!",
-            path: ["startTime"],
-        })
-
-    .refine(
-        data => data.endTime > data.startTime,
-        {
-            message: "Data și ora de sfârșit trebuie să fie după data și ora de început!",
-            path: ["endTime"],
-        }
-    )
-
-    .refine(
-        data => (data.endTime.getTime() - data.startTime.getTime()) >= 15 * 60 * 1000,
-        {
-            message: "Evenimentul trebuie să aibă o durată minimă de 15 minute!",
-            path: ["endTime"],
-        }
-    );
+}).refine(
+    data => data.startTime >= new Date(),
+    {
+        message: "Data și ora de început nu pot fi în trecut!",
+        path: ["startTime"],
+    }
+).refine(
+    data => data.endTime > data.startTime,
+    {
+        message: "Data și ora de sfârșit trebuie să fie după data și ora de început!",
+        path: ["endTime"],
+    }
+).refine(
+    data => (data.endTime.getTime() - data.startTime.getTime()) >= 15 * 60 * 1000,
+    {
+        message: "Evenimentul trebuie să aibă o durată minimă de 15 minute!",
+        path: ["endTime"],
+    }
+);
 
 export type EventSchema = z.infer<typeof eventSchema>;
 
@@ -396,6 +400,7 @@ export const attendanceSchema = z.object({
     id: z.coerce.number().optional(),
     date: z.coerce.date({ message: "Data este obligatorie!" }),
     present: z.string(),
+    excused: z.string(),
     studentId: z.string().min(1, { message: "Studentul este obligatoriu!" }),
     lessonId: z.coerce
         .number({ message: "Ora asociată este obligatorie!" })
@@ -408,6 +413,7 @@ export type AttendanceActionData = {
     id?: number;
     date: Date;
     present: boolean;
+    excused: boolean;
     studentId: string;
     lessonId: number;
 };

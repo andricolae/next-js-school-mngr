@@ -5,6 +5,7 @@ export const clerkErrorTranslations: Record<string, string> = {
     form_param_format_invalid: "Numele de utilizator introdus este invalid",
     form_password_length_too_short: "Parola trebuie să aibă cel puțin 8 caractere",
     form_username_invalid_character: "Numele de utilizator conține caractere invalide",
+    resource_not_found: "Utilizatorul nu a fost gasit",
 };
 
 export function translateClerkError(code: string, fallback: string) {

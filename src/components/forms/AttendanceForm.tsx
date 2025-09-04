@@ -44,6 +44,7 @@ const AttendanceForm = ({
                 id: formData.id,
                 date: formData.date,
                 present: formData.present === "true",
+                excused: formData.excused === "true",
                 studentId: formData.studentId,
                 lessonId: formData.lessonId,
             };
@@ -83,14 +84,16 @@ const AttendanceForm = ({
 
     const getDateError = (field: "date") => {
         const err = errors[field];
-        if (isSubmitted && !touchedFields[field] && !err) {
-            return "Data este obligatorie!";
-        }
+        // if (isSubmitted && !touchedFields[field] && !err) {
+        //     return "Data este obligatorie!";
+        // }
         if (err?.message === "Invalid date") {
             return "Data este obligatorie!";
         }
         return err?.message;
     };
+
+    const [present, setPresent] = useState<any>(data?.present !== undefined ? data.present : true);
 
     return (
 
@@ -188,12 +191,32 @@ const AttendanceForm = ({
                 <div className="flex flex-col gap-2 w-full">
                     <label className="text-xs text-gray-400">Status</label>
                     <select
-                        className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
+                        className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full "
                         {...register("present")}
-                        defaultValue={data?.present !== undefined ? String(data.present) : "true"}
+                        name="present"
+                        defaultValue={present}
+                        onChange={() => { setPresent(!present) }}
                     >
                         <option value="true">Prezent</option>
                         <option value="false">Absent</option>
+                    </select>
+                    {errors.present?.message && (
+                        <p className="text-xs text-red-400">
+                            {errors.present.message.toString()}
+                        </p>
+                    )}
+                </div>
+
+                <div className="flex flex-col gap-2 w-full">
+                    <label className="text-xs text-gray-400">Motivat / nemotivat</label>
+                    <select
+                        className={`ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full ${present ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "ring-gray-300"}`}
+                        {...register("excused")}
+                        defaultValue={data?.excused !== undefined ? String(data.excused) : "true"}
+                        disabled={present}
+                    >
+                        <option value="true">Motivat</option>
+                        <option value="false">Nemotivat</option>
                     </select>
                     {errors.present?.message && (
                         <p className="text-xs text-red-400">
