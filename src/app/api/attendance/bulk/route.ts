@@ -74,6 +74,7 @@ export async function POST(request: NextRequest) {
         const formattedRecords = attendanceRecords.map(record => ({
             date: new Date(record.date),
             present: Boolean(record.present),
+            excused: Boolean(record.excused),
             studentId: record.studentId,
             lessonId: record.lessonId
         }));

@@ -208,7 +208,7 @@ const TeacherForm = ({
             email: data?.email,
             phone: data?.phone,
             address: data?.address,
-            bloodType: data?.bloodType,
+            CNP: data?.CNP,
             gender: data?.gender,
             // birthday: data?.birthday,
             subjects: data?.subjects?.map((subject: any) => subject.id.toString()) || [],
@@ -362,11 +362,11 @@ const TeacherForm = ({
                     error={errors?.address}
                 />
                 {/* <InputField
-                    label="Blood Type"
-                    name="bloodType"
-                    defaultValue={data?.bloodType}
+                    label="CNP"
+                    name="CNP"
+                    defaultValue={data?.CNP}
                     register={register}
-                    error={errors?.bloodType}
+                    error={errors?.CNP}
                 /> */}
                 <InputField
                     label="Data nașterii"
