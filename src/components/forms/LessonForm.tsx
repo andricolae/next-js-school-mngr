@@ -241,7 +241,7 @@ const LessonForm = ({
         });
     };
 
-    const isRecurringWatch = watch("isRecurring", isRecurring);
+    // const isRecurringWatch = watch("isRecurring", isRecurring);
 
     return (
         <form className="flex flex-col gap-6" onSubmit={onSubmit}>
@@ -353,25 +353,41 @@ const LessonForm = ({
 
                     </div>
                     <div className="flex flex-col flex-1 mx-1 mt-7 gap-4">
-                        <div className="mt-1">
-                            <InputField
-                                label="Începutul orei"
-                                name="startTime"
-                                defaultValue={data?.startTime ? formatDateForInput(data.startTime) : undefined}
-                                register={register}
-                                error={getDateError("startTime")}
-                                type={isRecurringWatch ? "time" : "datetime-local"}
-                            />
+                        <div className="mt-1 flex items-start gap-2">
+                            <span
+                                className="text-gray-400 text-xs cursor-help shrink-0 pt-2"
+                                title="Dacă este bifată opțiunea de ore recurente, atunci selectați doar ora și minutul. Puteți ignora data."
+                            >
+                                ⓘ
+                            </span>
+                            <div className="flex-1">
+                                <InputField
+                                    label="Începutul orei"
+                                    name="startTime"
+                                    defaultValue={data?.startTime ? formatDateForInput(data.startTime) : undefined}
+                                    register={register}
+                                    error={getDateError("startTime")}
+                                    type="datetime-local"
+                                />
+                            </div>
                         </div>
-                        <div className="mt-1">
-                            <InputField
-                                label="Sfârșitul orei"
-                                name="endTime"
-                                defaultValue={data?.endTime ? formatDateForInput(data.endTime) : undefined}
-                                register={register}
-                                error={getDateError("endTime")}
-                                type={isRecurringWatch ? "time" : "datetime-local"}
-                            />
+                        <div className="mt-1 flex items-start gap-2">
+                            <span
+                                className="text-gray-400 text-xs cursor-help shrink-0 pt-2"
+                                title="Dacă este bifată opțiunea de ore recurente, atunci selectați doar ora și minutul. Puteți ignora data."
+                            >
+                                ⓘ
+                            </span>
+                            <div className="flex-1">
+                                <InputField
+                                    label="Sfârșitul orei"
+                                    name="endTime"
+                                    defaultValue={data?.endTime ? formatDateForInput(data.endTime) : undefined}
+                                    register={register}
+                                    error={getDateError("endTime")}
+                                    type="datetime-local"
+                                />
+                            </div>
                         </div>
 
                         <div className="flex flex-col gap-2 w-full mt-3">
