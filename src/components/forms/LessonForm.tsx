@@ -75,8 +75,8 @@ const LessonForm = ({
     } = useForm<LessonSchema>({
         resolver: zodResolver(lessonSchema),
         defaultValues: {
-            startTime: data?.startTime ? new Date(data.startTime) : undefined,
-            endTime: data?.endTime ? new Date(data.endTime) : undefined,
+            // startTime: data?.startTime ? new Date(data.startTime) : undefined,
+            // endTime: data?.endTime ? new Date(data.endTime) : undefined,
             isRecurring: false,
         }
     });
@@ -128,7 +128,6 @@ const LessonForm = ({
 
         let currentDate = new Date(moduleStartDate);
         const lessonsToCreate = [];
-
 
         while (currentDate.getTime() <= moduleEndDate.getTime()) {
             if (currentDate.getDay() === lessonDayOfWeek) {
@@ -242,6 +241,8 @@ const LessonForm = ({
         });
     };
 
+    // const isRecurringWatch = watch("isRecurring", isRecurring);
+
     return (
         <form className="flex flex-col gap-6" onSubmit={onSubmit}>
             <h1 className="text-xl font-semibold">
@@ -261,7 +262,6 @@ const LessonForm = ({
                         </div>
 
                         <div className="flex flex-col gap-2 w-full mt-4">
-                            {/* <label className="text-xs text-gray-400">Ziua</label> */}
                             <div className="flex items-center gap-1">
                                 <label
                                     className={`text-xs ${!isRecurring ? "text-gray-400" : "text-gray-600"}`}
@@ -278,7 +278,6 @@ const LessonForm = ({
                                 )}
                             </div>
                             <select
-                                // className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
                                 className={`ring-[1.5px] p-2 rounded-md text-sm w-full ${!isRecurring ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "ring-gray-300"
                                     }`}
                                 defaultValue={data?.day || ""}
@@ -354,25 +353,41 @@ const LessonForm = ({
 
                     </div>
                     <div className="flex flex-col flex-1 mx-1 mt-7 gap-4">
-                        <div className="mt-1">
-                            <InputField
-                                label="Începutul orei"
-                                name="startTime"
-                                defaultValue={data?.startTime ? formatDateForInput(data.startTime) : undefined}
-                                register={register}
-                                error={getDateError("startTime")}
-                                type="datetime-local"
-                            />
+                        <div className="mt-1 flex items-start gap-2">
+                            <span
+                                className="text-gray-400 text-xs cursor-help shrink-0 pt-2"
+                                title="Dacă este bifată opțiunea de ore recurente, atunci selectați doar ora și minutul. Puteți ignora data."
+                            >
+                                ⓘ
+                            </span>
+                            <div className="flex-1">
+                                <InputField
+                                    label="Începutul orei"
+                                    name="startTime"
+                                    defaultValue={data?.startTime ? formatDateForInput(data.startTime) : undefined}
+                                    register={register}
+                                    error={getDateError("startTime")}
+                                    type="datetime-local"
+                                />
+                            </div>
                         </div>
-                        <div className="mt-1">
-                            <InputField
-                                label="Sfârșitul orei"
-                                name="endTime"
-                                defaultValue={data?.endTime ? formatDateForInput(data.endTime) : undefined}
-                                register={register}
-                                error={getDateError("endTime")}
-                                type="datetime-local"
-                            />
+                        <div className="mt-1 flex items-start gap-2">
+                            <span
+                                className="text-gray-400 text-xs cursor-help shrink-0 pt-2"
+                                title="Dacă este bifată opțiunea de ore recurente, atunci selectați doar ora și minutul. Puteți ignora data."
+                            >
+                                ⓘ
+                            </span>
+                            <div className="flex-1">
+                                <InputField
+                                    label="Sfârșitul orei"
+                                    name="endTime"
+                                    defaultValue={data?.endTime ? formatDateForInput(data.endTime) : undefined}
+                                    register={register}
+                                    error={getDateError("endTime")}
+                                    type="datetime-local"
+                                />
+                            </div>
                         </div>
 
                         <div className="flex flex-col gap-2 w-full mt-3">

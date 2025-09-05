@@ -28,7 +28,8 @@ const ExamForm = ({
         register,
         handleSubmit,
         formState: { errors, touchedFields, isSubmitted },
-        setValue
+        setValue,
+        watch
     } = useForm<ExamSchema>({
         resolver: zodResolver(examSchema),
     });
@@ -78,6 +79,18 @@ const ExamForm = ({
     };
 
     const { lessons } = relatedData;
+
+    const [startTime, setStartTime] = useState<any>(data?.startTime ? new Date(data.startTime).toISOString().split('T')[0] : "");
+    const [endTime, setEndTime] = useState<any>(data?.endTime ? new Date(data.endTime).toISOString().split('T')[0] : "");
+
+    const updateTime = (selectedLessonId: string | number) => {
+        const lesson = lessons.find((l: any) => l.id === Number(selectedLessonId));
+        if (lesson) {
+            setStartTime(formatDateForInput(lesson.startTime));
+            setEndTime(formatDateForInput(lesson.endTime));
+        }
+    }
+
     return (
         <form className="flex flex-col gap-6 " onSubmit={onSubmit}>
             <h1 className="text-xl font-semibold ">
@@ -93,10 +106,39 @@ const ExamForm = ({
                     error={errors?.title}
                 />
 
+                <div className="flex flex-col gap-1 w-full">
+                    <div className="flex items-center gap-1">
+                        <label className="text-xs text-gray-400">Ora</label>
+                        <span
+                            className="text-gray-400 text-xs cursor-help"
+                            title="Odată selectată ora, date și ora de început și sfârșit vor fi completate automat conform orei selectate."
+                        >
+                            ⓘ
+                        </span>
+                    </div>
+                    <select
+                        className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
+                        {...register("lessonId")}
+                        defaultValue={data?.lessonId || ""}
+                        onChange={(e) => { updateTime(Number(e.target.value)) }}
+                    >
+                        <option value="">Selectează o oră</option>
+                        {lessons.map((lesson: { id: number; name: string }) => (
+                            <option value={lesson.id} key={lesson.id}>
+                                {lesson.name}
+                            </option>
+                        ))}
+                    </select>
+                    {errors.lessonId?.message && (
+                        <p className="text-xs text-red-400">{errors.lessonId.message.toString()}</p>
+                    )}
+                </div>
+
                 <InputField
                     label="Dată și oră început"
                     name="startTime"
-                    defaultValue={data?.startTime ? formatDateForInput(data.startTime) : undefined}
+                    // defaultValue={data?.startTime ? formatDateForInput(data.startTime) : ""}
+                    defaultValue={startTime}
                     register={register}
                     error={getDateError("startTime")}
                     type="datetime-local"
@@ -105,7 +147,8 @@ const ExamForm = ({
                 <InputField
                     label="Dată și oră sfârșit"
                     name="endTime"
-                    defaultValue={data?.endTime ? formatDateForInput(data.endTime) : undefined}
+                    // defaultValue={data?.endTime ? formatDateForInput(data.endTime) : ""}
+                    defaultValue={endTime}
                     register={register}
                     error={getDateError("endTime")}
                     type="datetime-local"
@@ -122,24 +165,6 @@ const ExamForm = ({
                     />
                 )}
 
-                <div className="flex flex-col gap-1 w-full">
-                    <label className="text-xs text-gray-400">Ora</label>
-                    <select
-                        className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
-                        {...register("lessonId")}
-                        defaultValue={data?.lessonId || ""}
-                    >
-                        <option value="">Selectează o oră</option>
-                        {lessons.map((lesson: { id: number; name: string }) => (
-                            <option value={lesson.id} key={lesson.id}>
-                                {lesson.name}
-                            </option>
-                        ))}
-                    </select>
-                    {errors.lessonId?.message && (
-                        <p className="text-xs text-red-400">{errors.lessonId.message.toString()}</p>
-                    )}
-                </div>
             </div>
 
             {state.error && (
