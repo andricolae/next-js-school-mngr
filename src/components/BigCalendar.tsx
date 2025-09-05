@@ -1,41 +1,18 @@
-"use client"
+"use client";
+import { Calendar, momentLocalizer, View, Views } from "react-big-calendar";
+import { useState } from "react";
+import "react-big-calendar/lib/css/react-big-calendar.css";
+import moment from "moment";
+import "@/components/BigCalendar.css";
 
-import { Calendar, momentLocalizer, View, Views } from 'react-big-calendar'
-import moment from 'moment'
-import "react-big-calendar/lib/css/react-big-calendar.css"
-import 'moment/locale/ro';
-import { useEffect, useState } from 'react';
+const localizer = momentLocalizer(moment);
 
-moment.locale("ro");
-const localizer = momentLocalizer(moment)
-
-const BigCalendar = ({
-    data
-}: {
-    data: { title: string; start: Date; end: Date }[]
-}) => {
-    const [view, setView] = useState<View>(Views.WORK_WEEK)
-    const [events, setEvents] = useState<any[]>([])
-
-    useEffect(() => {
-        const formattedEvents = data.map(event => {
-            const start = new Date(event.start);
-            const end = new Date(event.end);
-
-            return {
-                title: event.title,
-                start,
-                end
-            };
-        });
-
-        setEvents(formattedEvents);
-    }, [data]);
+const BigCalendar = ({ data }: { data: { title: string; start: Date; end: Date }[] }) => {
+    const [view, setView] = useState<View>(Views.WORK_WEEK);
 
     const handleOnChangeView = (selectedView: View) => {
         setView(selectedView);
     };
-
 
     return (
         <Calendar
@@ -45,12 +22,12 @@ const BigCalendar = ({
             endAccessor="end"
             views={["work_week", "day"]}
             view={view}
-            style={{ height: "98%" }}
+            style={{ height: "100%" }}
             onView={handleOnChangeView}
             min={new Date(2025, 1, 1, 8, 0, 0)}
             max={new Date(2025, 1, 1, 19, 0, 0)}
         />
     );
-}
+};
 
 export default BigCalendar;
