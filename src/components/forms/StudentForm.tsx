@@ -25,6 +25,7 @@ const StudentForm = ({
     setOpen: Dispatch<SetStateAction<boolean>>;
     relatedData?: any;
 }) => {
+
     const {
         register,
         handleSubmit,
@@ -77,11 +78,11 @@ const StudentForm = ({
 
     const getDateError = (field: "birthday") => {
         const err = errors[field];
-        if (isSubmitted && !touchedFields[field] && !err) {
-            return "Data nașterii este obligatorie!";
-        }
+        // if (isSubmitted && !touchedFields[field] && !err) {
+        //     return "Data nașterii este obligatorie!2";
+        // }
         if (err?.message === "Invalid date") {
-            return "Data nașterii este obligatorie!";
+            return "Data nașterii este obligatorie!3";
         }
         return err?.message;
     };
@@ -178,13 +179,13 @@ const StudentForm = ({
                     register={register}
                     error={errors?.phone}
                 />
-                {/* <InputField
-                    label="Blood Type"
-                    name="bloodType"
-                    defaultValue={data?.bloodType}
+                <InputField
+                    label="CNP"
+                    name="CNP"
+                    defaultValue={data?.CNP || ""}
                     register={register}
-                    error={errors?.bloodType}
-                /> */}
+                    error={errors?.CNP}
+                />
                 <InputField
                     label="Adresă"
                     name="address"
@@ -196,12 +197,16 @@ const StudentForm = ({
                     label="Data nașterii"
                     name="birthday"
                     type="date"
-                    defaultValue={
-                        data?.birthday ? data.birthday.toISOString().split("T")[0] : ""
-                    }
+                    defaultValue={data?.birthday.toISOString().split("T")[0] || ""}
                     register={register}
                     error={getDateError("birthday")}
-
+                />
+                <InputField
+                    label="Locul nașterii"
+                    name="birthplace"
+                    defaultValue={data?.birthplace || ""}
+                    register={register}
+                    error={errors?.birthplace}
                 />
                 <div className="flex flex-col gap-2">
                     <label className="text-xs text-gray-400 font-medium">Gen</label>

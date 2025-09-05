@@ -93,7 +93,7 @@ const FormContainer = async ({ table, type, data, id }: FormContainerProps) => {
                     where: {
                         ...(role === "teacher" ? { teacherId: userId! } : {}),
                     },
-                    select: { id: true, name: true },
+                    select: { id: true, name: true, startTime: true, endTime: true },
                 });
                 relatedData = { lessons: examLessons };
                 break;
@@ -102,7 +102,7 @@ const FormContainer = async ({ table, type, data, id }: FormContainerProps) => {
                     where: {
                         ...(role === "teacher" ? { teacherId: userId! } : {}),
                     },
-                    select: { id: true, name: true },
+                    select: { id: true, name: true, startTime: true },
                 });
                 relatedData = { lessons: assignmentLessons };
                 break;
@@ -259,6 +259,7 @@ const FormContainer = async ({ table, type, data, id }: FormContainerProps) => {
                     select: {
                         id: true,
                         name: true,
+                        startTime: true,
                         subject: { select: { name: true } },
                         class: { select: { name: true } },
                         classId: true

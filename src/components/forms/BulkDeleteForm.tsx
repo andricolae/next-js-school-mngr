@@ -53,6 +53,12 @@ const BulkDeleteForm = ({
 
     const router = useRouter();
 
+    const tableMap: Record<string, string> = {
+        lesson: "ore"
+    };
+
+    const translatedTable = tableMap[table] ?? table;
+
     useEffect(() => {
         if (state?.success) {
             toast(`Lecțiile au fost șterse cu succes!`);
@@ -71,7 +77,7 @@ const BulkDeleteForm = ({
                 type="button"
                 className="w-7 h-7 flex items-center justify-center rounded-full bg-orange"
                 onClick={handleOpen}
-                title="Sterge lectiile selectate"
+                title="Șterge lecțiile selectate"
             >
                 <Image src={`/delete.png`} alt="Sterge" width={16} height={16} />
             </button>
@@ -101,8 +107,8 @@ const BulkDeleteForm = ({
                             ))}
 
                             <span className="text-center font-medium">
-                                Toate datele vor fi pierdute. Ești sigur/ă că vrei să ștergi?{" "}
-                                {selectedIds.length} {table}
+                                Toate datele vor fi pierdute. Ești sigur/ă că vrei să ștergi{" "}
+                                {selectedIds.length} {translatedTable}
                                 {selectedIds.length > 1 ? "s" : ""}?
                             </span>
 

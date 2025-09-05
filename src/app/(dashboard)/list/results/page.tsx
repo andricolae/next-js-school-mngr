@@ -23,6 +23,7 @@ type ResultList = {
     className: string;
     startTime: Date;
     subject: string;
+    resultDate: Date;
 };
 
 
@@ -130,7 +131,7 @@ const ResultListPage = async ({
             </td>
             <td className="hidden md:table-cell">{item.className}</td>
             <td className="hidden md:table-cell">
-                {new Intl.DateTimeFormat("ro-RO").format(item.startTime)}
+                {new Intl.DateTimeFormat("ro-RO").format(item.resultDate)}
             </td>
             <td>
                 <div className="flex items-center gap-2">
@@ -420,6 +421,7 @@ const ResultListPage = async ({
             examId: item.examId,
             assignmentId: item.assignmentId,
             subject: assessment.lesson.subject.name,
+            resultDate: item.resultDate
         };
     }).filter(Boolean) as ResultList[];
 
@@ -445,6 +447,7 @@ const ResultListPage = async ({
             examId: item.examId,
             assignmentId: item.assignmentId,
             subject: assessment.lesson.subject.name,
+            resultDate: item.resultDate
         };
     }).filter(Boolean) as ResultList[];
 
@@ -502,7 +505,6 @@ const ResultListPage = async ({
                 </div>
             </div>
             <Table columns={columns} renderRow={renderRow} data={data} />
-            {/* <COMPONENTA data={data} dataRes={dataRes} /> */}
             <Pagination page={p} count={count} />
 
             {isSingleStudentSelected && (

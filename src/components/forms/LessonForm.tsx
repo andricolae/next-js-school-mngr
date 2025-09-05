@@ -13,6 +13,7 @@ import LoadingPopup from "@/components/LoadingPopup";
 import { useTransition } from "react";
 import { availableModules } from "@/lib/modules";
 import { nationalHolidays } from "@/lib/holidays";
+import { formatDateForInput } from "@/lib/utils";
 
 type ModuleType = {
     id: number;
@@ -36,11 +37,7 @@ const LessonForm = ({
     type: "create" | "update";
     data?: any;
     setOpen: Dispatch<SetStateAction<boolean>>;
-    relatedData?: {
-        subjects: any[];
-        classes: any[];
-        teachers: any[];
-    };
+    relatedData?: any;
 }) => {
 
     // const availableModules: ModuleType[] = [
@@ -72,14 +69,21 @@ const LessonForm = ({
     const {
         register,
         handleSubmit,
-        formState: { errors },
+        formState: { errors, touchedFields, isSubmitted },
+        setValue,
+        watch,
     } = useForm<LessonSchema>({
         resolver: zodResolver(lessonSchema),
         defaultValues: {
-            startTime: data?.startTime ? new Date(data.startTime) : undefined,
-            endTime: data?.endTime ? new Date(data.endTime) : undefined,
+            // startTime: data?.startTime ? new Date(data.startTime) : undefined,
+            // endTime: data?.endTime ? new Date(data.endTime) : undefined,
+            isRecurring: false,
         }
     });
+
+    useEffect(() => {
+        setValue("isRecurring", isRecurring);
+    }, [isRecurring, setValue]);
 
     const [state, formAction] = useFormState(
         type === "create" ? createLesson : updateLesson,
@@ -125,7 +129,6 @@ const LessonForm = ({
         let currentDate = new Date(moduleStartDate);
         const lessonsToCreate = [];
 
-
         while (currentDate.getTime() <= moduleEndDate.getTime()) {
             if (currentDate.getDay() === lessonDayOfWeek) {
                 if (!isHoliday(currentDate)) {
@@ -152,6 +155,7 @@ const LessonForm = ({
                         subjectId: lessonData.subjectId,
                         classId: lessonData.classId,
                         teacherId: lessonData.teacherId,
+                        isRecurring: false,
                     });
                 }
             }
@@ -191,8 +195,8 @@ const LessonForm = ({
                 const submissionData = {
                     ...formData,
                     ...(type === "update" && data?.id && { id: data.id }),
-                    startTime: new Date(new Date(formData.startTime).getTime() + (3 * 60 * 60 * 1000)),
-                    endTime: new Date(new Date(formData.endTime).getTime() + (3 * 60 * 60 * 1000)),
+                    startTime: new Date(new Date(formData.startTime).getTime()),
+                    endTime: new Date(new Date(formData.endTime).getTime()),
                 };
                 formAction(submissionData);
             }
@@ -211,6 +215,20 @@ const LessonForm = ({
     const [filteredSubjects, setFilteredSubjects] = useState(subjects || []);
     const [filteredTeachers, setFilteredTeachers] = useState(teachers || []);
 
+    const getDateError = (field: "startTime" | "endTime") => {
+        const err = errors[field];
+        if (isSubmitted && !touchedFields[field] && !err) {
+            return field === "startTime"
+                ? "Data și ora de început sunt obligatorii!"
+                : "Data și ora de sfârșit sunt obligatorii!";
+        }
+        if (err?.message === "Invalid date") {
+            return field === "startTime"
+                ? "Data și ora de început sunt obligatorii!"
+                : "Data și ora de sfârșit sunt obligatorii!";
+        }
+        return err?.message;
+    };
     const updateSelect = async (selectedOption: "subjects" | "teachers", teacherIdOrSubjectName: string) => {
         startTransition(async () => {
             if (selectedOption === "subjects") {
@@ -222,6 +240,8 @@ const LessonForm = ({
             }
         });
     };
+
+    // const isRecurringWatch = watch("isRecurring", isRecurring);
 
     return (
         <form className="flex flex-col gap-6" onSubmit={onSubmit}>
@@ -242,11 +262,27 @@ const LessonForm = ({
                         </div>
 
                         <div className="flex flex-col gap-2 w-full mt-4">
-                            <label className="text-xs text-gray-400">Ziua</label>
+                            <div className="flex items-center gap-1">
+                                <label
+                                    className={`text-xs ${!isRecurring ? "text-gray-400" : "text-gray-600"}`}
+                                >
+                                    Ziua
+                                </label>
+                                {!isRecurring && (
+                                    <span
+                                        className="text-gray-400 text-xs cursor-help"
+                                        title="Disponibil doar dacă este bifată opțiunea de ore recurente"
+                                    >
+                                        ⓘ
+                                    </span>
+                                )}
+                            </div>
                             <select
-                                className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
+                                className={`ring-[1.5px] p-2 rounded-md text-sm w-full ${!isRecurring ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "ring-gray-300"
+                                    }`}
                                 defaultValue={data?.day || ""}
                                 {...register("day")}
+                                disabled={!isRecurring}
                             >
                                 <option value="">Alege o zi</option>
                                 <option value="MONDAY">Luni</option>
@@ -317,31 +353,41 @@ const LessonForm = ({
 
                     </div>
                     <div className="flex flex-col flex-1 mx-1 mt-7 gap-4">
-                        <div className="mt-1">
-                            <InputField
-                                label="Începutul orei"
-                                name="startTime"
-                                defaultValue={data?.startTime ?
-                                    new Date(data.startTime).toISOString().slice(0, 16) :
-                                    undefined
-                                }
-                                register={register}
-                                error={errors?.startTime}
-                                type="datetime-local"
-                            />
+                        <div className="mt-1 flex items-start gap-2">
+                            <span
+                                className="text-gray-400 text-xs cursor-help shrink-0 pt-2"
+                                title="Dacă este bifată opțiunea de ore recurente, atunci selectați doar ora și minutul. Puteți ignora data."
+                            >
+                                ⓘ
+                            </span>
+                            <div className="flex-1">
+                                <InputField
+                                    label="Începutul orei"
+                                    name="startTime"
+                                    defaultValue={data?.startTime ? formatDateForInput(data.startTime) : undefined}
+                                    register={register}
+                                    error={getDateError("startTime")}
+                                    type="datetime-local"
+                                />
+                            </div>
                         </div>
-                        <div className="mt-1">
-                            <InputField
-                                label="Sfârșitul orei"
-                                name="endTime"
-                                defaultValue={data?.endTime ?
-                                    new Date(data.endTime).toISOString().slice(0, 16) :
-                                    undefined
-                                }
-                                register={register}
-                                error={errors?.endTime}
-                                type="datetime-local"
-                            />
+                        <div className="mt-1 flex items-start gap-2">
+                            <span
+                                className="text-gray-400 text-xs cursor-help shrink-0 pt-2"
+                                title="Dacă este bifată opțiunea de ore recurente, atunci selectați doar ora și minutul. Puteți ignora data."
+                            >
+                                ⓘ
+                            </span>
+                            <div className="flex-1">
+                                <InputField
+                                    label="Sfârșitul orei"
+                                    name="endTime"
+                                    defaultValue={data?.endTime ? formatDateForInput(data.endTime) : undefined}
+                                    register={register}
+                                    error={getDateError("endTime")}
+                                    type="datetime-local"
+                                />
+                            </div>
                         </div>
 
                         <div className="flex flex-col gap-2 w-full mt-3">
@@ -410,7 +456,7 @@ const LessonForm = ({
                                             <div className="3 p-2 bg-blue-50 rounded text-xs">
                                                 <p><strong>Modul selectat:</strong> {availableModules.find(m => m.id === selectedModuleId)?.name}</p>
                                                 <p><strong>Perioada:</strong> {availableModules.find(m => m.id === selectedModuleId)?.startDate} - {availableModules.find(m => m.id === selectedModuleId)?.endDate}</p>
-                                                <p><strong>Important:</strong> Lecțiile vor fi create pentru fiecare zi selectată din intervalul ales, exceptând zilele libere naționale!</p>
+                                                <p><strong>Important:</strong> Lecțiile vor fi create pentru fiecare zi selectată din intervalul ales, exceptând weekendurile și zilele libere naționale!</p>
                                             </div>
                                         )}
                                     </div>
@@ -436,7 +482,7 @@ const LessonForm = ({
                 </div>
             </div>
             {isPending && <LoadingPopup />}
-        </form>
+        </form >
     );
 };
 

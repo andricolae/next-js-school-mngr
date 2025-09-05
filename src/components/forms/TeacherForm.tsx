@@ -13,6 +13,7 @@ import { useFormState } from "react-dom";
 import { CldUploadWidget } from "next-cloudinary";
 import LoadingPopup from "@/components/LoadingPopup";
 import { useTransition } from "react";
+import { formatDateForInput } from "@/lib/utils";
 
 interface FilterOption {
     id: string;
@@ -207,9 +208,9 @@ const TeacherForm = ({
             email: data?.email,
             phone: data?.phone,
             address: data?.address,
-            bloodType: data?.bloodType,
+            CNP: data?.CNP,
             gender: data?.gender,
-            birthday: data?.birthday,
+            // birthday: data?.birthday,
             subjects: data?.subjects?.map((subject: any) => subject.id.toString()) || [],
         },
     });
@@ -231,9 +232,7 @@ const TeacherForm = ({
 
     useEffect(() => {
         if (state.success) {
-            toast(
-                `Profesor ${type === "create" ? "adăugat" : "actualizat"} cu succes!`
-            );
+            toast(`Profesor ${type === "create" ? "adăugat" : "actualizat"} cu succes!`);
             setOpen(false);
             router.refresh();
         } else if (state.error) {
@@ -303,7 +302,7 @@ const TeacherForm = ({
                     onClick={() => openUploadWidget()}
                 >
                     <label className="text-sm font-medium text-gray-700 cursor-pointer select-none">
-                        Încară o imagine
+                        Încarcă o imagine
                     </label>
                     <div className="flex items-center gap-2">
                         <Image
@@ -363,19 +362,19 @@ const TeacherForm = ({
                     error={errors?.address}
                 />
                 {/* <InputField
-                    label="Blood Type"
-                    name="bloodType"
-                    defaultValue={data?.bloodType}
+                    label="CNP"
+                    name="CNP"
+                    defaultValue={data?.CNP}
                     register={register}
-                    error={errors?.bloodType}
+                    error={errors?.CNP}
                 /> */}
                 <InputField
                     label="Data nașterii"
                     name="birthday"
-                    type="date"
-                    defaultValue={data?.birthday}
+                    defaultValue={data?.birthday ? data?.birthday.toISOString().split('T')[0] : ""}
                     register={register}
                     error={getDateError("birthday")}
+                    type="date"
                 />
                 <div className="flex flex-col gap-2 pt-2">
                     <label className="text-xs text-gray-400 font-medium">Gen</label>

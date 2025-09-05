@@ -44,6 +44,7 @@ const AttendanceForm = ({
                 id: formData.id,
                 date: formData.date,
                 present: formData.present === "true",
+                excused: formData.excused === "true",
                 studentId: formData.studentId,
                 lessonId: formData.lessonId,
             };
@@ -68,12 +69,14 @@ const AttendanceForm = ({
     const { students, lessons } = relatedData || {};
     const [filteredStudents, setFilteredStudents] = useState(students || []);
     const [filteredLessons, setFilteredLessons] = useState(lessons || []);
+    const [date, setDate] = useState<any>(data?.date ? new Date(data.date).toISOString().split('T')[0] : undefined);
 
-    const updateSelect = (selectedOption: "student" | "lesson", classId: string | number) => {
+    const updateSelect = (selectedOption: "student" | "lesson", classId: string | number, lesson?: any) => {
         if (selectedOption === "student") {
             const newLessons = lessons?.filter((l: any) => String(l.classId) === String(classId));
             setFilteredLessons(newLessons || []);
         } else if (selectedOption === "lesson") {
+            setDate(new Date(lesson.startTime).toISOString().split('T')[0]);
             const newStudents = students?.filter((s: any) => String(s.classId) === String(classId));
             setFilteredStudents(newStudents || []);
         }
@@ -81,14 +84,16 @@ const AttendanceForm = ({
 
     const getDateError = (field: "date") => {
         const err = errors[field];
-        if (isSubmitted && !touchedFields[field] && !err) {
-            return "Data este obligatorie!";
-        }
+        // if (isSubmitted && !touchedFields[field] && !err) {
+        //     return "Data este obligatorie!";
+        // }
         if (err?.message === "Invalid date") {
             return "Data este obligatorie!";
         }
         return err?.message;
     };
+
+    const [present, setPresent] = useState<any>(data?.present !== undefined ? data.present : true);
 
     return (
 
@@ -100,31 +105,47 @@ const AttendanceForm = ({
             <h1 className="text-xl font-semibold">{type === "create" ? "Adaugă o nouă prezență" : "Actualizează prezența"}</h1>
 
             <div className="flex flex-col gap-4 w-full">
+                <div className="flex flex-col gap-2 w-full">
+                    <label className="text-xs text-gray-400">Ora</label>
+                    <select
+                        className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
+                        {...register("lessonId")}
+                        defaultValue={data?.lessonId}
+                        onChange={(e) => {
+                            const selectedId = Number(e.target.value);
+                            const lesson = filteredLessons?.find((s: any) => s.id === selectedId);
+                            if (lesson) {
+                                updateSelect("lesson", lesson.classId, lesson);
+                            }
+                        }}
+                    >
+                        <option value="">Alege o oră</option>
+                        {filteredLessons?.map(
+                            (lesson: { id: number; name: string; subject: { name: string }; class: { name: string } }) => (
+                                <option value={lesson.id} key={lesson.id}>
+                                    {lesson.subject.name} - {lesson.class.name} ({lesson.name})
+                                </option>
+                            )
+                        )
+                        }
+                    </select >
+                    {
+                        errors.lessonId?.message && (
+                            <p className="text-xs text-red-400">
+                                {errors.lessonId.message.toString()}
+                            </p>
+                        )
+                    }
+                </div >
+
                 <InputField
                     label="Data"
                     name="date"
                     type="date"
-                    defaultValue={data?.date ? new Date(data.date).toISOString().split('T')[0] : undefined}
+                    defaultValue={date}
                     register={register}
                     error={getDateError("date")}
                 />
-
-                <div className="flex flex-col gap-4 w-full">
-                    <label className="text-xs text-gray-400">Status</label>
-                    <select
-                        className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
-                        {...register("present")}
-                        defaultValue={data?.present !== undefined ? String(data.present) : "true"}
-                    >
-                        <option value="true">Prezent</option>
-                        <option value="false">Absent</option>
-                    </select>
-                    {errors.present?.message && (
-                        <p className="text-xs text-red-400">
-                            {errors.present.message.toString()}
-                        </p>
-                    )}
-                </div>
 
                 {data && (
                     <InputField
@@ -168,37 +189,41 @@ const AttendanceForm = ({
                 </div>
 
                 <div className="flex flex-col gap-2 w-full">
-                    <label className="text-xs text-gray-400">Ora</label>
+                    <label className="text-xs text-gray-400">Status</label>
                     <select
-                        className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
-                        {...register("lessonId")}
-                        defaultValue={data?.lessonId}
-                        onChange={(e) => {
-                            const selectedId = Number(e.target.value);
-                            const lesson = filteredLessons?.find((s: any) => s.id === selectedId);
-                            if (lesson) {
-                                updateSelect("lesson", lesson.classId);
-                            }
-                        }}
+                        className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full "
+                        {...register("present")}
+                        name="present"
+                        defaultValue={present}
+                        onChange={() => { setPresent(!present) }}
                     >
-                        <option value="">Alege o oră</option>
-                        {filteredLessons?.map(
-                            (lesson: { id: number; name: string; subject: { name: string }; class: { name: string } }) => (
-                                <option value={lesson.id} key={lesson.id}>
-                                    {lesson.subject.name} - {lesson.class.name} ({lesson.name})
-                                </option>
-                            )
-                        )
-                        }
-                    </select >
-                    {
-                        errors.lessonId?.message && (
-                            <p className="text-xs text-red-400">
-                                {errors.lessonId.message.toString()}
-                            </p>
-                        )
-                    }
-                </div >
+                        <option value="true">Prezent</option>
+                        <option value="false">Absent</option>
+                    </select>
+                    {errors.present?.message && (
+                        <p className="text-xs text-red-400">
+                            {errors.present.message.toString()}
+                        </p>
+                    )}
+                </div>
+
+                <div className="flex flex-col gap-2 w-full">
+                    <label className="text-xs text-gray-400">Motivat / nemotivat</label>
+                    <select
+                        className={`ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full ${present ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "ring-gray-300"}`}
+                        {...register("excused")}
+                        defaultValue={data?.excused !== undefined ? String(data.excused) : "true"}
+                        disabled={present}
+                    >
+                        <option value="true">Motivat</option>
+                        <option value="false">Nemotivat</option>
+                    </select>
+                    {errors.present?.message && (
+                        <p className="text-xs text-red-400">
+                            {errors.present.message.toString()}
+                        </p>
+                    )}
+                </div>
             </div >
 
             {state.error && (

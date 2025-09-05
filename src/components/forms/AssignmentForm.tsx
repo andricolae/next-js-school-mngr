@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import LoadingPopup from "@/components/LoadingPopup";
 import { useTransition } from "react";
+import { formatDateForInput } from "@/lib/utils";
 
 const AssignmentForm = ({
     type,
@@ -52,6 +53,7 @@ const AssignmentForm = ({
     const router = useRouter();
 
     useEffect(() => {
+        console.log(data)
         if (state.success) {
             toast(`Temă ${type === "create" ? "creată" : "actualizată"} cu succes!`);
             setOpen(false);
@@ -81,6 +83,16 @@ const AssignmentForm = ({
 
     const { lessons } = relatedData;
 
+    const [startDate, setStartDate] = useState<any>(data?.startDate ? new Date(data.startDate).toISOString().split('T')[0] : undefined);
+
+    const updateTime = (selectedLessonId: string | number) => {
+        const lesson = lessons.find((l: any) => l.id === Number(selectedLessonId));
+        console.log(new Date(lesson.startTime).toISOString().split('T')[0]);
+        if (lesson) {
+            setStartDate(new Date(lesson.startTime).toISOString().split('T')[0]);
+        }
+    }
+
     return (
         <form className="flex flex-col gap-4 max-auto" onSubmit={onSubmit}>
             <h1 className="text-xl font-semibold">{type === "create" ? "Adaugă o nouă temă" : "Actualizează tema"}</h1>
@@ -93,6 +105,29 @@ const AssignmentForm = ({
                     register={register}
                     error={errors?.title}
                 />
+                <div className="flex flex-col gap-2 w-full">
+                    <label className="text-xs text-gray-400">Ore</label>
+                    <select
+                        className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
+                        {...register("lessonId")}
+                        defaultValue={data?.lessonId}
+                        onChange={(e) => { updateTime(Number(e.target.value)) }}
+                    >
+                        <option value="">Alege ora</option>
+                        {lessons.map(
+                            (lesson: { id: number; name: string; }) => (
+                                <option value={lesson.id} key={lesson.id}>
+                                    {lesson.name}
+                                </option>
+                            )
+                        )}
+                    </select>
+                    {errors.lessonId?.message &&
+                        <p className="text-xs text-red-400">
+                            {errors.lessonId.message.toString()}
+                        </p>
+                    }
+                </div>
                 <InputField
                     label="Descriere"
                     name="description"
@@ -103,7 +138,8 @@ const AssignmentForm = ({
                 <InputField
                     label="Dată începere"
                     name="startDate"
-                    defaultValue={data?.startDate ? new Date(data.startDate).toISOString().split('T')[0] : undefined}
+                    // defaultValue={data?.startDate ? new Date(data.startDate).toISOString().split('T')[0] : undefined}
+                    defaultValue={startDate}
                     register={register}
                     error={getDateError("startDate")}
                     type="date"
@@ -126,28 +162,6 @@ const AssignmentForm = ({
                         hidden
                     />
                 )}
-                <div className="flex flex-col gap-2 w-full">
-                    <label className="text-xs text-gray-400">Ore</label>
-                    <select
-                        className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
-                        {...register("lessonId")}
-                        defaultValue={data?.lessonId}
-                    >
-                        <option value="">Alege ora</option>
-                        {lessons.map(
-                            (lesson: { id: number; name: string; }) => (
-                                <option value={lesson.id} key={lesson.id}>
-                                    {lesson.name}
-                                </option>
-                            )
-                        )}
-                    </select>
-                    {errors.lessonId?.message &&
-                        <p className="text-xs text-red-400">
-                            {errors.lessonId.message.toString()}
-                        </p>
-                    }
-                </div>
             </div>
             {state.error && (
                 <span className="text-red-500">
