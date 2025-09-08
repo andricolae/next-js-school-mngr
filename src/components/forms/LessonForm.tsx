@@ -22,6 +22,15 @@ type ModuleType = {
     endDate: string;
 };
 
+type Weekday =
+    | ""
+    | "MONDAY"
+    | "TUESDAY"
+    | "WEDNESDAY"
+    | "THURSDAY"
+    | "FRIDAY"
+    | undefined;
+
 // const holidays = [
 //     { name: "National Day Test1", date: "2025-07-01" },
 //     { name: "National Day Test2", date: "2025-07-15" },
@@ -112,6 +121,53 @@ const LessonForm = ({
         });
     };
 
+    const getNextWeekday = (targetDay: Weekday, fromDate: Date): Date | undefined | string => {
+        if (!targetDay) return undefined;
+
+        // Map weekday names to numeric values (Sunday = 0, Monday = 1, ..., Saturday = 6)
+        const dayMap: Record<Exclude<Weekday, "" | undefined>, number> = {
+            MONDAY: 1,
+            TUESDAY: 2,
+            WEDNESDAY: 3,
+            THURSDAY: 4,
+            FRIDAY: 5,
+        };
+        const targetDayNum = dayMap[targetDay];
+        if (targetDayNum === undefined) return undefined;
+
+        const currentDayNum = fromDate.getDay(); // Sunday=0 ... Saturday=6
+        // Compute days to add
+        const daysToAdd = (targetDayNum - currentDayNum + 7) % 7; // ensures non-negative result
+        // If the target day is today, return the same date
+        if (daysToAdd === 0) {
+            return new Date(fromDate);
+        }
+        // Otherwise, add the difference
+        const result = new Date(fromDate);
+        result.setDate(fromDate.getDate() + daysToAdd);
+        return result.toISOString();
+    };
+
+    const setDateWithHour = (dateInput: string | Date | undefined, time: string): Date => {
+        const date = dateInput ? new Date(dateInput) : new Date();
+
+        if (isNaN(date.getTime())) {
+            throw new Error("Invalid date input");
+        }
+        const [hours, minutes] = time.split(":").map(Number);
+
+        if (
+            isNaN(hours) || isNaN(minutes) ||
+            hours < 0 || hours > 23 ||
+            minutes < 0 || minutes > 59
+        ) {
+            throw new Error("Invalid time format. Expected hh:mm in 24-hour format.");
+        }
+        date.setHours(hours, minutes, 0, 0);
+
+        return date;
+    };
+
     const generateRecurringLessons = async (lessonData: LessonSchema, moduleId: number) => {
         const selectedModule = availableModules.find(mod => mod.id === moduleId);
         if (!selectedModule) return { total: 0, success: 0 };
@@ -120,8 +176,14 @@ const LessonForm = ({
         const moduleEndDate = new Date(selectedModule.endDate);
         const lessonDayOfWeek = getDayOfWeek(lessonData.day);
 
-        const baseStartTime = new Date(lessonData.startTime);
-        const baseEndTime = new Date(lessonData.endTime);
+        const dateOfFirstTypeOfDayInModule = getNextWeekday(lessonData.day, moduleStartDate);
+        const dateOfFirstTypeOfDayOutOfModule = getNextWeekday(lessonData.day, moduleEndDate);
+
+        const dateOfFirstTypeOfDayInModuleWithCorrectHour = setDateWithHour(dateOfFirstTypeOfDayInModule, lessonData.startTime);
+        const dateOfFirstTypeOfDayOutOfModuleWithCorrectHour = setDateWithHour(dateOfFirstTypeOfDayOutOfModule, lessonData.endTime);
+
+        const baseStartTime = new Date(dateOfFirstTypeOfDayInModuleWithCorrectHour || "");
+        const baseEndTime = new Date(dateOfFirstTypeOfDayOutOfModuleWithCorrectHour || "");
 
         moduleStartDate.setHours(0, 0, 0, 0);
         moduleEndDate.setHours(0, 0, 0, 0);
@@ -144,14 +206,14 @@ const LessonForm = ({
                     lessonDate.setMinutes(baseEndTime.getMinutes());
                     const newLessonEndTime = new Date(lessonDate);
 
-                    const uniqueLessonName = `${lessonData.name} - ${newLessonStartTime.toLocaleDateString('ro-RO')}`;
+                    const uniqueLessonName = `${lessonData.name} - ${newLessonStartTime.toISOString()}`;
 
                     lessonsToCreate.push({
                         //name: lessonData.name,
                         name: uniqueLessonName,
                         day: lessonData.day,
-                        startTime: newLessonStartTime,
-                        endTime: newLessonEndTime,
+                        startTime: newLessonStartTime.toString(),
+                        endTime: newLessonEndTime.toString(),
                         subjectId: lessonData.subjectId,
                         classId: lessonData.classId,
                         teacherId: lessonData.teacherId,
@@ -173,6 +235,19 @@ const LessonForm = ({
     };
 
     const onSubmit = handleSubmit(async (formData) => {
+        console.log(formData.teacherId)
+        if (isRecurring && selectedModuleId === null) {
+            toast.error("Selectați modulul!");
+            return;
+        }
+        if (isRecurring && formData.day === "") {
+            toast.error("Selectați ziua!");
+            return;
+        }
+        if (formData.teacherId === null || formData.teacherId === "abc") {
+            toast.error("Selectați profesorul!");
+            return;
+        }
         startTransition(async () => {
             if (isRecurring && selectedModuleId) {
                 setIsCreatingRecurring(true);
@@ -241,7 +316,7 @@ const LessonForm = ({
         });
     };
 
-    // const isRecurringWatch = watch("isRecurring", isRecurring);
+    const isRecurringWatch = watch("isRecurring", isRecurring);
 
     return (
         <form className="flex flex-col gap-6" onSubmit={onSubmit}>
@@ -354,12 +429,12 @@ const LessonForm = ({
                     </div>
                     <div className="flex flex-col flex-1 mx-1 mt-7 gap-4">
                         <div className="mt-1 flex items-start gap-2">
-                            <span
+                            {/* <span
                                 className="text-gray-400 text-xs cursor-help shrink-0 pt-2"
                                 title="Dacă este bifată opțiunea de ore recurente, atunci selectați doar ora și minutul. Puteți ignora data."
                             >
                                 ⓘ
-                            </span>
+                            </span> */}
                             <div className="flex-1">
                                 <InputField
                                     label="Începutul orei"
@@ -367,17 +442,17 @@ const LessonForm = ({
                                     defaultValue={data?.startTime ? formatDateForInput(data.startTime) : undefined}
                                     register={register}
                                     error={getDateError("startTime")}
-                                    type="datetime-local"
+                                    type={isRecurringWatch ? "time" : "datetime-local"}
                                 />
                             </div>
                         </div>
                         <div className="mt-1 flex items-start gap-2">
-                            <span
+                            {/* <span
                                 className="text-gray-400 text-xs cursor-help shrink-0 pt-2"
                                 title="Dacă este bifată opțiunea de ore recurente, atunci selectați doar ora și minutul. Puteți ignora data."
                             >
                                 ⓘ
-                            </span>
+                            </span> */}
                             <div className="flex-1">
                                 <InputField
                                     label="Sfârșitul orei"
@@ -385,7 +460,7 @@ const LessonForm = ({
                                     defaultValue={data?.endTime ? formatDateForInput(data.endTime) : undefined}
                                     register={register}
                                     error={getDateError("endTime")}
-                                    type="datetime-local"
+                                    type={isRecurringWatch ? "time" : "datetime-local"}
                                 />
                             </div>
                         </div>

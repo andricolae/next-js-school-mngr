@@ -1342,8 +1342,8 @@ export const createRecurringLessons = async (lessonsData: LessonSchema[]) => {
                 data: {
                     name: lessonData.name,
                     day: (lessonData.day ?? getDayFromDate(new Date(lessonData.startTime))) as Day,
-                    startTime: lessonData.startTime,
-                    endTime: lessonData.endTime,
+                    startTime: new Date(lessonData.startTime),
+                    endTime: new Date(lessonData.endTime),
                     subjectId: lessonData.subjectId,
                     classId: lessonData.classId,
                     teacherId: lessonData.teacherId,
