@@ -79,10 +79,10 @@ const StudentForm = ({
     const getDateError = (field: "birthday") => {
         const err = errors[field];
         // if (isSubmitted && !touchedFields[field] && !err) {
-        //     return "Data nașterii este obligatorie!2";
+        //     return "Data nașterii este obligatorie!";
         // }
         if (err?.message === "Invalid date") {
-            return "Data nașterii este obligatorie!3";
+            return "Data nașterii este obligatorie!";
         }
         return err?.message;
     };

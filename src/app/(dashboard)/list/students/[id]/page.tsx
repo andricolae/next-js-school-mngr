@@ -139,7 +139,7 @@ const SingleStudentPage = async ({
                     </div>
                 </div>
 
-                <div className="mt-4 bg-white rounded-md p-4 h-[535px]">
+                <div className="mt-4 bg-white rounded-md p-4 h-[fit]">
                     <h1>Orarul elevului</h1>
                     <BigCalendarContainer type="classId" id={student.class.id} />
                 </div>
