@@ -110,11 +110,11 @@ const FormModal = ({ table, type, data, id, results, relatedData, title, student
             ? "w-[40%] p-3 h-[80%]"
             : table === "subject" && (type === "create" || type === "update")
                 ? "w-[30%] p-5 h-[70%]"
-                    : ["exam", "assignment", "result", "attendance"].includes(table)
-                        ? "w-[40%] p-6 h-fit"
-                        : ["announcement", "event", "lesson", "class", "teacher", "student", "parent"].includes(table)
-                            ? "w-[40%] p-3 h-fit"
-                            : "w-[50%] p-4 h-fit";
+                : ["exam", "assignment", "result", "attendance"].includes(table)
+                    ? "w-[40%] p-6 h-fit"
+                    : ["announcement", "event", "lesson", "class", "teacher", "student", "parent"].includes(table)
+                        ? "w-[40%] p-3 h-fit"
+                        : "w-[50%] p-4 h-fit";
 
     const Form = () => {
         const [isPending, startTransition] = useTransition();
@@ -176,7 +176,7 @@ const FormModal = ({ table, type, data, id, results, relatedData, title, student
         <button
             className={title !== undefined ? `p-3 rounded-md bg-skyLight` : `${size} flex items-center justify-center rounded-full ${bgColor}`}
             onClick={() => { setOpen(true); }}
-            title={type === "create" ? "Adauga" : type === "delete" ? "Sterge" : "Editeaza"}
+            title={type === "create" ? "Adaugă" : type === "delete" ? "Șterge" : "Editează"}
         >
             {title !== undefined ? <div>{title}</div> : <Image src={`/${type}.png`} alt="" width={16} height={16} />}
         </button>
