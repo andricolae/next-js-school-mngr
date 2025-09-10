@@ -1,0 +1,7 @@
+.rbc-event {
+  transform: translateY(-10px) !important;
+}
+
+.rbc-event-label {
+    display: none;
+}

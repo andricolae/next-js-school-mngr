@@ -53,7 +53,6 @@ const AssignmentForm = ({
     const router = useRouter();
 
     useEffect(() => {
-        console.log(data)
         if (state.success) {
             toast(`Temă ${type === "create" ? "creată" : "actualizată"} cu succes!`);
             setOpen(false);
@@ -75,8 +74,8 @@ const AssignmentForm = ({
         }
         if (err?.message === "Invalid date") {
             return field === "startDate"
-                ? "Data de început este obligatorie!!"
-                : "Data limită este obligatorie!!";
+                ? "Data de început este obligatorie!"
+                : "Data limită este obligatorie!";
         }
         return err?.message;
     };
@@ -87,7 +86,6 @@ const AssignmentForm = ({
 
     const updateTime = (selectedLessonId: string | number) => {
         const lesson = lessons.find((l: any) => l.id === Number(selectedLessonId));
-        console.log(new Date(lesson.startTime).toISOString().split('T')[0]);
         if (lesson) {
             setStartDate(new Date(lesson.startTime).toISOString().split('T')[0]);
         }
