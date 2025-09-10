@@ -301,55 +301,55 @@ const parseToDate = (val: string): Date | null => {
 };
 
 export const lessonSchema = z.object({
-        id: z.coerce.number().optional(),
-        name: z.string().min(1, { message: "Titlul orei este obligatoriu!" }),
-        day: z.enum(["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", ""]).optional(),
+    id: z.coerce.number().optional(),
+    name: z.string().min(1, { message: "Titlul orei este obligatoriu!" }),
+    day: z.enum(["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", ""]).optional(),
 
-        startTime: z.string().refine((val) => {
-            const d = parseToDate(val);
-            if (!d) return false;
-            const h = d.getHours();
-            const m = d.getMinutes();
-            return (h >= 8 && h < 18) || (h === 18 && m === 0);
-        }, { message: "Ora de început trebuie să fie între 08:00 și 18:00!" })
-            .refine((val) => {
-                if (!dateTimeRegex.test(val)) return true;
-                const d = new Date(val);
-                return !isWeekend(d);
-            }, { message: "Nu puteți programa ore în zile de weekend!" })
-            .refine((val) => {
-                if (!dateTimeRegex.test(val)) return true;
-                const d = new Date(val);
-                return !isHoliday(d);
-            }, { message: "Nu puteți programa ore în zile libere naționale!" })
-            .refine((val) => {
-                if (!dateTimeRegex.test(val)) return true;
-                return new Date(val) >= new Date();
-            }, { message: "Ora de început nu poate fi în trecut!" }),
+    startTime: z.string().refine((val) => {
+        const d = parseToDate(val);
+        if (!d) return false;
+        const h = d.getHours();
+        const m = d.getMinutes();
+        return (h >= 8 && h < 18) || (h === 18 && m === 0);
+    }, { message: "Ora de început trebuie să fie între 08:00 și 18:00!" })
+        .refine((val) => {
+            if (!dateTimeRegex.test(val)) return true;
+            const d = new Date(val);
+            return !isWeekend(d);
+        }, { message: "Nu puteți programa ore în zile de weekend!" })
+        .refine((val) => {
+            if (!dateTimeRegex.test(val)) return true;
+            const d = new Date(val);
+            return !isHoliday(d);
+        }, { message: "Nu puteți programa ore în zile libere naționale!" })
+        .refine((val) => {
+            if (!dateTimeRegex.test(val)) return true;
+            return new Date(val) >= new Date();
+        }, { message: "Ora de început nu poate fi în trecut!" }),
 
-        endTime: z.string().refine((val) => {
-            const d = parseToDate(val);
-            if (!d) return false;
-            const h = d.getHours();
-            const m = d.getMinutes();
-            return (h >= 9 && h < 19) || (h === 19 && m === 0);
-        }, { message: "Ora de sfârșit trebuie să fie între 09:00 și 19:00!" })
-            .refine((val) => {
-                if (!dateTimeRegex.test(val)) return true;
-                const d = new Date(val);
-                return !isWeekend(d);
-            }, { message: "Nu puteți programa ore în zile de weekend!" })
-            .refine((val) => {
-                if (!dateTimeRegex.test(val)) return true;
-                const d = new Date(val);
-                return !isHoliday(d);
-            }, { message: "Nu puteți programa ore în zile libere naționale!" }),
+    endTime: z.string().refine((val) => {
+        const d = parseToDate(val);
+        if (!d) return false;
+        const h = d.getHours();
+        const m = d.getMinutes();
+        return (h >= 9 && h < 19) || (h === 19 && m === 0);
+    }, { message: "Ora de sfârșit trebuie să fie între 09:00 și 19:00!" })
+        .refine((val) => {
+            if (!dateTimeRegex.test(val)) return true;
+            const d = new Date(val);
+            return !isWeekend(d);
+        }, { message: "Nu puteți programa ore în zile de weekend!" })
+        .refine((val) => {
+            if (!dateTimeRegex.test(val)) return true;
+            const d = new Date(val);
+            return !isHoliday(d);
+        }, { message: "Nu puteți programa ore în zile libere naționale!" }),
 
-        subjectId: z.coerce.number({ message: "Materia este obligatorie!" }),
-        classId: z.coerce.number({ message: "Clasa este obligatorie!" }),
-        teacherId: z.string().min(1, { message: "Profesorul este obligatoriu!" }),
-        isRecurring: z.boolean(),
-    })
+    subjectId: z.coerce.number({ message: "Materia este obligatorie!" }),
+    classId: z.coerce.number({ message: "Clasa este obligatorie!" }),
+    teacherId: z.string().min(1, { message: "Profesorul este obligatoriu!" }),
+    isRecurring: z.boolean(),
+})
     .refine((data) => {
         if (!data.isRecurring && dateTimeRegex.test(data.startTime) && dateTimeRegex.test(data.endTime)) {
             const s = new Date(data.startTime);
