@@ -364,13 +364,13 @@ const TeacherForm = ({
                     register={register}
                     error={errors?.address}
                 />
-                {/* <InputField
+                <InputField
                     label="CNP"
                     name="CNP"
                     defaultValue={data?.CNP}
                     register={register}
                     error={errors?.CNP}
-                /> */}
+                />
                 <InputField
                     label="Data nașterii"
                     name="birthday"
