@@ -4,7 +4,6 @@ export const generateTranscriptPDF = (cif: string, nume: string, cnp: string,
     nationalitate: string, dataLocNastere: string, numeTata: string, numeMama: string,
     domiciliuParinti: string, domiciliuElev: string, materiiSiNote: string[]
 ) => {
-    console.log(materiiSiNote);
     const doc = new jsPDF({
         orientation: "portrait",
         unit: "pt",

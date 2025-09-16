@@ -1,7 +1,7 @@
 import React from 'react';
 
 interface ScoreData {
-    score: number | null | undefined;
+    score: string | null | undefined;
     [key: string]: any;
 }
 
@@ -27,14 +27,14 @@ const useAverageCalculation = <T extends ScoreData>(
         const validScores = data.filter(item =>
             item.score !== null &&
             item.score !== undefined &&
-            !isNaN(item.score)
+            !isNaN(Number(item.score))
         );
 
         if (validScores.length === 0) {
             return { average: 0, totalWithScores: 0, hasValidData: false };
         }
 
-        const sum = validScores.reduce((acc, item) => acc + item.score!, 0);
+        const sum = validScores.reduce((acc, item) => acc + Number(item.score!), 0);
         const average = Math.round((sum / validScores.length) * Math.pow(10, precision)) / Math.pow(10, precision);
 
         return {

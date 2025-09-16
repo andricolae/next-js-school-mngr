@@ -129,7 +129,7 @@ const MultiSelect = ({
                     value={searchText}
                     onChange={handleInputChange}
                     onFocus={handleInputFocus}
-                    placeholder={selectedIds.length > 0 ? "Add another..." : placeholder}
+                    placeholder={selectedIds.length > 0 ? "Adaugă..." : placeholder}
                     className="block w-full px-3 py-2 pr-20 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                     readOnly={false}
                 />
@@ -171,7 +171,7 @@ const MultiSelect = ({
                     ref={dropdownRef}
                     className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg"
                 >
-                    <div className="px-3 py-2 text-gray-500">No results found for {searchText}</div>
+                    <div className="px-3 py-2 text-gray-500">Niciun rezultat gasit pentru {searchText}</div>
                 </div>
             )}
         </div>

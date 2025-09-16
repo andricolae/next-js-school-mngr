@@ -1,16 +1,16 @@
-"use client"
-
+"use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import InputField from "../InputField";
+import { Controller, useForm } from "react-hook-form";
+import InputField from "@/components/InputField";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { resultSchema, ResultSchema } from "@/lib/formValidationSchemas";
 import { useFormState } from "react-dom";
-import { createResult, studentsOfClassAssignedToAnAssignment, updateResult } from "@/lib/actions";
+import { createResult, updateResult } from "@/lib/actions";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import LoadingPopup from "@/components/LoadingPopup";
 import { useTransition } from "react";
+import { MultiSelect } from "@/components/forms/FilterForm";
 
 const ResultForm = ({
     type,
@@ -26,20 +26,21 @@ const ResultForm = ({
     const {
         register,
         handleSubmit,
+        control,
         formState: { errors },
         watch,
         setValue,
         reset
     } = useForm<ResultSchema>({
         resolver: zodResolver(resultSchema),
-        // defaultValues: type === "update" && data ? {
-        //     id: data.id,
-        //     score: data.score,
-        //     studentId: data.studentId || "",
-        //     examId: data.examId || undefined,
-        //     assignmentId: data.assignmentId || undefined,
-        //     resultDate: data.resultDate,
-        // } : {}
+        defaultValues: type === "update" && data ? {
+            // id: data.id,
+            // score: data.score,
+            studentId: data.studentId || "",
+            examId: data.examId || undefined,
+            assignmentId: data.assignmentId || undefined,
+            // resultDate: data.resultDate,
+        } : {}
     });
 
     const [state, formAction] = useFormState(type === "create"
@@ -74,40 +75,69 @@ const ResultForm = ({
     }, [state, router, type, setOpen]);
 
     const { students, exams, assignments } = relatedData;
-    const [filteredStudents, setFilteredStudents] = useState(students || []);
 
-    const updateSelect = async (selectedOption: "exam" | "assignment", id: number) => {
-        startTransition(async () => {
-            if (selectedOption === "exam") {
-                const newStudents = students?.filter((t: any) => t.subjects?.some((sub: any) => sub.name === id));
-                setFilteredStudents(newStudents || []);
-            } else if (selectedOption === "assignment") {
-                const newStudents = await studentsOfClassAssignedToAnAssignment(id);
-                setFilteredStudents(newStudents || []);
-            }
-        });
+    const getDateError = (field: "resultDate") => {
+        const err = errors[field];
+        if (err?.message === "Invalid date") {
+            return "Data este obligatorie!";
+        }
+        return err?.message;
     };
+
+    const stdents: any[] = students?.map((stud: any) => ({
+        id: stud.id.toString(),
+        name: stud.name + " " + stud.surname,
+    })) || [];
+
+    const exms: any[] = exams?.map((exam: any) => ({
+        id: exam.id.toString(),
+        name: exam.title + " - " + exam.lesson.subject.name + " (" + exam.lesson.class.name + ")",
+    })) || [];
+
+    const asignments: any[] = assignments?.map((assign: any) => ({
+        id: assign.id.toString(),
+        name: assign.title + " - " + assign.lesson.subject.name + " (" + assign.lesson.class.name + ")",
+    })) || [];
 
     return (
         <form className="flex flex-col gap-6 mx-auto" onSubmit={onSubmit}>
             <h1 className="text-xl font-semibold">
                 {type === "create" ? "Adaugă o nouă notă" : "Actualizează nota"}</h1>
 
-            <div className=" mt-2 text-xs text-gray-500">
+            <div className="mt-2 text-xs text-gray-500">
                 Important: Pentru a adăuga o notă, selectează un test sau o temă, nu ambele.
             </div>
 
             <div className="flex flex-col gap-4">
-                <InputField
-                    label="Nota"
-                    name="score"
-                    type="number"
-                    defaultValue={data?.score}
-                    register={register}
-                    error={errors?.score}
-                    inputProps={{ min: 0, max: 100 }}
-                />
-
+                <div className="flex flex-col gap-2">
+                    <label className="text-xs text-gray-400 mb-1 block">Nota</label>
+                    <select
+                        className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
+                        {...register("score")}
+                        defaultValue={data?.score}
+                    >
+                        <option value="">Selectează nota</option>
+                        <option value="10">10</option>
+                        <option value="9">9</option>
+                        <option value="8">8</option>
+                        <option value="7">7</option>
+                        <option value="6">6</option>
+                        <option value="5">5</option>
+                        <option value="4">4</option>
+                        <option value="3">3</option>
+                        <option value="2">2</option>
+                        <option value="1">1</option>
+                        <option value="FB">FB</option>
+                        <option value="B">B</option>
+                        <option value="S">S</option>
+                        <option value="I">I</option>
+                    </select>
+                    {errors.score?.message && (
+                        <p className="text-xs text-red-400">
+                            {errors.score.message.toString()}
+                        </p>
+                    )}
+                </div>
                 {data && (
                     <InputField
                         label="Id"
@@ -120,27 +150,20 @@ const ResultForm = ({
                 )}
 
                 <div className="flex flex-col gap-1 w-full">
-                    <label className="text-xs text-gray-400">Elev</label>
-                    <select
-                        className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
-                        defaultValue={data?.studentId || ""}
-                        {...register("studentId")}
-                    >
-                        <option value="">Alege un elev</option>
-                        {filteredStudents !== null ?
-                            <>
-                                {filteredStudents?.map(
-                                    (student: { id: string; name: string; surname: string }) => (
-                                        <option value={student.id} key={student.id}>
-                                            {student.name} {student.surname}
-                                        </option>
-                                    )
-                                )}
-                            </>
-                            :
-                            <></>
-                        }
-                    </select>
+                    <Controller
+                        name="studentId"
+                        control={control}
+                        render={({ field }) => (
+                            <MultiSelect
+                                id="studentId"
+                                label="Elev"
+                                options={stdents}
+                                placeholder="Selectează un elev"
+                                selectedIds={field.value ? [field.value] : []}
+                                onSelectionChange={(ids) => field.onChange(ids[0] ?? "")}
+                            />
+                        )}
+                    />
                     {errors.studentId?.message && (
                         <p className="text-xs text-red-400">
                             {errors.studentId.message.toString()}
@@ -149,39 +172,29 @@ const ResultForm = ({
                 </div>
 
                 <InputField
-                    label="Data obtinerii notei"
+                    label="Data obținerii notei"
                     name="resultDate"
                     type="date"
                     defaultValue={data?.resultDate !== undefined ? new Date(data?.resultDate).toISOString().split("T")[0] : ""}
                     register={register}
-                    error={errors.resultDate}
+                    error={getDateError("resultDate")}
                 />
 
                 <div className="flex flex-col gap-2 w-full">
-                    <label className="text-xs text-gray-400">Test (Opțional)</label>
-                    <select
-                        className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
-                        defaultValue={data?.examId || ""}
-                        {...register("examId")}
-                        onChange={(e) => {
-                            setValue("examId", parseInt(e.target.value));
-                            setValue("assignmentId", undefined);
-                            // const selectedId = e.target.value;
-                            // const exam = exams?.find((s: any) => s.id === selectedId);
-                            // if (exam) {
-                            //     updateSelect("exam", exam.id);
-                            // }
-                        }}
-                    >
-                        <option value="">Selectează un test</option>
-                        {exams?.map(
-                            (exam: { id: number; title: string; lesson: { subject: { name: string }, class: { name: string } } }) => (
-                                <option value={exam.id} key={exam.id}>
-                                    {exam.title} - {exam.lesson.subject.name} ({exam.lesson.class.name})
-                                </option>
-                            )
+                    <Controller
+                        name="examId"
+                        control={control}
+                        render={({ field }) => (
+                            <MultiSelect
+                                id="examId"
+                                label="Test (Opțional)"
+                                options={exms}
+                                placeholder="Selectează un test"
+                                selectedIds={field.value?.toString() ? [field.value.toString()] : []}
+                                onSelectionChange={(ids) => field.onChange(ids[0] ?? "")}
+                            />
                         )}
-                    </select>
+                    />
                     {errors.examId?.message && (
                         <p className="text-xs text-red-400">
                             {errors.examId.message.toString()}
@@ -190,30 +203,20 @@ const ResultForm = ({
                 </div>
 
                 <div className="flex flex-col gap-2 w-full">
-                    <label className="text-xs text-gray-400">Temă (Opțional)</label>
-                    <select
-                        className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
-                        defaultValue={data?.assignmentId || ""}
-                        {...register("assignmentId")}
-                        onChange={(e) => {
-                            setValue("assignmentId", parseInt(e.target.value));
-                            setValue("examId", undefined);
-                            const selectedId = Number(e.target.value);
-                            const assignment = assignments?.find((s: any) => s.id === selectedId);
-                            if (assignment) {
-                                updateSelect("assignment", assignment.id);
-                            }
-                        }}
-                    >
-                        <option value="">Selectează o temă</option>
-                        {assignments?.map(
-                            (assignment: { id: number; title: string; lesson: { subject: { name: string }, class: { name: string } } }) => (
-                                <option value={assignment.id} key={assignment.id}>
-                                    {assignment.title} - {assignment.lesson.subject.name} ({assignment.lesson.class.name})
-                                </option>
-                            )
+                    <Controller
+                        name="assignmentId"
+                        control={control}
+                        render={({ field }) => (
+                            <MultiSelect
+                                id="assignmentId"
+                                label="Temă (Opțional)"
+                                options={asignments}
+                                placeholder="Selectează o temă"
+                                selectedIds={field.value?.toString() ? [field.value.toString()] : []}
+                                onSelectionChange={(ids) => field.onChange(ids[0] ?? "")}
+                            />
                         )}
-                    </select>
+                    />
                     {errors.assignmentId?.message && (
                         <p className="text-xs text-red-400">
                             {errors.assignmentId.message.toString()}
@@ -241,4 +244,4 @@ const ResultForm = ({
     )
 };
 
-export default ResultForm
+export default ResultForm;

@@ -17,7 +17,7 @@ const StudentAttendanceCard = async ({ id }: { id: string }) => {
 
     return (
         <div className=''>
-            <h1 className='text-xl font-semibold'>{percentage || "-"}% </h1>
+            <h1 className='text-xl font-semibold'>{percentage.toString().slice(0, 4) || "-"}% </h1>
             <span className='text-sm text-gray-400'>Prezență</span>
         </div>
     )

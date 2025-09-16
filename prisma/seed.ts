@@ -122,6 +122,7 @@ async function main() {
                 phone: `987-654-321${i}`,
                 address: `Address${i}`,
                 CNP: "1234567891234",
+                registrationNo: `123${i}`,
                 gender: i % 2 === 0 ? UserGender.MALE : UserGender.FEMALE,
                 parentId: `parentId${Math.ceil(i / 2) % 25 || 25}`,
                 gradeId: (i % 6) + 1,
@@ -161,7 +162,7 @@ async function main() {
     for (let i = 1; i <= 10; i++) {
         await prisma.result.create({
             data: {
-                score: 90,
+                score: "9",
                 studentId: `student${i}`,
                 ...(i <= 5 ? { examId: i } : { assignmentId: i - 5 }),
                 resultDate: new Date()

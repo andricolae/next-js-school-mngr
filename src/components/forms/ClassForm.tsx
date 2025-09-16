@@ -84,7 +84,7 @@ const ClassForm = ({
                     error={errors?.name}
                 />
                 <InputField
-                    label="Capacitate"
+                    label="Număr maxim elevi"
                     name="capacity"
                     type="number"
                     defaultValue={data?.capacity}

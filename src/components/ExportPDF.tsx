@@ -15,7 +15,7 @@ interface ResultItemForPdf {
     studentSurname: string;
     teacherName: string;
     teacherSurname: string;
-    score: number;
+    score: string;
     className: string;
     startTime: Date;
     subject: string;
@@ -27,7 +27,6 @@ interface PdfHeaderDetails {
     moduleName?: string;
     isSingleStudentSelected?: boolean;
 }
-
 
 interface FetchAllDataParams {
     filters?: any;
@@ -78,7 +77,7 @@ function calculateAverageForPdf(results: ResultItemForPdf[]): {
     const validScores = results.filter(item =>
         item.score !== null &&
         item.score !== undefined &&
-        !isNaN(item.score)
+        !isNaN(Number(item.score))
     );
 
     if (validScores.length === 0) {
@@ -92,12 +91,12 @@ function calculateAverageForPdf(results: ResultItemForPdf[]): {
         };
     }
 
-    const scores = validScores.map(item => item.score);
+    const scores = validScores.map(item => Number(item.score));
     const sum = scores.reduce((acc, score) => acc + score, 0);
-    const average = Math.round((sum / validScores.length) * 100) / 100;
+    const average = Math.round((Number(sum) / validScores.length) * 100) / 100;
     const maxScore = Math.max(...scores);
     const minScore = Math.min(...scores);
-    const passRate = Math.round((scores.filter(score => score >= 60).length / scores.length) * 100);
+    const passRate = Math.round((scores.filter(score => Number(score) >= 60).length / scores.length) * 100);
 
     return {
         average,

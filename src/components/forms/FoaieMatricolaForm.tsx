@@ -110,7 +110,7 @@ const AdeverintaElevForm = ({
         for (let i = 0; i < resultArray.length; ++i) {
             x.push({ id: `${i + 1}`, name: resultArray[i][0] });
         }
-        setAllSubjects(x);
+        // setAllSubjects(x);
 
         return resultArray;
     }
@@ -178,8 +178,8 @@ const AdeverintaElevForm = ({
             });
         }
 
-        generateTranscriptPDF("10101010", `${student.surname} ${student.name}`, "cnp 5010526388915",
-            `loc nastere damaroaia ${new Date(student.birthday).toLocaleDateString('ro-RO').replace(/\//g, '.')}`,
+        generateTranscriptPDF("10101010", `${student.surname + " " + student.name}`, `${student.CNP}`,
+            `${student.birthplace} ${new Date(student.birthday).toLocaleDateString('ro-RO').replace(/\//g, '.')}`,
             "nationalitate ungur", "numeTata Ion", "numeMama Ioana", "domiciliuParinti Ungaria", `${student.address}`, materiiSiNote);
         setOpen(false);
         setIsSubmitting(false);
@@ -188,6 +188,13 @@ const AdeverintaElevForm = ({
     const router = useRouter();
 
     useEffect(() => {
+
+        console.log(allSubjects);
+        console.log(data);
+        console.log(relatedData);
+        console.log(results);
+        console.log(student)
+
         if (state.success) {
             toast(`Assignment has been ${type === "create" ? "created" : "updated"} successfully!`);
             setOpen(false);
@@ -207,9 +214,9 @@ const AdeverintaElevForm = ({
     return (
         <form className="flex flex-col gap-8 items-center" onSubmit={onSubmit}>
             <div className="flex flex-col gap-4 w-full">
-                <h1 className="text-cl font-semibold">{type === "create" ? "Create a new assignment" : "Update the assignment"}</h1>
+                <h1 className="text-cl font-semibold">{type === "create" ? "Foaie matricola" : ""}</h1>
                 <div className="flex flex-col gap-2 w-full">
-                    <label className="text-xs text-gray-400">Start Date</label>
+                    <label className="text-xs text-gray-400">Interval (data inceput)</label>
                     <input
                         type="date"
                         name="startDate"
@@ -221,7 +228,7 @@ const AdeverintaElevForm = ({
                     )}
                 </div>
                 <div className="flex flex-col gap-2 w-full">
-                    <label className="text-xs text-gray-400">End Date</label>
+                    <label className="text-xs text-gray-400">Interval (data sfarsit)</label>
                     <input
                         type="date"
                         name="endDate"
@@ -232,14 +239,14 @@ const AdeverintaElevForm = ({
                         <span className="text-red-500 text-sm">Date calendaristice invalide.</span>
                     )}
                 </div>
-                <MultiSelect id="foaieMatricola" label="Subjects" options={allSubjects} placeholder="Add another..."
+                <MultiSelect id="foaieMatricola" label="Materii" options={allSubjects} placeholder="Adauga..."
                     selectedIds={subjectFilters} onSelectionChange={setSubjectFilters} />
             </div>
             <button type="submit"
                 className={`bg-blue-500 text-white p-2 rounded-md w-fit`}
                 disabled={isSubmitting}
             >
-                {type === "create" ? "Create" : "Update"}
+                {type === "create" ? "Descarca" : "Descarca"}
             </button>
         </form>
     )

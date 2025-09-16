@@ -3,11 +3,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { assignmentSchema, AssignmentSchema } from "@/lib/formValidationSchemas";
-import { createAssignment, updateAssignment } from "@/lib/actions";
+import { createAssignment, readAttendanceData, updateAssignment } from "@/lib/actions";
 import { useFormState } from "react-dom";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { generateRaportAbsentePDF } from "@/components/RaportAbsente";
+import { schoolData } from "@/lib/schoolData";
+import { useTransition } from "react"
+import LoadingPopup from "@/components/LoadingPopup";
 
 const RaportAbsenteForm = ({
     type,
@@ -38,28 +41,34 @@ const RaportAbsenteForm = ({
         ? createAssignment : updateAssignment, { success: false, error: false })
 
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isPending, startTransition] = useTransition();
 
-    const onSubmit = (e: any) => {
 
+    const onSubmit = async (e: any) => {
         e.preventDefault();
-        const formData = new FormData(e.target);
-        const selectedMonthForReport = formData.get("selectedMonthForReport") as string;
+        startTransition(async () => {
+            const formData = new FormData(e.target);
+            const selectedMonthForReport = formData.get("selectedMonthForReport") as string;
 
-        if (selectedMonthForReport === null) {
-            const newErrors = {
-                selectedMonthForReport: !selectedMonthForReport,
-            };
+            if (selectedMonthForReport === null) {
+                const newErrors = {
+                    selectedMonthForReport: !selectedMonthForReport,
+                };
 
-            setErrorsInputs(newErrors);
-            return;
-        }
-        setIsSubmitting(true);
-        let absente = [{ data: "01.05", status: "motivata" }, { data: "07.05", status: "nemotivata" }, { data: "09.05", status: "motivata" }]
+                setErrorsInputs(newErrors);
+                return;
+            }
+            setIsSubmitting(true);
+            const result = await readAttendanceData(student.id, selectedMonthForReport);
+            const absente = result.data?.[0];
 
-        generateRaportAbsentePDF("UnitateInvatamant", new Date().toLocaleDateString("ro-RO").replace(/\//g, "."),
-            student?.surname, student?.name, selectedMonthForReport, absente);
-        setOpen(false);
-        setIsSubmitting(false);
+            console.log(result.data?.[0])
+
+            generateRaportAbsentePDF(schoolData[0].name, new Date().toLocaleDateString("ro-RO").replace(/\//g, "."),
+                student?.surname, student?.name, selectedMonthForReport, absente);
+            setOpen(false);
+            setIsSubmitting(false);
+        });
     }
 
     const router = useRouter();
@@ -91,39 +100,35 @@ const RaportAbsenteForm = ({
                         <option value="" disabled hidden className="h-12">
                             Alege o lună
                         </option>
+
                         {(() => {
-                            const options = [];
+                            const options: any = [];
                             const now = new Date();
+                            const currentMonth = now.getMonth(); // 0..11
                             const currentYear = now.getFullYear();
-                            const previousYear = currentYear - 1;
+                            const prevYear = currentYear - 1;
+                            const nextYear = currentYear + 1;
 
                             const monthNames = [
                                 "Ianuarie", "Februarie", "Martie", "Aprilie", "Mai", "Iunie",
                                 "Iulie", "August", "Septembrie", "Octombrie", "Noiembrie", "Decembrie"
                             ];
 
-                            // Last 4 months of previous year (Sep–Dec)
-                            for (let month = 8; month <= 11; month++) {
+                            const pushOption = (year: any, monthIndex: any) => {
+                                const value = `${year}-${String(monthIndex + 1).padStart(2, "0")}`;
                                 options.push(
-                                    <option
-                                        key={`${previousYear}-${month}`}
-                                        value={`${previousYear}-${month + 1}`}
-                                    >
-                                        {`${monthNames[month]} ${previousYear}`}
+                                    <option key={`${year}-${monthIndex}`} value={value}>
+                                        {`${monthNames[monthIndex]} ${year}`}
                                     </option>
                                 );
-                            }
+                            };
 
-                            // First 7 months of current year (Jan–Jul)
-                            for (let month = 0; month <= 6; month++) {
-                                options.push(
-                                    <option
-                                        key={`${currentYear}-${month}`}
-                                        value={`${currentYear}-${month + 1}`}
-                                    >
-                                        {`${monthNames[month]} ${currentYear}`}
-                                    </option>
-                                );
+                            if (currentMonth <= 7) {
+                                for (let m = 8; m <= 11; m++) pushOption(prevYear, m);
+                                for (let m = 0; m <= 6; m++) pushOption(currentYear, m);
+                            } else {
+                                for (let m = 8; m <= 11; m++) pushOption(currentYear, m);
+                                for (let m = 0; m <= 6; m++) pushOption(nextYear, m);
                             }
 
                             return options;
@@ -142,6 +147,7 @@ const RaportAbsenteForm = ({
             >
                 {type === "create" ? "Descarca" : "Update"}
             </button>
+            {isPending && <LoadingPopup />}
         </form>
     )
 };
