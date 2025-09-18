@@ -21,6 +21,7 @@ type ResultList = {
     teacherSurname: string;
     score: string;
     className: string;
+    resultDate: Date;
     startTime: Date;
     subject: string;
 };
@@ -130,7 +131,7 @@ const ResultListPage = async ({
             </td>
             <td className="hidden md:table-cell">{item.className}</td>
             <td className="hidden md:table-cell">
-                {new Intl.DateTimeFormat("ro-RO").format(item.startTime)}
+                {new Intl.DateTimeFormat("ro-RO").format(item.resultDate)}
             </td>
             <td>
                 <div className="flex items-center gap-2">
@@ -398,6 +399,8 @@ const ResultListPage = async ({
         orderBy: shouldSortTransformed ? undefined : orderBy,
     });
 
+    let x = dataRes;
+
 
     let data = dataRes.map((item) => {
         const assessment = item.exam || item.assignment;
@@ -415,6 +418,7 @@ const ResultListPage = async ({
             teacherSurname: assessment.lesson.teacher.surname,
             score: item.score,
             className: assessment.lesson.class.name,
+            resultDate: item.resultDate,
             startTime: isExam ? assessment.startTime : assessment.startDate,
             studentId: item.studentId,
             examId: item.examId,
@@ -440,6 +444,7 @@ const ResultListPage = async ({
             teacherSurname: assessment.lesson.teacher.surname,
             score: item.score,
             className: assessment.lesson.class.name,
+            resultDate: item.resultDate,
             startTime: isExam ? assessment.startTime : assessment.startDate,
             studentId: item.studentId,
             examId: item.examId,
@@ -489,8 +494,8 @@ const ResultListPage = async ({
                         <DownloadButton
                             dataToExport={allDataTransformedForExport}
                             headerDetails={{
-                                companyName: "Test School",
-                                companyAddress: "Test Street 123, Test City",
+                                companyName: "Smart School",
+                                companyAddress: "Sibiu",
                                 isSingleStudentSelected: isSingleStudentSelected,
                             }}
                         />
@@ -502,13 +507,12 @@ const ResultListPage = async ({
                 </div>
             </div>
             <Table columns={columns} renderRow={renderRow} data={data} />
-            {/* <COMPONENTA data={data} dataRes={dataRes} /> */}
             <Pagination page={p} count={count} />
 
             {isSingleStudentSelected && (
                 <AverageCalculator
                     data={allDataTransformedForExport}
-                    title="General average"
+                    title="Media generala"
                     precision={2}
                     showCount={true}
                     containerStyle="info"

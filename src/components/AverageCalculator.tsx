@@ -87,7 +87,7 @@ const AverageCalculator = <T extends ScoreData>({
             </span>
             {showCount && (
                 <span className="text-sm opacity-75 ml-2">
-                    (from {totalWithScores} {totalWithScores === 1 ? 'result' : 'results'})
+                    (de la {totalWithScores} {totalWithScores === 1 ? 'nota' : 'note'})
                 </span>
             )}
         </div>

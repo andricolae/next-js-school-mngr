@@ -175,7 +175,7 @@ const ResultForm = ({
                     label="Data obținerii notei"
                     name="resultDate"
                     type="date"
-                    defaultValue={data?.resultDate !== undefined ? new Date(data?.resultDate).toISOString().split("T")[0] : ""}
+                    defaultValue={data?.resultDate ? new Date(data?.resultDate).toISOString().split("T")[0] : undefined}
                     register={register}
                     error={getDateError("resultDate")}
                 />
