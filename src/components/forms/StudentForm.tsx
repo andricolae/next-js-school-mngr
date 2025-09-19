@@ -254,26 +254,6 @@ const StudentForm = ({
                         </p>
                     )}
                 </div>
-                {/* <div className="flex flex-col gap-2">
-                    <label className="text-xs text-gray-400 font-medium">Nivel</label>
-                    <select
-                        className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
-                        {...register("gradeId")}
-                        defaultValue={data?.gradeId || ""}
-                    >
-                        <option value="">Selectează nivelul</option>
-                        {grades.map((grade: { id: number; level: number }) => (
-                            <option value={grade.id} key={grade.id}>
-                                {grade.level}
-                            </option>
-                        ))}
-                    </select>
-                    {errors.gradeId?.message && (
-                        <p className="text-xs text-red-400">
-                            {errors.gradeId.message.toString()}
-                        </p>
-                    )}
-                </div> */}
                 <div className="flex flex-col gap-2">
                     <label className="text-xs text-gray-400 font-medium">Clasa</label>
                     <select

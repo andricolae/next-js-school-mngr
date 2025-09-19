@@ -399,9 +399,6 @@ const ResultListPage = async ({
         orderBy: shouldSortTransformed ? undefined : orderBy,
     });
 
-    let x = dataRes;
-
-
     let data = dataRes.map((item) => {
         const assessment = item.exam || item.assignment;
 

@@ -231,9 +231,6 @@ const TeacherForm = ({
     const [isPending, startTransition] = useTransition();
 
     useEffect(() => {
-        console.log(data);
-        console.log(relatedData);
-        
         if (state.success) {
             toast(`Profesor ${type === "create" ? "adăugat" : "actualizat"} cu succes!`);
             setOpen(false);
