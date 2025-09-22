@@ -10,8 +10,9 @@ interface ResultItemForPdf {
     studentSurname: string;
     teacherName: string;
     teacherSurname: string;
-    score: number;
+    score: string;
     className: string;
+    resultDate: Date;
     startTime: Date;
     subject: string;
 }

@@ -28,13 +28,13 @@ interface ModuleOption {
 }
 
 const SORT_DATE_OPTIONS = [
-    { value: "", label: "No sorting" },
+    { value: "", label: "Nesortat" },
     { value: "date_asc", label: "Ascending" },
     { value: "date_desc", label: "Descending" },
 ];
 
 const SORT_GRADE_OPTIONS = [
-    { value: "", label: "No sorting" },
+    { value: "", label: "Nesortat" },
     { value: "score_asc", label: "Ascending" },
     { value: "score_desc", label: "Descending" },
 ];
@@ -125,7 +125,7 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
 
     return (
         <div className="filter-field relative">
-            <label htmlFor={id} className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor={id} className="text-xs text-gray-400 mb-1 block">
                 {label}
             </label>
 
@@ -157,7 +157,7 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
                     value={searchText}
                     onChange={handleInputChange}
                     onFocus={handleInputFocus}
-                    placeholder={selectedIds.length > 0 ? "Add another..." : placeholder}
+                    placeholder={selectedIds.length > 0 ? "Adaugă..." : placeholder}
                     className="block w-full px-3 py-2 pr-20 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 />
                 <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center gap-1">
@@ -199,7 +199,7 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
                     className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg"
                 >
                     <div className="px-3 py-2 text-gray-500">
-                        No results found for &quot;{searchText}&quot;
+                        Niciun rezultat gasit pentru &quot;{searchText}&quot;
                     </div>
                 </div>
             )}
@@ -331,7 +331,7 @@ const FilterForm: React.FC<FilterFormProps> = ({
                     <div className="filter-modal-content bg-white p-6 rounded-lg shadow-xl w-full max-w-2xl mx-auto relative max-h-[90vh] overflow-y-auto">
                         <div className="filter-modal-header flex justify-between items-center border-b pb-3 mb-4">
                             <h2 className="text-xl font-semibold">
-                                Filter Results
+                                Filtrează rezultate
                                 {activeFiltersCount > 0 && (
                                     <span className="ml-2 text-sm text-gray-500">
                                         ({activeFiltersCount} active {activeFiltersCount === 1 ? 'filter' : 'filters'})
@@ -347,60 +347,60 @@ const FilterForm: React.FC<FilterFormProps> = ({
                         </div>
 
                         <p className="text-gray-600 mb-4">
-                            You can select multiple options for each filter. Filters will be applied cumulatively.
+                            Puteți selecta mai multe optiuni de filtrare simultan pentru fiecare categorie.
                         </p>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                             <div className="filter-field">
-                                <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                                <label htmlFor="title" className="text-xs text-gray-400 mb-1 block">Titlu</label>
                                 <input
                                     type="text"
                                     id="title"
                                     value={titleFilter}
                                     onChange={(e) => setTitleFilter(e.target.value)}
-                                    placeholder="Exam/assignment title"
+                                    placeholder="Titlu test/temă"
                                     className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                                 />
                             </div>
 
                             <MultiSelect
                                 id="subjects"
-                                label="Subjects"
+                                label="Materi"
                                 options={subjects}
-                                placeholder="Select subjects..."
+                                placeholder="Selectează materie..."
                                 selectedIds={subjectFilters}
                                 onSelectionChange={setSubjectFilters}
                             />
 
                             <MultiSelect
                                 id="students"
-                                label="Students"
+                                label="Elevi"
                                 options={students}
-                                placeholder="Search students..."
+                                placeholder="Selectează elevi..."
                                 selectedIds={studentFilters}
                                 onSelectionChange={setStudentFilters}
                             />
 
                             <MultiSelect
                                 id="teachers"
-                                label="Teachers"
+                                label="Profesori"
                                 options={teachers}
-                                placeholder="Search teachers..."
+                                placeholder="Selectează profesori..."
                                 selectedIds={teacherFilters}
                                 onSelectionChange={setTeacherFilters}
                             />
 
                             <MultiSelect
                                 id="classes"
-                                label="Classes"
+                                label="Clase"
                                 options={classes}
-                                placeholder="Select classes..."
+                                placeholder="Selectează clase..."
                                 selectedIds={classFilters}
                                 onSelectionChange={setClassFilters}
                             />
 
                             <div className="filter-field">
-                                <label htmlFor="moduleFilter" className="block text-sm font-medium text-gray-700 mb-1">
+                                <label htmlFor="moduleFilter" className="text-xs text-gray-400 mb-1 block">
                                     Module
                                 </label>
                                 <select
@@ -409,7 +409,7 @@ const FilterForm: React.FC<FilterFormProps> = ({
                                     onChange={(e) => setModuleFilter(e.target.value)}
                                     className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                                 >
-                                    <option value="">Select module</option>
+                                    <option value="">Selectează module</option>
                                     {modules.map((moduleOption) => (
                                         <option key={moduleOption.id} value={moduleOption.id}>
                                             {moduleOption.name} (Starts: {moduleOption.startDate}, Ends: {moduleOption.endDate})
@@ -420,8 +420,8 @@ const FilterForm: React.FC<FilterFormProps> = ({
 
 
                             <div className="filter-field">
-                                <label htmlFor="sortDateOption" className="block text-sm font-medium text-gray-700 mb-1">
-                                    Sort by Date
+                                <label htmlFor="sortDateOption" className="text-xs text-gray-400 mb-1 block">
+                                    Sortează după dată
                                 </label>
                                 <select
                                     id="sortDateOption"
@@ -438,8 +438,8 @@ const FilterForm: React.FC<FilterFormProps> = ({
                             </div>
 
                             <div className="filter-field">
-                                <label htmlFor="sortGradeOption" className="block text-sm font-medium text-gray-700 mb-1">
-                                    Sort by Grade
+                                <label htmlFor="sortGradeOption" className="text-xs text-gray-400 mb-1 block">
+                                    Sortează după anul de învățământ
                                 </label>
                                 <select
                                     id="sortGradeOption"
@@ -456,18 +456,18 @@ const FilterForm: React.FC<FilterFormProps> = ({
                             </div>
                         </div>
 
-                        <div className="filter-modal-footer flex justify-end gap-2 pt-4 border-t mt-4 mb-8">
+                        <div className="filter-modal-footer flex justify-center gap-4 pt-4 border-t mt-4 mb-8">
                             <button
                                 className="filter-button-clear px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50"
                                 onClick={handleClearFilters}
                             >
-                                Clear All Filters
+                                Șterge toate filtrele
                             </button>
                             <button
                                 className="filter-button-apply px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-opacity-50"
                                 onClick={handleApplyFilters}
                             >
-                                Apply Filters ({activeFiltersCount})
+                                Aplică filtrele ({activeFiltersCount})
                             </button>
                         </div>
                     </div>

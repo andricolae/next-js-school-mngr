@@ -249,7 +249,6 @@ export const deleteTeacher = async (currentState: CurrentState, data: FormData) 
 
 export const createStudent = async (currentState: CurrentState, data: StudentSchema) => {
     try {
-
         const classItem = await prisma.class.findUnique({
             where: { id: data.classId },
             include: { _count: { select: { students: true } } },
@@ -279,6 +278,7 @@ export const createStudent = async (currentState: CurrentState, data: StudentSch
                     address: data.address,
                     img: data.img,
                     CNP: data.CNP ?? "",
+                    registrationNo: data.registrationNo ?? "",
                     gender: data.gender,
                     birthday: data.birthday,
                     gradeId: data.gradeId,
@@ -309,7 +309,6 @@ export const createStudent = async (currentState: CurrentState, data: StudentSch
 }
 
 export const updateStudent = async (currentState: CurrentState, data: StudentSchema) => {
-
     if (!data.id) {
         return { success: false, error: true };
     }
@@ -339,6 +338,7 @@ export const updateStudent = async (currentState: CurrentState, data: StudentSch
                     address: data.address,
                     img: data.img,
                     CNP: data.CNP,
+                    registrationNo: data.registrationNo,
                     gender: data.gender,
                     birthday: data.birthday,
                     gradeId: data.gradeId,
@@ -1486,31 +1486,62 @@ export const studentsAssignedToAnExam = async (examId: number) => {
     return examStudents;
 }
 
-export const studentsOfClassAssignedToAnAssignment = async (assignmentId: number) => {
-    const assignmentClassStudents = await prisma.assignment.findUnique({
-        where: { id: assignmentId },
-        select: {
-            id: true,
-            title: true,
-            lesson: {
-                select: {
-                    class: {
-                        select: {
-                            id: true,
-                            name: true,
-                            students: {
-                                select: {
-                                    id: true,
-                                    name: true,
-                                    surname: true,
-                                    username: true,
-                                },
-                            },
-                        },
+// export const studentsOfClassAssignedToAnAssignment = async (assignmentId: number) => {
+//     const assignmentClassStudents = await prisma.assignment.findUnique({
+//         where: { id: assignmentId },
+//         select: {
+//             id: true,
+//             title: true,
+//             lesson: {
+//                 select: {
+//                     class: {
+//                         select: {
+//                             id: true,
+//                             name: true,
+//                             students: {
+//                                 select: {
+//                                     id: true,
+//                                     name: true,
+//                                     surname: true,
+//                                     username: true,
+//                                 },
+//                             },
+//                         },
+//                     },
+//                 },
+//             },
+//         },
+//     });
+//     return assignmentClassStudents?.lesson?.class?.students;
+// }
+
+export const readAttendanceData = async (studentId: any, yearMonth: string) => {
+    const { sessionClaims } = await auth();
+    let tokenData;
+    if (sessionClaims !== null) {
+        tokenData = sessionClaims as unknown as TokenData;
+    }
+    let role = tokenData?.userPblcMtdt?.role;
+    try {
+        const [givenYearStr, givenMonthStr] = yearMonth.split("-");
+        const givenYear = parseInt(givenYearStr, 10);
+        const givenMonth = parseInt(givenMonthStr, 10);
+
+        const data = await prisma.$transaction([
+            prisma.attendance.findMany({
+                where: {
+                    studentId: studentId,
+                    date: {
+                        gte: new Date(givenYear, givenMonth - 1, 1),
+                        lt: new Date(givenYear, givenMonth, 1)
                     },
+                    present: false
                 },
-            },
-        },
-    });
-    return assignmentClassStudents?.lesson?.class?.students;
-}
+            })
+        ]);
+        return { success: true, error: false, data }
+    } catch (e: any) {
+        e.message = getFriendlyErrorMessage(e);
+        return { success: false, error: true, message: e.message }
+    }
+};

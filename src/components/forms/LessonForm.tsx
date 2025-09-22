@@ -235,7 +235,6 @@ const LessonForm = ({
     };
 
     const onSubmit = handleSubmit(async (formData) => {
-        console.log(formData.teacherId)
         if (isRecurring && selectedModuleId === null) {
             toast.error("Selectați modulul!");
             return;

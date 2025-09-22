@@ -1,5 +1,6 @@
 import jsPDF from "jspdf";
 import { autoTable } from "jspdf-autotable";
+const imgData = "/logoScoala.png";
 
 declare module "jspdf" {
     interface jsPDF {
@@ -15,8 +16,9 @@ interface ResultItemForPdf {
     studentSurname: string;
     teacherName: string;
     teacherSurname: string;
-    score: number;
+    score: string;
     className: string;
+    resultDate: Date;
     startTime: Date;
     subject: string;
 }
@@ -27,7 +29,6 @@ interface PdfHeaderDetails {
     moduleName?: string;
     isSingleStudentSelected?: boolean;
 }
-
 
 interface FetchAllDataParams {
     filters?: any;
@@ -78,7 +79,7 @@ function calculateAverageForPdf(results: ResultItemForPdf[]): {
     const validScores = results.filter(item =>
         item.score !== null &&
         item.score !== undefined &&
-        !isNaN(item.score)
+        !isNaN(Number(item.score))
     );
 
     if (validScores.length === 0) {
@@ -92,12 +93,12 @@ function calculateAverageForPdf(results: ResultItemForPdf[]): {
         };
     }
 
-    const scores = validScores.map(item => item.score);
+    const scores = validScores.map(item => Number(item.score));
     const sum = scores.reduce((acc, score) => acc + score, 0);
-    const average = Math.round((sum / validScores.length) * 100) / 100;
+    const average = Math.round((Number(sum) / validScores.length) * 100) / 100;
     const maxScore = Math.max(...scores);
     const minScore = Math.min(...scores);
-    const passRate = Math.round((scores.filter(score => score >= 60).length / scores.length) * 100);
+    const passRate = Math.round((scores.filter(score => Number(score) >= 60).length / scores.length) * 100);
 
     return {
         average,
@@ -113,21 +114,16 @@ function addProfessionalHeader(doc: jsPDF, headerDetails?: PdfHeaderDetails) {
     doc.setFillColor(...[20, 43, 94]);
     doc.rect(0, 0, doc.internal.pageSize.width, 35, 'F');
 
-    doc.setFillColor(...[137, 207, 240]);
-    doc.circle(25, 17.5, 8, 'F');
-    doc.setTextColor(...[255, 255, 255]);
-    doc.setFontSize(10);
-    doc.setFont('helvetica', 'bold');
-    doc.text('SC', 25, 20, { align: 'center' });
+    doc.addImage(imgData, "PNG", 17, 10, 16, 16); 
 
     doc.setTextColor(...[255, 255, 255]);
     doc.setFontSize(20);
     doc.setFont('helvetica', 'bold');
-    doc.text('STUDENT RESULTS REPORT', 45, 20);
+    doc.text('Raport note elev', 45, 20);
 
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
-    doc.text('Academic Performance Analysis', 45, 28);
+    doc.text('Analiza notelor', 45, 28);
 
     if (headerDetails?.companyName) {
         doc.setTextColor(...[255, 255, 255]);
@@ -162,7 +158,7 @@ function addModuleInfo(doc: jsPDF, startY: number, moduleName?: string): number 
     doc.setTextColor(...[20, 43, 94]);
     doc.setFontSize(11);
     doc.setFont('helvetica', 'bold');
-    doc.text('FILTERED BY MODULE:', 35, startY + 6);
+    doc.text('Pentru modulul:', 35, startY + 6);
 
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
@@ -181,14 +177,14 @@ function addEnhancedStatistics(doc: jsPDF, startY: number, stats: any) {
     doc.setTextColor(...[255, 255, 255]);
     doc.setFontSize(12);
     doc.setFont('helvetica', 'bold');
-    doc.text('PERFORMANCE STATISTICS', 20, startY + 8);
+    doc.text('Statistici performanta', 20, startY + 8);
 
     const contentY = startY + 20;
 
     doc.setTextColor(...[20, 43, 94]);
     doc.setFontSize(11);
     doc.setFont('helvetica', 'bold');
-    doc.text('Average Score:', 20, contentY);
+    doc.text('Media generala:', 20, contentY);
 
 
     const avgColor = stats.average >= 80 ? [16, 185, 129] :
@@ -201,17 +197,17 @@ function addEnhancedStatistics(doc: jsPDF, startY: number, stats: any) {
     doc.setTextColor(...[55, 65, 81]);
     doc.setFontSize(9);
     doc.setFont('helvetica', 'normal');
-    doc.text(`Highest: ${stats.maxScore}`, 20, contentY + 8);
-    doc.text(`Lowest: ${stats.minScore}`, 20, contentY + 14);
-    doc.text(`Pass Rate: ${stats.passRate}%`, 20, contentY + 20);
+    doc.text(`Cea mai mare: ${stats.maxScore}`, 20, contentY + 8);
+    doc.text(`Cea mai mica: ${stats.minScore}`, 20, contentY + 14);
+    doc.text(`Rata de promovare: ${stats.passRate}%`, 20, contentY + 20);
 
     doc.setTextColor(...[37, 99, 235]);
     doc.setFontSize(10);
-    doc.text(`Based on ${stats.totalWithScores} result${stats.totalWithScores === 1 ? '' : 's'}`, 100, contentY + 8);
+    doc.text(`Raportul bazeazat pe ${stats.totalWithScores} note`, 100, contentY + 8);
 
     doc.setTextColor(...[107, 114, 128]);
     doc.setFontSize(8);
-    doc.text(`Report generated: ${new Date().toLocaleDateString('ro-RO', {
+    doc.text(`Raport generat: ${new Date().toLocaleDateString('ro-RO', {
         weekday: 'long',
         year: 'numeric',
         month: 'long',
@@ -230,8 +226,8 @@ function addProfessionalFooter(doc: jsPDF, pageNum: number, totalPages: number) 
 
     doc.setTextColor(...[107, 114, 128]);
     doc.setFontSize(8);
-    doc.text('Generated by SmartClass © 2024', 20, footerY);
-    doc.text(`Page ${pageNum} of ${totalPages}`, doc.internal.pageSize.width - 20, footerY, { align: 'right' });
+    doc.text(`Generated by SmartClass © ${new Date().getFullYear()}`, 20, footerY);
+    doc.text(`Pagina ${pageNum} of ${totalPages}`, doc.internal.pageSize.width - 20, footerY, { align: 'right' });
 }
 
 
@@ -358,13 +354,13 @@ export function GenerateResultsPDF(
     }
 
     const tableHeaders = [
-        "Assessment Title",
-        "Subject",
-        "Student Name",
-        "Instructor",
-        "Class",
-        "Score",
-        "Date"
+        "Evaluare",
+        "Materia",
+        "Nume elev",
+        "Profesor",
+        "Clasa",
+        "Nota",
+        "Data"
     ];
 
     const tableBody = results.map((item) => [
@@ -378,7 +374,7 @@ export function GenerateResultsPDF(
             year: 'numeric',
             month: 'short',
             day: 'numeric'
-        }).format(new Date(item.startTime))
+        }).format(new Date(item.resultDate))
     ]);
 
     autoTable(doc, {
@@ -431,7 +427,7 @@ export function GenerateResultsPDF(
     const modulePrefix = headerDetails?.moduleName ?
         `${headerDetails.moduleName.replace(/\s+/g, '_')}_` : '';
 
-    const filename = `SmartClass_Report_${modulePrefix}${timestamp}.pdf`;
+    const filename = `SmartClass_Raport_${modulePrefix}${timestamp}.pdf`;
 
     doc.save(filename);
 

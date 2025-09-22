@@ -44,6 +44,9 @@ const StudentForm = ({
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const onSubmit = handleSubmit((data) => {
+        const foundClass = relatedData.classes.find((cls: any) => cls.id === data.classId);
+        data = ({ ...data, gradeId: foundClass.gradeId });
+
         startTransition(() => {
             formAction({ ...data, img: img?.secure_url });
             setIsSubmitting(true);
@@ -56,9 +59,7 @@ const StudentForm = ({
 
     useEffect(() => {
         if (state.success) {
-            toast(
-                `Elev ${type === "create" ? "adăugat" : "actualizat"} cu succes!`
-            );
+            toast(`Elev ${type === "create" ? "adăugat" : "actualizat"} cu succes!`);
             setOpen(false);
             router.refresh();
         } else if (state.error) {
@@ -180,6 +181,13 @@ const StudentForm = ({
                     error={errors?.phone}
                 />
                 <InputField
+                    label="Adresă"
+                    name="address"
+                    defaultValue={data?.address || ""}
+                    register={register}
+                    error={errors?.address}
+                />
+                <InputField
                     label="CNP"
                     name="CNP"
                     defaultValue={data?.CNP || ""}
@@ -187,11 +195,11 @@ const StudentForm = ({
                     error={errors?.CNP}
                 />
                 <InputField
-                    label="Adresă"
-                    name="address"
-                    defaultValue={data?.address || ""}
+                    label="Numar matricol"
+                    name="registrationNo"
+                    defaultValue={data?.registrationNo || ""}
                     register={register}
-                    error={errors?.address}
+                    error={errors?.CNP}
                 />
                 <InputField
                     label="Data nașterii"
@@ -223,26 +231,6 @@ const StudentForm = ({
                     {errors.gender?.message && (
                         <p className="text-xs text-red-400">
                             {errors.gender.message.toString()}
-                        </p>
-                    )}
-                </div>
-                <div className="flex flex-col gap-2">
-                    <label className="text-xs text-gray-400 font-medium">Nivel</label>
-                    <select
-                        className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
-                        {...register("gradeId")}
-                        defaultValue={data?.gradeId || ""}
-                    >
-                        <option value="">Selectează nivelul</option>
-                        {grades.map((grade: { id: number; level: number }) => (
-                            <option value={grade.id} key={grade.id}>
-                                {grade.level}
-                            </option>
-                        ))}
-                    </select>
-                    {errors.gradeId?.message && (
-                        <p className="text-xs text-red-400">
-                            {errors.gradeId.message.toString()}
                         </p>
                     )}
                 </div>
