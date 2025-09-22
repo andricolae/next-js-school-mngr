@@ -69,7 +69,7 @@ const LessonListPage = async ({ searchParams }: { searchParams: { [key: string]:
             <td className="hidden md:table-cell">{item.teacher.name + " " + item.teacher.surname}</td>
             <td>
 
-                {item.startTime ? new Date(item.startTime).toLocaleString('ro-RO', {
+                {item.startTime ? new Date(item.startTime).toLocaleString(undefined, {
                     year: 'numeric',
                     month: 'numeric',
                     day: 'numeric',
