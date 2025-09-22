@@ -2,20 +2,7 @@
 import React from 'react';
 import Image from "next/image";
 import { GenerateResultsPDF } from "@/components/ExportPDF";
-
-interface ResultItemForPdf {
-    id: number;
-    title: string;
-    studentName: string;
-    studentSurname: string;
-    teacherName: string;
-    teacherSurname: string;
-    score: string;
-    className: string;
-    resultDate: Date;
-    startTime: Date;
-    subject: string;
-}
+import { ResultItemForPdf } from '@/lib/sharedInterfaces';
 
 interface PdfHeaderDetails {
     companyName?: string;

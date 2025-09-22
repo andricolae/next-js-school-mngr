@@ -1,5 +1,4 @@
 "use client";
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, Controller } from "react-hook-form";
 import InputField from "../InputField";
@@ -13,6 +12,7 @@ import { useFormState } from "react-dom";
 import { CldUploadWidget } from "next-cloudinary";
 import LoadingPopup from "@/components/LoadingPopup";
 import { useTransition } from "react";
+import InputFieldPassword from "@/components/InputFieldPassword";
 import { formatDateForInput } from "@/lib/utils";
 
 interface FilterOption {
@@ -289,7 +289,7 @@ const TeacherForm = ({
                     register={register}
                     error={errors?.email}
                 />
-                <InputField
+                <InputFieldPassword
                     label="Parolă"
                     name="password"
                     type="password"

@@ -143,7 +143,7 @@ export const studentSchema = (isUpdate = false) => z.object({
             { message: "Elevul/a trebuie să aibă minim vârsta de 5 ani!" }
         ),
     gender: z.enum(["FEMALE", "MALE", "OTHER"], { message: "Genul este obligatoriu!" }),
-    gradeId: z.coerce.number().min(1, { message: "Nivelul este obligatoriu!" }),
+    gradeId: z.string().optional(),
     classId: z.coerce.number().min(1, { message: "Clasa este obligatorie!" }),
     parentId: z.coerce.string().min(1, { message: "Părintele este obligatoriu!" }),
     birthplace: z.string().optional(),
@@ -155,7 +155,7 @@ export const examSchema = z.object({
     id: z.coerce.number().optional(),
     title: z
         .string()
-        .min(1, { message: 'Denumirea materiei este obligatorie!' }),
+        .min(1, { message: 'Titlul testului este obligatoriu!' }),
     startTime: z
         .coerce.date()
         .refine((date) => !isNaN(date.getTime()), {
@@ -170,11 +170,10 @@ export const examSchema = z.object({
 }).refine((data) => data.endTime > data.startTime, {
     message: "Ora de sfârșit trebuie să fie după ora de început!",
     path: ["endTime"],
-})
-    .refine((data) => data.startTime >= new Date(), {
-        message: "Ora de început nu poate fi în trecut!",
-        path: ["startTime"],
-    });
+}).refine((data) => data.startTime >= new Date(), {
+    message: "Ora de început nu poate fi în trecut!",
+    path: ["startTime"],
+});
 
 export type ExamSchema = z.infer<typeof examSchema>;
 

@@ -1,5 +1,4 @@
-"use client"
-
+"use client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import InputField from "../InputField";
@@ -11,6 +10,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import LoadingPopup from "@/components/LoadingPopup";
 import { useTransition } from "react";
+import InputFieldPassword from "@/components/InputFieldPassword";
 
 const ParentForm = ({
     type,
@@ -103,7 +103,7 @@ const ParentForm = ({
                         register={register}
                         error={errors?.email}
                     />
-                    <InputField
+                    <InputFieldPassword
                         label="Parolă"
                         name="password"
                         type="password"

@@ -25,9 +25,7 @@ const SingleStudentPage = async ({
     }
     let role = tokenData?.userPblcMtdt?.role;
 
-    const student: | (Student & {
-        class: (Class & { _count: { lessons: number } })
-    }) | null = await prisma.student.findUnique({
+    const student: | (Student & { class: (Class & { _count: { lessons: number } }) }) | null = await prisma.student.findUnique({
         where: { id },
         include: {
             class: { include: { _count: { select: { lessons: true } } } }

@@ -108,7 +108,7 @@ const ExamForm = ({
 
                 <div className="flex flex-col gap-1 w-full">
                     <div className="flex items-center gap-1">
-                        <label className="text-xs text-gray-400">Ora</label>
+                        <label className="text-xs text-gray-400">Lecția</label>
                         <span
                             className="text-gray-400 text-xs cursor-help"
                             title="Odată selectată ora, date și ora de început și sfârșit vor fi completate automat conform orei selectate."
@@ -122,7 +122,7 @@ const ExamForm = ({
                         defaultValue={data?.lessonId || ""}
                         onChange={(e) => { updateTime(Number(e.target.value)) }}
                     >
-                        <option value="">Selectează o oră</option>
+                        <option value="q">Selectează o oră</option>
                         {lessons.map((lesson: { id: number; name: string }) => (
                             <option value={lesson.id} key={lesson.id}>
                                 {lesson.name}

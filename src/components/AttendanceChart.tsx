@@ -1,11 +1,11 @@
 "use client"
 import { BarChart, Bar, Rectangle, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
-const AttendanceChart = ({ data }: { data: { name: string, present: number, absent: number }[] }) => {
+const AttendanceChart = ({ data }: { data: { name: string, prezențe: number, absențe: number }[] }) => {
 
     const statusMap: Record<string, string> = {
-        present: "prezențe",
-        absent: "absențe"
+        prezențe: "prezențe",
+        absențe: "absențe"
     }
 
     return (
@@ -20,8 +20,8 @@ const AttendanceChart = ({ data }: { data: { name: string, present: number, abse
                 <YAxis axisLine={false} tick={{ fill: "#D1D5DB" }} tickLine={false} />
                 <Tooltip contentStyle={{ borderRadius: "10px", borderColor: "lightgrey" }} />
                 <Legend align='left' verticalAlign='top' wrapperStyle={{ paddingTop: "20px", paddingBottom: "40px" }} formatter={(value) => statusMap[value] || value} />
-                <Bar dataKey="present" fill="#FCE149" legendType='circle' radius={[10, 10, 0, 0]} />
-                <Bar dataKey="absent" fill="#ABE7FF" legendType='circle' radius={[10, 10, 0, 0]} />
+                <Bar dataKey="prezențe" fill="#FCE149" legendType='circle' radius={[10, 10, 0, 0]} />
+                <Bar dataKey="absențe" fill="#ABE7FF" legendType='circle' radius={[10, 10, 0, 0]} />
             </BarChart>
         </ResponsiveContainer>
     )
