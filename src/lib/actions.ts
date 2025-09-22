@@ -281,7 +281,7 @@ export const createStudent = async (currentState: CurrentState, data: StudentSch
                     registrationNo: data.registrationNo ?? "",
                     gender: data.gender,
                     birthday: data.birthday,
-                    gradeId: data.gradeId,
+                    gradeId: Number(data.gradeId),
                     classId: data.classId,
                     parentId: data.parentId,
                     birthplace: data.birthplace,

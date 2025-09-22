@@ -143,7 +143,7 @@ export const studentSchema = (isUpdate = false) => z.object({
             { message: "Elevul/a trebuie să aibă minim vârsta de 5 ani!" }
         ),
     gender: z.enum(["FEMALE", "MALE", "OTHER"], { message: "Genul este obligatoriu!" }),
-    gradeId: z.string().optional(),
+    gradeId: z.coerce.number().optional(),
     classId: z.coerce.number().min(1, { message: "Clasa este obligatorie!" }),
     parentId: z.coerce.string().min(1, { message: "Părintele este obligatoriu!" }),
     birthplace: z.string().optional(),

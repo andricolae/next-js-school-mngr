@@ -45,7 +45,7 @@ const StudentForm = ({
 
     const onSubmit = handleSubmit((data) => {
         const foundClass = relatedData.classes.find((cls: any) => cls.id === data.classId);
-        data = ({ ...data, gradeId: foundClass.gradeId });
+        data = ({ ...data, gradeId: Number(foundClass.gradeId) });
 
         startTransition(() => {
             formAction({ ...data, img: img?.secure_url });
