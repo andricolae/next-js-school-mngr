@@ -27,12 +27,12 @@ const ClassForm = ({
         register,
         handleSubmit,
         formState: { errors },
-    } = useForm<ClassSchema>({
+    } = useForm({
         resolver: zodResolver(classSchema),
         defaultValues: type === "update" ? {
             name: data?.name,
             capacity: data?.capacity,
-            supervisorId: data?.supervisorId,
+            supervisorId: data?.supervisorId?.toString() ?? "",
             gradeId: data?.gradeId,
         } : {},
     });

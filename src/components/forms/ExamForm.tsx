@@ -137,8 +137,7 @@ const ExamForm = ({
                 <InputField
                     label="Dată și oră început"
                     name="startTime"
-                    // defaultValue={data?.startTime ? formatDateForInput(data.startTime) : ""}
-                    defaultValue={startTime}
+                    defaultValue={data?.startTime ? formatDateForInput(data.startTime) : ""}
                     register={register}
                     error={getDateError("startTime")}
                     type="datetime-local"
@@ -147,8 +146,7 @@ const ExamForm = ({
                 <InputField
                     label="Dată și oră sfârșit"
                     name="endTime"
-                    // defaultValue={data?.endTime ? formatDateForInput(data.endTime) : ""}
-                    defaultValue={endTime}
+                    defaultValue={data?.endTime ? formatDateForInput(data.endTime) : ""}
                     register={register}
                     error={getDateError("endTime")}
                     type="datetime-local"

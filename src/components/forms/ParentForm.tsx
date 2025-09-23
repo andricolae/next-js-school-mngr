@@ -78,6 +78,9 @@ const ParentForm = ({
                 {type === "create" ? "Adaugă un nou părinte" : "Actualizează părintele"}
             </h1>
 
+            <div className="text-xs text-gray-500">
+                Important: Asocierea elevului se realizează prin formularul de student.
+            </div>
 
             <div className="flex gap-8">
                 <span className="text-xs text-gray-400 font-medium flex-1">Informații de autentificare</span>
@@ -147,10 +150,6 @@ const ParentForm = ({
                 register={register}
                 error={errors?.address}
             />
-
-            <div className="text-xs text-gray-500">
-                Important: Asocierea elevului se realizează prin formularul de student.
-            </div>
 
             <div className="flex justify-center mt-1 mb-8">
                 <button

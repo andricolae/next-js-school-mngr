@@ -85,6 +85,9 @@ const EventForm = ({
     return (
         <form className="flex flex-col gap-8" onSubmit={onSubmit}>
             <h1 className="text-xl font-semibold">{type === "create" ? "Adaugă un nou eveniment" : "Actualizează evenimentul"}</h1>
+            <div className="text-xs text-gray-500">
+                Important: Pentru a crea un eveniment pentru întreaga școală, lăsați câmpul „clasă” liber!
+            </div>
 
             <div className="flex-col gap-4">
                 <InputField
@@ -160,10 +163,6 @@ const EventForm = ({
                         </p>
                     )}
                 </div>
-            </div>
-
-            <div className="text-xs text-gray-500">
-                Important: Pentru a crea un eveniment pentru întreaga școală, lăsați câmpul „clasă” liber!
             </div>
 
             {state.error && (

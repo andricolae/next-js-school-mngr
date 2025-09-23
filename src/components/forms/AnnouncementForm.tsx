@@ -83,6 +83,9 @@ const AnnouncementForm = ({
     return (
         <form className="flex flex-col gap-8" onSubmit={onSubmit}>
             <h1 className="text-xl font-semibold">{type === "create" ? "Adaugă un anunț" : "Actualizează anunțul"}</h1>
+            <div className="text-xs text-gray-500">
+                Important: Pentru a crea un anunț pentru întreaga școală, lăsați câmpul „clasă” liber!
+            </div>
 
             <div className="flex flex-col gap-4 w-full">
 
@@ -152,10 +155,6 @@ const AnnouncementForm = ({
                         </p>
                     )}
                 </div>
-            </div>
-
-            <div className="text-xs text-gray-500">
-                Important: Pentru a crea un anunț pentru întreaga școală, lăsați câmpul „clasă” liber!
             </div>
 
             {state.error && (

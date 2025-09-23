@@ -267,6 +267,9 @@ const TeacherForm = ({
             <h1 className="text-xl font-semibold">
                 {type === "create" ? "Adaugă un nou profesor" : "Actualizează profesorul"}
             </h1>
+            <div className="text-xs text-gray-500">
+                Important: Asocierea claselor se realizează prin formularul de student.
+            </div>
 
             {/* Authentication Information */}
             <span className="text-xs text-gray-400 font-medium -mb-4 mt-2">

@@ -505,7 +505,7 @@ const LessonForm = ({
                                         className="w-4 h-4"
                                     />
                                     <label htmlFor="isRecurring" className="text-sm font-medium">
-                                        Crează ore recurente
+                                        Creează ore recurente
                                     </label>
                                 </div>
 

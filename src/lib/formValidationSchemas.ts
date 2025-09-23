@@ -44,9 +44,14 @@ export const classSchema = z.object({
     gradeId: z
         .coerce.number()
         .min(1, { message: 'Denumirea nivelului este obligatorie!' }),
-    supervisorId: z
-        .string()
-        .optional(),
+    supervisorId: z.preprocess(
+        (val) => {
+            if (val === null || val === undefined) return "";
+            if (typeof val === "number" && isNaN(val)) return "";
+            return val;
+        },
+        z.string().min(1, { message: "Numele dirigintelui este obligatoriu!" })
+    ),
 });
 
 export type ClassSchema = z.infer<typeof classSchema>;

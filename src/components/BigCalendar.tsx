@@ -1,5 +1,5 @@
 "use client";
-import { Calendar, momentLocalizer, View, Views } from "react-big-calendar";
+import { Calendar, momentLocalizer, View, Views, Formats } from "react-big-calendar";
 import { useState } from "react";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import moment from "moment";
@@ -14,6 +14,10 @@ const BigCalendar = ({ data }: { data: { title: string; start: Date; end: Date }
         setView(selectedView);
     };
 
+    const formats: Formats = {
+        timeGutterFormat: (date) => moment(date).format("H:mm"),
+    };
+
     return (
         <Calendar
             localizer={localizer}
@@ -26,6 +30,7 @@ const BigCalendar = ({ data }: { data: { title: string; start: Date; end: Date }
             onView={handleOnChangeView}
             min={new Date(2025, 1, 1, 8, 0, 0)}
             max={new Date(2025, 1, 1, 19, 0, 0)}
+            formats={formats}
         />
     );
 };
