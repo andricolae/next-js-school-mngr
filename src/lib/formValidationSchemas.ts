@@ -429,7 +429,8 @@ export type ParentSchema = z.infer<ReturnType<typeof parentSchema>>;
 
 export const attendanceSchema = z.object({
     id: z.coerce.number().optional(),
-    date: z.coerce.date({ message: "Data este obligatorie!" }),
+    // date: z.coerce.date({ message: "Data este obligatorie!" }),
+    date: z.any(),
     present: z.string(),
     excused: z.string(),
     studentId: z.string().min(1, { message: "Elevul este obligatoriu!" }),
@@ -442,7 +443,7 @@ export type AttendanceFormData = z.infer<typeof attendanceSchema>;
 
 export type AttendanceActionData = {
     id?: number;
-    date: Date;
+    date: string;
     present: boolean;
     excused: boolean;
     studentId: string;

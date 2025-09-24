@@ -136,16 +136,65 @@ const AttendanceForm = ({
                             </p>
                         )
                     }
-                </div >
+                </div>
 
-                <InputField
+
+
+
+
+
+
+
+                {/* <div className="flex flex-col gap-2 w-full">
+                    <label className="text-xs text-gray-400">Data</label>
+                    <input
+                        type="date"
+                        className={`ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full bg-gray-100 text-gray-400`}
+                        {...register("date")}
+                        defaultValue={data?.date !== undefined ? String(data.date) : ""}
+                    // readOnly
+                    />
+                    {errors.date?.message && (
+                        <p className="text-xs text-red-400">
+                            {errors.date.message.toString()}
+                        </p>
+                    )}
+                </div> */}
+
+                <div className="flex flex-col gap-2 pt-2">
+                    <label className="text-xs text-gray-400">Data</label>
+                    <input
+                        type="date"
+                        {...register("date")}
+                        className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
+                        defaultValue={date}
+                        readOnly
+                    />
+                    {errors.date?.message && (
+                        <p className="text-xs text-red-400">
+                            {errors.date.message.toString()}
+                        </p>
+                    )}
+                </div>
+
+                {/* <InputField
                     label="Data"
                     name="date"
                     type="date"
                     defaultValue={date}
                     register={register}
                     error={getDateError("date")}
-                />
+                /> */}
+
+
+
+
+
+
+
+
+
+
 
                 {data && (
                     <InputField

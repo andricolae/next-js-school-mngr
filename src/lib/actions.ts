@@ -1137,13 +1137,13 @@ export const createAttendance = async (currentState: CurrentState, data: Attenda
             where: {
                 studentId: data.studentId,
                 lessonId: data.lessonId,
-                date: data.date,
+                date: new Date(data.date),
             },
         });
         if (!existing) {
             await prisma.attendance.create({
                 data: {
-                    date: data.date,
+                    date: new Date(data.date),
                     present: true,
                     excused: true,
                     studentId: data.studentId,
@@ -1190,7 +1190,7 @@ export const updateAttendance = async (currentState: CurrentState, data: Attenda
                 id: data.id,
             },
             data: {
-                date: data.date,
+                date: new Date(data.date),
                 present: data.present,
                 excused: data.excused,
                 studentId: data.studentId,
