@@ -1,5 +1,4 @@
 "use client";
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, Controller } from "react-hook-form";
 import InputField from "../InputField";
@@ -13,6 +12,7 @@ import { useFormState } from "react-dom";
 import { CldUploadWidget } from "next-cloudinary";
 import LoadingPopup from "@/components/LoadingPopup";
 import { useTransition } from "react";
+import InputFieldPassword from "@/components/InputFieldPassword";
 import { formatDateForInput } from "@/lib/utils";
 
 interface FilterOption {
@@ -267,6 +267,9 @@ const TeacherForm = ({
             <h1 className="text-xl font-semibold">
                 {type === "create" ? "Adaugă un nou profesor" : "Actualizează profesorul"}
             </h1>
+            <div className="text-xs text-gray-500">
+                Important: Asocierea claselor se realizează prin formularul de student.
+            </div>
 
             {/* Authentication Information */}
             <span className="text-xs text-gray-400 font-medium -mb-4 mt-2">
@@ -289,7 +292,7 @@ const TeacherForm = ({
                     register={register}
                     error={errors?.email}
                 />
-                <InputField
+                <InputFieldPassword
                     label="Parolă"
                     name="password"
                     type="password"

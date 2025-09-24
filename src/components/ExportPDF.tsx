@@ -1,3 +1,4 @@
+import { ResultItemForPdf } from "@/lib/sharedInterfaces";
 import jsPDF from "jspdf";
 import { autoTable } from "jspdf-autotable";
 const imgData = "/logoScoala.png";
@@ -7,20 +8,6 @@ declare module "jspdf" {
         autoTable: (options: any) => jsPDF;
         lastAutoTable?: { finalY: number };
     }
-}
-
-interface ResultItemForPdf {
-    id: number;
-    title: string;
-    studentName: string;
-    studentSurname: string;
-    teacherName: string;
-    teacherSurname: string;
-    score: string;
-    className: string;
-    resultDate: Date;
-    startTime: Date;
-    subject: string;
 }
 
 interface PdfHeaderDetails {

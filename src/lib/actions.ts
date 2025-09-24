@@ -1,6 +1,6 @@
 "use server"
 import { auth, clerkClient } from "@clerk/nextjs/server";
-import { CreateAnnouncementSchema, UpdateAnnouncementSchema, AssignmentSchema, AttendanceActionData, ClassSchema, EventSchema, ExamSchema, LessonSchema, ParentSchema, ResultSchema, StudentSchema, SubjectSchema, TeacherSchema } from "./formValidationSchemas";
+import { CreateAnnouncementSchema, UpdateAnnouncementSchema, AssignmentSchema, AttendanceActionData, ClassSchema, EventSchema, ExamSchema, LessonSchema, ParentSchema, ResultSchema, StudentSchema, SubjectSchema, TeacherSchema, AttendanceFormData } from "./formValidationSchemas";
 import prisma from "./prisma";
 import { TokenData } from "@/lib/utils";
 import { Day } from "@prisma/client";
@@ -281,7 +281,7 @@ export const createStudent = async (currentState: CurrentState, data: StudentSch
                     registrationNo: data.registrationNo ?? "",
                     gender: data.gender,
                     birthday: data.birthday,
-                    gradeId: data.gradeId,
+                    gradeId: Number(data.gradeId),
                     classId: data.classId,
                     parentId: data.parentId,
                     birthplace: data.birthplace,
@@ -1129,21 +1129,34 @@ export const createAttendance = async (currentState: CurrentState, data: Attenda
                 return { success: false, error: true };
             }
         }
+
         if (data.present === true && data.excused !== true) {
             data.excused = true;
         }
-        await prisma.attendance.create({
-            data: {
-                date: data.date,
-                present: data.present,
-                excused: data.excused,
+        const existing = await prisma.attendance.findFirst({
+            where: {
                 studentId: data.studentId,
                 lessonId: data.lessonId,
+                date: new Date(data.date),
             },
         });
+        if (!existing) {
+            await prisma.attendance.create({
+                data: {
+                    date: new Date(data.date),
+                    present: true,
+                    excused: true,
+                    studentId: data.studentId,
+                    lessonId: data.lessonId,
+                },
+            });
+        } else {
+            return { success: false, error: true, message: "Această prezență/absență deja există!" }
+        }
         return { success: true, error: false }
 
     } catch (e: any) {
+        console.log(e)
         e.message = getFriendlyErrorMessage(e);
         return { success: false, error: true, message: e.message }
     }
@@ -1177,7 +1190,7 @@ export const updateAttendance = async (currentState: CurrentState, data: Attenda
                 id: data.id,
             },
             data: {
-                date: data.date,
+                date: new Date(data.date),
                 present: data.present,
                 excused: data.excused,
                 studentId: data.studentId,
@@ -1432,7 +1445,7 @@ const getFriendlyErrorMessage = (e: any): string => {
     } else if (e.message) {
         friendlyMessage = e.message;
         if (e.message.includes("Unique constraint failed on the")) {
-            friendlyMessage = "Intrarea această există deja.";
+            friendlyMessage = "Intrarea aceasta există deja.";
         }
     } else if (typeof e === 'string') {
         friendlyMessage = e;

@@ -44,9 +44,14 @@ export const classSchema = z.object({
     gradeId: z
         .coerce.number()
         .min(1, { message: 'Denumirea nivelului este obligatorie!' }),
-    supervisorId: z
-        .string()
-        .optional(),
+    supervisorId: z.preprocess(
+        (val) => {
+            if (val === null || val === undefined) return "";
+            if (typeof val === "number" && isNaN(val)) return "";
+            return val;
+        },
+        z.string().min(1, { message: "Numele dirigintelui este obligatoriu!" })
+    ),
 });
 
 export type ClassSchema = z.infer<typeof classSchema>;
@@ -143,7 +148,7 @@ export const studentSchema = (isUpdate = false) => z.object({
             { message: "Elevul/a trebuie să aibă minim vârsta de 5 ani!" }
         ),
     gender: z.enum(["FEMALE", "MALE", "OTHER"], { message: "Genul este obligatoriu!" }),
-    gradeId: z.coerce.number().min(1, { message: "Nivelul este obligatoriu!" }),
+    gradeId: z.coerce.number().optional(),
     classId: z.coerce.number().min(1, { message: "Clasa este obligatorie!" }),
     parentId: z.coerce.string().min(1, { message: "Părintele este obligatoriu!" }),
     birthplace: z.string().optional(),
@@ -155,7 +160,7 @@ export const examSchema = z.object({
     id: z.coerce.number().optional(),
     title: z
         .string()
-        .min(1, { message: 'Denumirea materiei este obligatorie!' }),
+        .min(1, { message: 'Titlul testului este obligatoriu!' }),
     startTime: z
         .coerce.date()
         .refine((date) => !isNaN(date.getTime()), {
@@ -170,11 +175,10 @@ export const examSchema = z.object({
 }).refine((data) => data.endTime > data.startTime, {
     message: "Ora de sfârșit trebuie să fie după ora de început!",
     path: ["endTime"],
-})
-    .refine((data) => data.startTime >= new Date(), {
-        message: "Ora de început nu poate fi în trecut!",
-        path: ["startTime"],
-    });
+}).refine((data) => data.startTime >= new Date(), {
+    message: "Ora de început nu poate fi în trecut!",
+    path: ["startTime"],
+});
 
 export type ExamSchema = z.infer<typeof examSchema>;
 
@@ -425,7 +429,8 @@ export type ParentSchema = z.infer<ReturnType<typeof parentSchema>>;
 
 export const attendanceSchema = z.object({
     id: z.coerce.number().optional(),
-    date: z.coerce.date({ message: "Data este obligatorie!" }),
+    // date: z.coerce.date({ message: "Data este obligatorie!" }),
+    date: z.any(),
     present: z.string(),
     excused: z.string(),
     studentId: z.string().min(1, { message: "Elevul este obligatoriu!" }),
@@ -438,7 +443,7 @@ export type AttendanceFormData = z.infer<typeof attendanceSchema>;
 
 export type AttendanceActionData = {
     id?: number;
-    date: Date;
+    date: string;
     present: boolean;
     excused: boolean;
     studentId: string;

@@ -327,7 +327,7 @@ const LessonForm = ({
                     <div className="flex flex-col flex-1 mx-1 mt-7 gap-4">
                         <div className="mt-1">
                             <InputField
-                                label="Denumire oră"
+                                label="Subiectul lecției"
                                 name="name"
                                 defaultValue={data?.name}
                                 register={register}
@@ -505,7 +505,7 @@ const LessonForm = ({
                                         className="w-4 h-4"
                                     />
                                     <label htmlFor="isRecurring" className="text-sm font-medium">
-                                        Crează ore recurente
+                                        Creează ore recurente
                                     </label>
                                 </div>
 

@@ -2,6 +2,7 @@ import prisma from "@/lib/prisma";
 import FormModal from "./FormModal";
 import { auth } from "@clerk/nextjs/server";
 import { TokenData } from "@/lib/utils";
+import { number } from "zod";
 
 export type FormContainerProps = {
     table:
@@ -48,6 +49,29 @@ const FormContainer = async ({ table, type, data, id }: FormContainerProps) => {
     // const role = (sessionClaims?.metadata as {
     // 	role?: "admin" | "teacher" | "student" | "parent";
     // })?.role;
+
+    if (!data && table === "teacher") {
+        data = await prisma.teacher.findUnique({
+            where: { id: String(id) },
+            include: {
+                subjects: true,
+                _count: {
+                    select: {
+                        subjects: true,
+                        lessons: true,
+                        classes: true,
+                    }
+                }
+            }
+        });
+    } else if (!data && table === "student") {
+        data = await prisma.student.findUnique({
+            where: { id: String(id) },
+            include: {
+                class: { include: { _count: { select: { lessons: true } } } }
+            }
+        });
+    }
 
     if (type !== "delete") {
         switch (table) {

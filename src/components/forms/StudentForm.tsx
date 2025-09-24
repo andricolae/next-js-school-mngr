@@ -1,8 +1,7 @@
 "use client";
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import InputField from "../InputField";
+import InputField from "@/components/InputField";
 import Image from "next/image";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { studentSchema, StudentSchema } from "@/lib/formValidationSchemas";
@@ -13,6 +12,7 @@ import { useFormState } from "react-dom";
 import { CldUploadWidget } from "next-cloudinary";
 import LoadingPopup from "@/components/LoadingPopup";
 import { useTransition } from "react";
+import InputFieldPassword from "@/components/InputFieldPassword";
 
 const StudentForm = ({
     type,
@@ -45,7 +45,7 @@ const StudentForm = ({
 
     const onSubmit = handleSubmit((data) => {
         const foundClass = relatedData.classes.find((cls: any) => cls.id === data.classId);
-        data = ({ ...data, gradeId: foundClass.gradeId });
+        data = ({ ...data, gradeId: Number(foundClass.gradeId) });
 
         startTransition(() => {
             formAction({ ...data, img: img?.secure_url });
@@ -115,7 +115,7 @@ const StudentForm = ({
                     register={register}
                     error={errors?.email}
                 />
-                <InputField
+                <InputFieldPassword
                     label="Parolă"
                     name="password"
                     type="password"
@@ -123,6 +123,7 @@ const StudentForm = ({
                     register={register}
                     error={errors?.password}
                 />
+
                 <div
                     className="flex flex-col gap-1 cursor-pointer justify-center items-start  mt-6 ml-24"
                     onClick={() => openUploadWidget()}
@@ -199,8 +200,9 @@ const StudentForm = ({
                     name="registrationNo"
                     defaultValue={data?.registrationNo || ""}
                     register={register}
-                    error={errors?.CNP}
+                    error={errors?.registrationNo}
                 />
+
                 <InputField
                     label="Data nașterii"
                     name="birthday"
@@ -264,7 +266,7 @@ const StudentForm = ({
                         <option value="">Selectează o clasă</option>
                         {classes.map((c: any) => (
                             <option key={c.id} value={c.id}>
-                                ({c.name} - {c._count.students}/{c.capacity} places filled)
+                                ({c.name} - {c._count.students}/{c.capacity} locuri ocupate)
                             </option>
                         ))}
                     </select>
