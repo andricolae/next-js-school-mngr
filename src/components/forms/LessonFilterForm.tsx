@@ -139,7 +139,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
                     value={searchText}
                     onChange={handleInputChange}
                     onFocus={handleInputFocus}
-                    placeholder={selectedIds.length > 0 ? "Add another..." : placeholder}
+                    placeholder={selectedIds.length > 0 ? "Adaugă..." : placeholder}
                     className="block w-full px-3 py-2 pr-20 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 />
                 <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center gap-1">
@@ -181,7 +181,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
                     className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg"
                 >
                     <div className="px-3 py-2 text-gray-500">
-                        No results found for &quot;{searchText}&quot;
+                        Niciun rezultat gasit pentru &quot;{searchText}&quot;
                     </div>
                 </div>
             )}
@@ -298,7 +298,7 @@ const LessonFilterForm: React.FC<LessonFilterFormProps> = ({
                     <div className="filter-modal-content bg-white p-6 rounded-lg shadow-xl w-full max-w-2xl mx-auto relative max-h-[90vh] overflow-y-auto">
                         <div className="filter-modal-header flex justify-between items-center border-b pb-3 mb-4">
                             <h2 className="text-xl font-semibold">
-                                Filter Lessons
+                                Filtrează orele
                                 {activeFiltersCount > 0 && (
                                     <span className="ml-2 text-sm text-gray-500">
                                         ({activeFiltersCount} active {activeFiltersCount === 1 ? 'filter' : 'filters'})
@@ -314,33 +314,33 @@ const LessonFilterForm: React.FC<LessonFilterFormProps> = ({
                         </div>
 
                         <p className="text-gray-600 mb-4">
-                            You can select multiple options for each filter. Filters will be applied cumulatively.
+                            Puteți selecta mai multe optiuni de filtrare simultan pentru fiecare categorie.
                         </p>
 
                         <div className="flex flex-col gap-4 mb-6">
                             <MultiSelect
                                 id="subjects"
-                                label="Subjects"
+                                label="Materi"
                                 options={subjects}
-                                placeholder="Select subjects..."
+                                placeholder="Selectează materie..."
                                 selectedIds={subjectFilters}
                                 onSelectionChange={setSubjectFilters}
                             />
 
                             <MultiSelect
                                 id="teachers"
-                                label="Teachers"
+                                label="Profesori"
                                 options={teachers}
-                                placeholder="Search teachers..."
+                                placeholder="Selectează profesori..."
                                 selectedIds={teacherFilters}
                                 onSelectionChange={setTeacherFilters}
                             />
 
                             <MultiSelect
                                 id="classes"
-                                label="Classes"
+                                label="Clase"
                                 options={classes}
-                                placeholder="Select classes..."
+                                placeholder="Selectează clase..."
                                 selectedIds={classFilters}
                                 onSelectionChange={setClassFilters}
                             />
@@ -356,7 +356,7 @@ const LessonFilterForm: React.FC<LessonFilterFormProps> = ({
                                     value={moduleFilter} // Folosește valoarea din stare
                                     onChange={(e) => handleSingleFilterChange("moduleId", e.target.value)} // Folosește funcția nouă
                                 >
-                                    <option value="">All Modules</option>
+                                    <option value="">Toate modulele</option>
                                     {modules.map((m) => (
                                         <option key={m.id} value={m.id}>
                                             {m.name} ({m.startDate} - {m.endDate})
@@ -372,13 +372,13 @@ const LessonFilterForm: React.FC<LessonFilterFormProps> = ({
                                 className="filter-button-clear px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50"
                                 onClick={handleClearFilters}
                             >
-                                Clear All Filters
+                                Șterge toate filtrele
                             </button>
                             <button
                                 className="filter-button-apply px-8 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-opacity-50"
                                 onClick={handleApplyFilters}
                             >
-                                Apply Filters ({activeFiltersCount})
+                                Aplică filtrele ({activeFiltersCount})
                             </button>
                         </div>
                     </div>

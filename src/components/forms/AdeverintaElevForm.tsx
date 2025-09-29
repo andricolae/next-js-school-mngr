@@ -8,6 +8,7 @@ import { useFormState } from "react-dom";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { generateCertificatePDF } from "@/components/AdeverintaElev";
+import { schoolData } from "@/lib/schoolData";
 
 const AdeverintaElevForm = ({
     type,
@@ -63,8 +64,8 @@ const AdeverintaElevForm = ({
         }
         setIsSubmitting(true);
 
-        generateCertificatePDF("Scoala Loamnes", numarAdeverinta, new Date().toLocaleDateString("ro-RO").replace(/\//g, "."),
-            "Ion", "1 C", "111122223456789", anScolarStart, anScolarSfarsit, motivAdeverinta);
+        generateCertificatePDF(schoolData[0].name, numarAdeverinta, new Date().toLocaleDateString("ro-RO").replace(/\//g, "."),
+            `${student.surname + " " + student.name}`, student.class.name, anScolarStart, anScolarSfarsit, motivAdeverinta);
         setOpen(false);
         setIsSubmitting(false);
     }
@@ -87,7 +88,7 @@ const AdeverintaElevForm = ({
     return (
         <form className="flex flex-col gap-8 items-center" onSubmit={onSubmit}>
             <div className="flex flex-col gap-4 w-full">
-                <h1 className="text-cl font-semibold">{type === "create" ? "Adeverinta student" : "Update the assignment"}</h1>
+                <h1 className="text-cl font-semibold">{type === "create" ? "Adeverinta elev" : ""}</h1>
                 <div className="flex flex-col gap-2 w-full">
                     <label className="text-xs text-gray-400">Numar adeverinta: </label>
                     <input
@@ -120,8 +121,8 @@ const AdeverintaElevForm = ({
                         defaultValue=""
                     >
                         <option value="" disabled hidden className="h-12">Alege un an</option>
-                        {Array.from({ length: 2040 - 1989 + 1 }, (_, i) => {
-                            const year = 1989 + i;
+                        {Array.from({ length: 2030 - 2019 + 1 }, (_, i) => {
+                            const year = 2019 + i;
                             return <option key={year} value={year}>{year}</option>;
                         })}
                     </select>
@@ -137,8 +138,8 @@ const AdeverintaElevForm = ({
                         defaultValue=""
                     >
                         <option value="" disabled hidden>Alege un an</option>
-                        {Array.from({ length: 2040 - 1989 + 1 }, (_, i) => {
-                            const year = 1989 + i;
+                        {Array.from({ length: 2030 - 2019 + 1 }, (_, i) => {
+                            const year = 2019 + i;
                             return <option key={year} value={year}>{year}</option>;
                         })}
                     </select>

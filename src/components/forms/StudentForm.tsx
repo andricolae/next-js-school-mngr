@@ -1,8 +1,7 @@
 "use client";
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import InputField from "../InputField";
+import InputField from "@/components/InputField";
 import Image from "next/image";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { studentSchema, StudentSchema } from "@/lib/formValidationSchemas";
@@ -13,6 +12,7 @@ import { useFormState } from "react-dom";
 import { CldUploadWidget } from "next-cloudinary";
 import LoadingPopup from "@/components/LoadingPopup";
 import { useTransition } from "react";
+import InputFieldPassword from "@/components/InputFieldPassword";
 
 const StudentForm = ({
     type,
@@ -44,6 +44,9 @@ const StudentForm = ({
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const onSubmit = handleSubmit((data) => {
+        const foundClass = relatedData.classes.find((cls: any) => cls.id === data.classId);
+        data = ({ ...data, gradeId: Number(foundClass.gradeId) });
+
         startTransition(() => {
             formAction({ ...data, img: img?.secure_url });
             setIsSubmitting(true);
@@ -56,9 +59,7 @@ const StudentForm = ({
 
     useEffect(() => {
         if (state.success) {
-            toast(
-                `Elev ${type === "create" ? "adăugat" : "actualizat"} cu succes!`
-            );
+            toast(`Elev ${type === "create" ? "adăugat" : "actualizat"} cu succes!`);
             setOpen(false);
             router.refresh();
         } else if (state.error) {
@@ -114,7 +115,7 @@ const StudentForm = ({
                     register={register}
                     error={errors?.email}
                 />
-                <InputField
+                <InputFieldPassword
                     label="Parolă"
                     name="password"
                     type="password"
@@ -122,6 +123,7 @@ const StudentForm = ({
                     register={register}
                     error={errors?.password}
                 />
+
                 <div
                     className="flex flex-col gap-1 cursor-pointer justify-center items-start  mt-6 ml-24"
                     onClick={() => openUploadWidget()}
@@ -180,6 +182,13 @@ const StudentForm = ({
                     error={errors?.phone}
                 />
                 <InputField
+                    label="Adresă"
+                    name="address"
+                    defaultValue={data?.address || ""}
+                    register={register}
+                    error={errors?.address}
+                />
+                <InputField
                     label="CNP"
                     name="CNP"
                     defaultValue={data?.CNP || ""}
@@ -187,12 +196,13 @@ const StudentForm = ({
                     error={errors?.CNP}
                 />
                 <InputField
-                    label="Adresă"
-                    name="address"
-                    defaultValue={data?.address || ""}
+                    label="Numar matricol"
+                    name="registrationNo"
+                    defaultValue={data?.registrationNo || ""}
                     register={register}
-                    error={errors?.address}
+                    error={errors?.registrationNo}
                 />
+
                 <InputField
                     label="Data nașterii"
                     name="birthday"
@@ -227,26 +237,6 @@ const StudentForm = ({
                     )}
                 </div>
                 <div className="flex flex-col gap-2">
-                    <label className="text-xs text-gray-400 font-medium">Nivel</label>
-                    <select
-                        className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
-                        {...register("gradeId")}
-                        defaultValue={data?.gradeId || ""}
-                    >
-                        <option value="">Selectează nivelul</option>
-                        {grades.map((grade: { id: number; level: number }) => (
-                            <option value={grade.id} key={grade.id}>
-                                {grade.level}
-                            </option>
-                        ))}
-                    </select>
-                    {errors.gradeId?.message && (
-                        <p className="text-xs text-red-400">
-                            {errors.gradeId.message.toString()}
-                        </p>
-                    )}
-                </div>
-                <div className="flex flex-col gap-2">
                     <label className="text-xs text-gray-400 font-medium">Părinte</label>
                     <select
                         className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
@@ -276,7 +266,7 @@ const StudentForm = ({
                         <option value="">Selectează o clasă</option>
                         {classes.map((c: any) => (
                             <option key={c.id} value={c.id}>
-                                ({c.name} - {c._count.students}/{c.capacity} places filled)
+                                ({c.name} - {c._count.students}/{c.capacity} locuri ocupate)
                             </option>
                         ))}
                     </select>

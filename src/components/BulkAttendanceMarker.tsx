@@ -228,7 +228,7 @@ const BulkAttendanceMarker = ({
                         disabled={loading || !selectedLesson}
                         className="bg-blue-500 text-white py-3 px-6 rounded-md font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-blue-600"
                     >
-                        {loading ? "Se trimite..." : "Trimite prezența"}
+                        {loading ? "Se marchează..." : "Marchează prezența"}
                     </button>
                 </>
             )}

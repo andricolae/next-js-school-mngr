@@ -675,7 +675,7 @@ export const resultsData = [
         student: "John Doe",
         date: "2025-01-01",
         type: "exam",
-        score: 90,
+        score: "90",
     },
     {
         id: 2,
@@ -685,7 +685,7 @@ export const resultsData = [
         student: "John Doe",
         date: "2025-01-01",
         type: "exam",
-        score: 90,
+        score: "90",
     },
     {
         id: 3,
@@ -695,7 +695,7 @@ export const resultsData = [
         student: "John Doe",
         date: "2025-01-01",
         type: "exam",
-        score: 90,
+        score: "90",
     },
     {
         id: 4,
@@ -705,7 +705,7 @@ export const resultsData = [
         student: "John Doe",
         date: "2025-01-01",
         type: "exam",
-        score: 90,
+        score: "90",
     },
     {
         id: 5,
@@ -715,7 +715,7 @@ export const resultsData = [
         student: "John Doe",
         date: "2025-01-01",
         type: "exam",
-        score: 90,
+        score: "90",
     },
     {
         id: 6,
@@ -725,7 +725,7 @@ export const resultsData = [
         student: "John Doe",
         date: "2025-01-01",
         type: "exam",
-        score: 90,
+        score: "90",
     },
     {
         id: 7,
@@ -735,7 +735,7 @@ export const resultsData = [
         student: "John Doe",
         date: "2025-01-01",
         type: "exam",
-        score: 90,
+        score: "90",
     },
     {
         id: 8,
@@ -745,7 +745,7 @@ export const resultsData = [
         student: "John Doe",
         date: "2025-01-01",
         type: "exam",
-        score: 90,
+        score: "90",
     },
     {
         id: 9,
@@ -755,7 +755,7 @@ export const resultsData = [
         student: "John Doe",
         date: "2025-01-01",
         type: "exam",
-        score: 90,
+        score: "90",
     },
     {
         id: 10,
@@ -765,7 +765,7 @@ export const resultsData = [
         student: "John Doe",
         date: "2025-01-01",
         type: "exam",
-        score: 90,
+        score: "90",
     },
 ];
 

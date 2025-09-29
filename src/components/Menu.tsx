@@ -20,9 +20,9 @@ const menuItems = [
         visible: ["admin", "teacher"],
     },
     {
-        icon: "/student.png",
-        label: "Elevi",
-        href: "/list/students",
+        icon: "/class.png",
+        label: "Clase",
+        href: "/list/classes",
         visible: ["admin", "teacher"],
     },
     {
@@ -32,16 +32,16 @@ const menuItems = [
         visible: ["admin", "teacher"],
     },
     {
+        icon: "/student.png",
+        label: "Elevi",
+        href: "/list/students",
+        visible: ["admin", "teacher"],
+    },
+    {
         icon: "/subject.png",
         label: "Materii",
         href: "/list/subjects",
         visible: ["admin"],
-    },
-    {
-        icon: "/class.png",
-        label: "Clase",
-        href: "/list/classes",
-        visible: ["admin", "teacher"],
     },
     {
         icon: "/lesson.png",
@@ -121,7 +121,7 @@ const Menu = () => {
                                     : "text-gray-500 hover:bg-skyLight"
                                     }`}
                             >
-                                <Image src={item.icon} alt="" width={20} height={20} />
+                                <Image src={item.icon} alt="" width={20} height={20} title={item.label} />
                                 <span className="hidden lg:block">{item.label}</span>
                             </Link>
                         </div>

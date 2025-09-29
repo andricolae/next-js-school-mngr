@@ -1,5 +1,4 @@
 "use client";
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, Controller } from "react-hook-form";
 import InputField from "../InputField";
@@ -13,6 +12,7 @@ import { useFormState } from "react-dom";
 import { CldUploadWidget } from "next-cloudinary";
 import LoadingPopup from "@/components/LoadingPopup";
 import { useTransition } from "react";
+import InputFieldPassword from "@/components/InputFieldPassword";
 import { formatDateForInput } from "@/lib/utils";
 
 interface FilterOption {
@@ -132,7 +132,7 @@ const MultiSelect = ({
                     value={searchText}
                     onChange={handleInputChange}
                     onFocus={handleInputFocus}
-                    placeholder={selectedIds?.length > 0 ? "Add another..." : placeholder}
+                    placeholder={selectedIds?.length > 0 ? "Adaugă..." : placeholder}
                     className="block w-full px-3 py-2 pr-20 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 />
                 <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center gap-1">
@@ -173,7 +173,7 @@ const MultiSelect = ({
                     ref={dropdownRef}
                     className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg"
                 >
-                    <div className="px-3 py-2 text-gray-500">No results found for </div>
+                    <div className="px-3 py-2 text-gray-500">Niciun rezultat gasit pentru </div>
                 </div>
             )}
         </div>
@@ -267,6 +267,9 @@ const TeacherForm = ({
             <h1 className="text-xl font-semibold">
                 {type === "create" ? "Adaugă un nou profesor" : "Actualizează profesorul"}
             </h1>
+            <div className="text-xs text-gray-500">
+                Important: Asocierea claselor se realizează prin formularul de student.
+            </div>
 
             {/* Authentication Information */}
             <span className="text-xs text-gray-400 font-medium -mb-4 mt-2">
@@ -289,7 +292,7 @@ const TeacherForm = ({
                     register={register}
                     error={errors?.email}
                 />
-                <InputField
+                <InputFieldPassword
                     label="Parolă"
                     name="password"
                     type="password"

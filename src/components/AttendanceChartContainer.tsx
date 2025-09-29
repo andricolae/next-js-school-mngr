@@ -29,12 +29,12 @@ const AttendanceChartContainer = async () => {
     }
 
     const daysOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri"];
-    const attendanceMap: { [key: string]: { present: number; absent: number } } = {
-        Mon: { present: 0, absent: 0 },
-        Tue: { present: 0, absent: 0 },
-        Wed: { present: 0, absent: 0 },
-        Thu: { present: 0, absent: 0 },
-        Fri: { present: 0, absent: 0 },
+    const attendanceMap: { [key: string]: { prezențe: number; absențe: number } } = {
+        Mon: { prezențe: 0, absențe: 0 },
+        Tue: { prezențe: 0, absențe: 0 },
+        Wed: { prezențe: 0, absențe: 0 },
+        Thu: { prezențe: 0, absențe: 0 },
+        Fri: { prezențe: 0, absențe: 0 },
     };
 
     responseData.forEach(item => {
@@ -44,17 +44,17 @@ const AttendanceChartContainer = async () => {
         if (itemDayOfWeek >= 1 && itemDayOfWeek <= 5) {
             const dayName = daysOfWeek[itemDayOfWeek - 1];
             if (item.present) {
-                attendanceMap[dayName].present += 1;
+                attendanceMap[dayName].prezențe += 1;
             } else {
-                attendanceMap[dayName].absent += 1;
+                attendanceMap[dayName].absențe += 1;
             }
         }
     });
 
     const data = daysOfWeek.map((day) => ({
         name: dayMap[day],
-        present: attendanceMap[day].present,
-        absent: attendanceMap[day].absent
+        prezențe: attendanceMap[day].prezențe,
+        absențe: attendanceMap[day].absențe
     }));
 
     return (

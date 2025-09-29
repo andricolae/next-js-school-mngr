@@ -1,6 +1,6 @@
 "use server"
 import { auth, clerkClient } from "@clerk/nextjs/server";
-import { CreateAnnouncementSchema, UpdateAnnouncementSchema, AssignmentSchema, AttendanceActionData, ClassSchema, EventSchema, ExamSchema, LessonSchema, ParentSchema, ResultSchema, StudentSchema, SubjectSchema, TeacherSchema } from "./formValidationSchemas";
+import { CreateAnnouncementSchema, UpdateAnnouncementSchema, AssignmentSchema, AttendanceActionData, ClassSchema, EventSchema, ExamSchema, LessonSchema, ParentSchema, ResultSchema, StudentSchema, SubjectSchema, TeacherSchema, AttendanceFormData } from "./formValidationSchemas";
 import prisma from "./prisma";
 import { TokenData } from "@/lib/utils";
 import { Day } from "@prisma/client";
@@ -249,7 +249,6 @@ export const deleteTeacher = async (currentState: CurrentState, data: FormData) 
 
 export const createStudent = async (currentState: CurrentState, data: StudentSchema) => {
     try {
-
         const classItem = await prisma.class.findUnique({
             where: { id: data.classId },
             include: { _count: { select: { students: true } } },
@@ -279,9 +278,10 @@ export const createStudent = async (currentState: CurrentState, data: StudentSch
                     address: data.address,
                     img: data.img,
                     CNP: data.CNP ?? "",
+                    registrationNo: data.registrationNo ?? "",
                     gender: data.gender,
                     birthday: data.birthday,
-                    gradeId: data.gradeId,
+                    gradeId: Number(data.gradeId),
                     classId: data.classId,
                     parentId: data.parentId,
                     birthplace: data.birthplace,
@@ -309,7 +309,6 @@ export const createStudent = async (currentState: CurrentState, data: StudentSch
 }
 
 export const updateStudent = async (currentState: CurrentState, data: StudentSchema) => {
-
     if (!data.id) {
         return { success: false, error: true };
     }
@@ -339,6 +338,7 @@ export const updateStudent = async (currentState: CurrentState, data: StudentSch
                     address: data.address,
                     img: data.img,
                     CNP: data.CNP,
+                    registrationNo: data.registrationNo,
                     gender: data.gender,
                     birthday: data.birthday,
                     gradeId: data.gradeId,
@@ -1129,21 +1129,34 @@ export const createAttendance = async (currentState: CurrentState, data: Attenda
                 return { success: false, error: true };
             }
         }
+
         if (data.present === true && data.excused !== true) {
             data.excused = true;
         }
-        await prisma.attendance.create({
-            data: {
-                date: data.date,
-                present: data.present,
-                excused: data.excused,
+        const existing = await prisma.attendance.findFirst({
+            where: {
                 studentId: data.studentId,
                 lessonId: data.lessonId,
+                date: new Date(data.date),
             },
         });
+        if (!existing) {
+            await prisma.attendance.create({
+                data: {
+                    date: new Date(data.date),
+                    present: true,
+                    excused: true,
+                    studentId: data.studentId,
+                    lessonId: data.lessonId,
+                },
+            });
+        } else {
+            return { success: false, error: true, message: "Această prezență/absență deja există!" }
+        }
         return { success: true, error: false }
 
     } catch (e: any) {
+        console.log(e)
         e.message = getFriendlyErrorMessage(e);
         return { success: false, error: true, message: e.message }
     }
@@ -1177,7 +1190,7 @@ export const updateAttendance = async (currentState: CurrentState, data: Attenda
                 id: data.id,
             },
             data: {
-                date: data.date,
+                date: new Date(data.date),
                 present: data.present,
                 excused: data.excused,
                 studentId: data.studentId,
@@ -1432,7 +1445,7 @@ const getFriendlyErrorMessage = (e: any): string => {
     } else if (e.message) {
         friendlyMessage = e.message;
         if (e.message.includes("Unique constraint failed on the")) {
-            friendlyMessage = "Intrarea această există deja.";
+            friendlyMessage = "Intrarea aceasta există deja.";
         }
     } else if (typeof e === 'string') {
         friendlyMessage = e;
@@ -1486,31 +1499,62 @@ export const studentsAssignedToAnExam = async (examId: number) => {
     return examStudents;
 }
 
-export const studentsOfClassAssignedToAnAssignment = async (assignmentId: number) => {
-    const assignmentClassStudents = await prisma.assignment.findUnique({
-        where: { id: assignmentId },
-        select: {
-            id: true,
-            title: true,
-            lesson: {
-                select: {
-                    class: {
-                        select: {
-                            id: true,
-                            name: true,
-                            students: {
-                                select: {
-                                    id: true,
-                                    name: true,
-                                    surname: true,
-                                    username: true,
-                                },
-                            },
-                        },
+// export const studentsOfClassAssignedToAnAssignment = async (assignmentId: number) => {
+//     const assignmentClassStudents = await prisma.assignment.findUnique({
+//         where: { id: assignmentId },
+//         select: {
+//             id: true,
+//             title: true,
+//             lesson: {
+//                 select: {
+//                     class: {
+//                         select: {
+//                             id: true,
+//                             name: true,
+//                             students: {
+//                                 select: {
+//                                     id: true,
+//                                     name: true,
+//                                     surname: true,
+//                                     username: true,
+//                                 },
+//                             },
+//                         },
+//                     },
+//                 },
+//             },
+//         },
+//     });
+//     return assignmentClassStudents?.lesson?.class?.students;
+// }
+
+export const readAttendanceData = async (studentId: any, yearMonth: string) => {
+    const { sessionClaims } = await auth();
+    let tokenData;
+    if (sessionClaims !== null) {
+        tokenData = sessionClaims as unknown as TokenData;
+    }
+    let role = tokenData?.userPblcMtdt?.role;
+    try {
+        const [givenYearStr, givenMonthStr] = yearMonth.split("-");
+        const givenYear = parseInt(givenYearStr, 10);
+        const givenMonth = parseInt(givenMonthStr, 10);
+
+        const data = await prisma.$transaction([
+            prisma.attendance.findMany({
+                where: {
+                    studentId: studentId,
+                    date: {
+                        gte: new Date(givenYear, givenMonth - 1, 1),
+                        lt: new Date(givenYear, givenMonth, 1)
                     },
+                    present: false
                 },
-            },
-        },
-    });
-    return assignmentClassStudents?.lesson?.class?.students;
-}
+            })
+        ]);
+        return { success: true, error: false, data }
+    } catch (e: any) {
+        e.message = getFriendlyErrorMessage(e);
+        return { success: false, error: true, message: e.message }
+    }
+};

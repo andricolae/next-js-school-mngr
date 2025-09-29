@@ -1,7 +1,7 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import InputField from "../InputField";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { AttendanceFormData, attendanceSchema } from "@/lib/formValidationSchemas";
@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import LoadingPopup from "@/components/LoadingPopup";
 import { useTransition } from "react";
+import { MultiSelect } from "@/components/forms/FilterForm";
 
 const AttendanceForm = ({
     type,
@@ -26,9 +27,14 @@ const AttendanceForm = ({
     const {
         register,
         handleSubmit,
+        control,
         formState: { errors, touchedFields, isSubmitted },
     } = useForm<AttendanceFormData>({
         resolver: zodResolver(attendanceSchema),
+        defaultValues: type === "update" && data ? {
+            lessonId: data?.lessonId || "",
+            studentId: data?.studentId || "",
+        } : {}
     });
 
     const [state, formAction] = useFormState(type === "create"
@@ -67,20 +73,7 @@ const AttendanceForm = ({
     }, [state, router, type, setOpen]);
 
     const { students, lessons } = relatedData || {};
-    const [filteredStudents, setFilteredStudents] = useState(students || []);
-    const [filteredLessons, setFilteredLessons] = useState(lessons || []);
     const [date, setDate] = useState<any>(data?.date ? new Date(data.date).toISOString().split('T')[0] : undefined);
-
-    const updateSelect = (selectedOption: "student" | "lesson", classId: string | number, lesson?: any) => {
-        if (selectedOption === "student") {
-            const newLessons = lessons?.filter((l: any) => String(l.classId) === String(classId));
-            setFilteredLessons(newLessons || []);
-        } else if (selectedOption === "lesson") {
-            setDate(new Date(lesson.startTime).toISOString().split('T')[0]);
-            const newStudents = students?.filter((s: any) => String(s.classId) === String(classId));
-            setFilteredStudents(newStudents || []);
-        }
-    };
 
     const getDateError = (field: "date") => {
         const err = errors[field];
@@ -95,57 +88,69 @@ const AttendanceForm = ({
 
     const [present, setPresent] = useState<any>(data?.present !== undefined ? data.present : true);
 
+    const lesons = lessons.map((lesson: any) => ({
+        id: lesson.id.toString(),
+        name: `${lesson.subject.name} - ${lesson.class.name} (${lesson.name})`,
+    })) || [];
+
+    const stdents = students.map((student: any) => ({
+        id: student.id.toString(),
+        name: `${student.name} - ${student.surname} (${student.username})`,
+    })) || [];
+
+
     return (
-
-        <form
-            className="flex flex-col gap-6 w-full "
-            onSubmit={onSubmit}
-        >
-
+        <form className="flex flex-col gap-6 w-full" onSubmit={onSubmit}>
             <h1 className="text-xl font-semibold">{type === "create" ? "Adaugă o nouă prezență" : "Actualizează prezența"}</h1>
 
             <div className="flex flex-col gap-4 w-full">
-                <div className="flex flex-col gap-2 w-full">
-                    <label className="text-xs text-gray-400">Ora</label>
-                    <select
-                        className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
-                        {...register("lessonId")}
-                        defaultValue={data?.lessonId}
-                        onChange={(e) => {
-                            const selectedId = Number(e.target.value);
-                            const lesson = filteredLessons?.find((s: any) => s.id === selectedId);
-                            if (lesson) {
-                                updateSelect("lesson", lesson.classId, lesson);
-                            }
-                        }}
-                    >
-                        <option value="">Alege o oră</option>
-                        {filteredLessons?.map(
-                            (lesson: { id: number; name: string; subject: { name: string }; class: { name: string } }) => (
-                                <option value={lesson.id} key={lesson.id}>
-                                    {lesson.subject.name} - {lesson.class.name} ({lesson.name})
-                                </option>
-                            )
-                        )
-                        }
-                    </select >
-                    {
-                        errors.lessonId?.message && (
-                            <p className="text-xs text-red-400">
-                                {errors.lessonId.message.toString()}
-                            </p>
-                        )
-                    }
-                </div >
+                
+                <div className="flex flex-col gap-1 w-full">
+                    <Controller
+                        name="lessonId"
+                        control={control}
+                        render={({ field }) => (
+                            <MultiSelect
+                                id="lessonId"
+                                label="Ora"
+                                options={lesons}
+                                placeholder="Selectează ora"
+                                selectedIds={field.value ? [field.value.toString()] : []}
+                                onSelectionChange={(ids) => {
+                                    const selectedId = ids[0];
+                                    field.onChange(selectedId ? Number(selectedId) : "");
+                                    if (selectedId) {
+                                        const lesson = lessons.find((lesn: any) => lesn.id.toString() === selectedId);
+                                        if (lesson) {
+                                            setDate(new Date(lesson.startTime).toISOString().split("T")[0]);
+                                        }
+                                    }
+                                }}
+                            />
+                        )}
+                    />
+                    {errors.lessonId?.message && (
+                        <p className="text-xs text-red-400">
+                            {errors.lessonId.message.toString()}
+                        </p>
+                    )}
+                </div>
 
-                <InputField
-                    label="Data"
-                    name="date"
-                    type="date"
-                    defaultValue={date}
-                    register={register}
-                    error={getDateError("date")}
-                />
+                <div className="flex flex-col gap-2 pt-2">
+                    <label className="text-xs text-gray-400">Data</label>
+                    <input
+                        type="date"
+                        {...register("date")}
+                        className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
+                        defaultValue={date}
+                        readOnly
+                    />
+                    {errors.date?.message && (
+                        <p className="text-xs text-red-400">
+                            {getDateError("date")?.toString()}
+                        </p>
+                    )}
+                </div>
 
                 {data && (
                     <InputField
@@ -158,29 +163,21 @@ const AttendanceForm = ({
                     />
                 )}
 
-                <div className="flex flex-col gap-2 w-full">
-                    <label className="text-xs text-gray-400">Elev</label>
-                    <select
-                        className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
-                        {...register("studentId")}
-                        defaultValue={data?.studentId}
-                        onChange={(e) => {
-                            const selectedId = e.target.value;
-                            const student = filteredStudents?.find((s: any) => s.id === selectedId);
-                            if (student) {
-                                updateSelect("student", student.classId);
-                            }
-                        }}
-                    >
-                        <option value="">Alege un elev</option>
-                        {filteredStudents?.map(
-                            (student: { id: string; name: string; surname: string; username: string }) => (
-                                <option value={student.id} key={student.id}>
-                                    {student.name} {student.surname} ({student.username})
-                                </option>
-                            )
+                <div className="flex flex-col gap-1 w-full">
+                    <Controller
+                        name="studentId"
+                        control={control}
+                        render={({ field }) => (
+                            <MultiSelect
+                                id="studentId"
+                                label="Elev"
+                                options={stdents}
+                                placeholder="Selectează un elev"
+                                selectedIds={field.value ? [field.value] : []}
+                                onSelectionChange={(ids) => field.onChange(ids[0] ?? "")}
+                            />
                         )}
-                    </select>
+                    />
                     {errors.studentId?.message && (
                         <p className="text-xs text-red-400">
                             {errors.studentId.message.toString()}

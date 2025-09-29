@@ -19,11 +19,11 @@ type ResultList = {
     studentSurname: string;
     teacherName: string;
     teacherSurname: string;
-    score: number;
+    score: string;
     className: string;
+    resultDate: Date;
     startTime: Date;
     subject: string;
-    resultDate: Date;
 };
 
 
@@ -399,7 +399,6 @@ const ResultListPage = async ({
         orderBy: shouldSortTransformed ? undefined : orderBy,
     });
 
-
     let data = dataRes.map((item) => {
         const assessment = item.exam || item.assignment;
 
@@ -416,12 +415,12 @@ const ResultListPage = async ({
             teacherSurname: assessment.lesson.teacher.surname,
             score: item.score,
             className: assessment.lesson.class.name,
+            resultDate: item.resultDate,
             startTime: isExam ? assessment.startTime : assessment.startDate,
             studentId: item.studentId,
             examId: item.examId,
             assignmentId: item.assignmentId,
             subject: assessment.lesson.subject.name,
-            resultDate: item.resultDate
         };
     }).filter(Boolean) as ResultList[];
 
@@ -442,12 +441,12 @@ const ResultListPage = async ({
             teacherSurname: assessment.lesson.teacher.surname,
             score: item.score,
             className: assessment.lesson.class.name,
+            resultDate: item.resultDate,
             startTime: isExam ? assessment.startTime : assessment.startDate,
             studentId: item.studentId,
             examId: item.examId,
             assignmentId: item.assignmentId,
             subject: assessment.lesson.subject.name,
-            resultDate: item.resultDate
         };
     }).filter(Boolean) as ResultList[];
 
@@ -463,9 +462,9 @@ const ResultListPage = async ({
 
             data.sort((a, b) => {
                 if (sortGrade === 'score_asc') {
-                    return a.score - b.score;
+                    return Number(a.score) - Number(b.score);
                 } else if (sortGrade === 'score_desc') {
-                    return b.score - a.score;
+                    return Number(b.score) - Number(a.score);
                 }
                 return 0;
             });
@@ -492,8 +491,8 @@ const ResultListPage = async ({
                         <DownloadButton
                             dataToExport={allDataTransformedForExport}
                             headerDetails={{
-                                companyName: "Test School",
-                                companyAddress: "Test Street 123, Test City",
+                                companyName: "Smart School",
+                                companyAddress: "Sibiu",
                                 isSingleStudentSelected: isSingleStudentSelected,
                             }}
                         />
@@ -510,7 +509,7 @@ const ResultListPage = async ({
             {isSingleStudentSelected && (
                 <AverageCalculator
                     data={allDataTransformedForExport}
-                    title="General average"
+                    title="Media generala"
                     precision={2}
                     showCount={true}
                     containerStyle="info"

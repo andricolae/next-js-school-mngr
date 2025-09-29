@@ -83,7 +83,10 @@ const TeacherListPage = async ({ searchParams }: { searchParams: { [key: string]
                         </button>
                     </Link>
                     {role === "admin" && (
-                        <FormContainer table="teacher" type="delete" id={item.id} />
+                        <>
+                            <FormContainer table="teacher" type="update" data={""} id={item.id} />
+                            <FormContainer table="teacher" type="delete" id={item.id} />
+                        </>
                     )}
                 </div>
             </td>

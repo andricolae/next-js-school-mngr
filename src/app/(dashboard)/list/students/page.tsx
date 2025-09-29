@@ -66,7 +66,7 @@ const StudentListPage = async ({ searchParams }: { searchParams: { [key: string]
                 </div>
             </td>
             <td className="hidden md:table-cell">{item.username}</td>
-            <td className="hidden md:table-cell">{item.class.name[0]}</td>
+            <td className="hidden md:table-cell">{item.class.gradeId}</td>
             <td className="hidden md:table-cell">{item.phone}</td>
             <td className="hidden md:table-cell">{item.address}</td>
             <td>
@@ -77,7 +77,10 @@ const StudentListPage = async ({ searchParams }: { searchParams: { [key: string]
                         </button>
                     </Link>
                     {role === "admin" && (
-                        <FormContainer table="student" type="delete" id={item.id} />
+                        <>
+                            <FormContainer table="student" type="update" data={""} id={item.id}/>
+                            <FormContainer table="student" type="delete" id={item.id} />
+                        </>
                     )}
                 </div>
             </td>
