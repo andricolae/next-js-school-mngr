@@ -85,18 +85,7 @@ const ExamForm = ({
 
     const { lessons } = relatedData;
 
-    // const [startTime, setStartTime] = useState<any>(data?.startTime ? new Date(data.startTime).toISOString().split('T')[0] : "");
-    // const [endTime, setEndTime] = useState<any>(data?.endTime ? new Date(data.endTime).toISOString().split('T')[0] : "");
-
-    // const updateTime = (selectedLessonId: string | number) => {
-    //     const lesson = lessons.find((l: any) => l.id === Number(selectedLessonId));
-    //     if (lesson) {
-    //         setStartTime(formatDateForInput(lesson.startTime));
-    //         setEndTime(formatDateForInput(lesson.endTime));
-    //     }
-    // }
-
-     const lesons = lessons.map((lesson: any) => ({
+    const lesons = lessons.map((lesson: any) => ({
         id: lesson.id.toString(),
         name: `${lesson.name}`,
     })) || [];
@@ -140,34 +129,6 @@ const ExamForm = ({
                         </p>
                     )}
                 </div>
-
-                {/* <div className="flex flex-col gap-1 w-full">
-                    <div className="flex items-center gap-1">
-                        <label className="text-xs text-gray-400">Lecția</label>
-                        <span
-                            className="text-gray-400 text-xs cursor-help"
-                            title="Odată selectată ora, date și ora de început și sfârșit vor fi completate automat conform orei selectate."
-                        >
-                            ⓘ
-                        </span>
-                    </div>
-                    <select
-                        className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
-                        {...register("lessonId")}
-                        defaultValue={data?.lessonId || ""}
-                        onChange={(e) => { updateTime(Number(e.target.value)) }}
-                    >
-                        <option value="q">Selectează o oră</option>
-                        {lessons.map((lesson: { id: number; name: string }) => (
-                            <option value={lesson.id} key={lesson.id}>
-                                {lesson.name}
-                            </option>
-                        ))}
-                    </select>
-                    {errors.lessonId?.message && (
-                        <p className="text-xs text-red-400">{errors.lessonId.message.toString()}</p>
-                    )}
-                </div> */}
 
                 <InputField
                     label="Dată și oră început"
