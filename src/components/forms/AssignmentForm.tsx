@@ -1,7 +1,7 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import InputField from "../InputField";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { assignmentSchema, AssignmentSchema } from "@/lib/formValidationSchemas";
@@ -11,7 +11,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import LoadingPopup from "@/components/LoadingPopup";
 import { useTransition } from "react";
-import { formatDateForInput } from "@/lib/utils";
+import { MultiSelect } from "./FilterForm";
 
 const AssignmentForm = ({
     type,
@@ -27,9 +27,13 @@ const AssignmentForm = ({
     const {
         register,
         handleSubmit,
+        control,
         formState: { errors, touchedFields, isSubmitted },
     } = useForm<AssignmentSchema>({
         resolver: zodResolver(assignmentSchema),
+        defaultValues: type === "update" && data ? {
+            lessonId: data?.lessonId || "",
+        } : {}
     });
 
     const [state, formAction] = useFormState(type === "create"
@@ -84,12 +88,10 @@ const AssignmentForm = ({
 
     const [startDate, setStartDate] = useState<any>(data?.startDate ? new Date(data.startDate).toISOString().split('T')[0] : undefined);
 
-    const updateTime = (selectedLessonId: string | number) => {
-        const lesson = lessons.find((l: any) => l.id === Number(selectedLessonId));
-        if (lesson) {
-            setStartDate(new Date(lesson.startTime).toISOString().split('T')[0]);
-        }
-    }
+    const lesons = lessons.map((lesson: any) => ({
+        id: lesson.id.toString(),
+        name: `${lesson.name}`,
+    })) || [];
 
     return (
         <form className="flex flex-col gap-4 max-auto" onSubmit={onSubmit}>
@@ -103,29 +105,39 @@ const AssignmentForm = ({
                     register={register}
                     error={errors?.title}
                 />
-                <div className="flex flex-col gap-2 w-full">
-                    <label className="text-xs text-gray-400">Ore</label>
-                    <select
-                        className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
-                        {...register("lessonId")}
-                        defaultValue={data?.lessonId}
-                        onChange={(e) => { updateTime(Number(e.target.value)) }}
-                    >
-                        <option value="">Alege ora</option>
-                        {lessons.map(
-                            (lesson: { id: number; name: string; }) => (
-                                <option value={lesson.id} key={lesson.id}>
-                                    {lesson.name}
-                                </option>
-                            )
+
+                <div className="flex flex-col gap-1 w-full">
+                    <Controller
+                        name="lessonId"
+                        control={control}
+                        render={({ field }) => (
+                            <MultiSelect
+                                id="lessonId"
+                                label="Ora"
+                                options={lesons}
+                                placeholder="Selectează ora"
+                                selectedIds={field.value ? [field.value.toString()] : []}
+                                onSelectionChange={async (ids) => {
+                                    const selectedId = ids[0];
+                                    field.onChange(selectedId ? Number(selectedId) : "");
+                                    if (selectedId) {
+                                        const lesson = lessons.find((lesn: any) => lesn.id.toString() === selectedId);
+                                        if (lesson) {
+                                            await setStartDate(new Date(lesson.startTime).toISOString().split("T")[0]);
+                                        }
+                                    }
+                                }}
+                            />
                         )}
-                    </select>
-                    {errors.lessonId?.message &&
+                    />
+                    {errors.lessonId?.message && (
                         <p className="text-xs text-red-400">
                             {errors.lessonId.message.toString()}
                         </p>
-                    }
+                    )}
                 </div>
+
+
                 <InputField
                     label="Descriere"
                     name="description"

@@ -1,7 +1,7 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import InputField from "../InputField";
 import { examSchema, ExamSchema } from "@/lib/formValidationSchemas";
 import { createExam, updateExam } from "@/lib/actions";
@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation";
 import LoadingPopup from "@/components/LoadingPopup";
 import { useTransition } from "react";
 import { formatDateForInput } from "@/lib/utils";
+import { MultiSelect } from "./FilterForm";
 
 const ExamForm = ({
     type,
@@ -27,11 +28,15 @@ const ExamForm = ({
     const {
         register,
         handleSubmit,
+        control,
         formState: { errors, touchedFields, isSubmitted },
         setValue,
         watch
     } = useForm<ExamSchema>({
         resolver: zodResolver(examSchema),
+        defaultValues: type === "update" && data ? {
+            lessonId: data?.lessonId || "",
+        } : {}
     });
 
     const [state, formAction] = useFormState(type === "create"
@@ -80,16 +85,21 @@ const ExamForm = ({
 
     const { lessons } = relatedData;
 
-    const [startTime, setStartTime] = useState<any>(data?.startTime ? new Date(data.startTime).toISOString().split('T')[0] : "");
-    const [endTime, setEndTime] = useState<any>(data?.endTime ? new Date(data.endTime).toISOString().split('T')[0] : "");
+    // const [startTime, setStartTime] = useState<any>(data?.startTime ? new Date(data.startTime).toISOString().split('T')[0] : "");
+    // const [endTime, setEndTime] = useState<any>(data?.endTime ? new Date(data.endTime).toISOString().split('T')[0] : "");
 
-    const updateTime = (selectedLessonId: string | number) => {
-        const lesson = lessons.find((l: any) => l.id === Number(selectedLessonId));
-        if (lesson) {
-            setStartTime(formatDateForInput(lesson.startTime));
-            setEndTime(formatDateForInput(lesson.endTime));
-        }
-    }
+    // const updateTime = (selectedLessonId: string | number) => {
+    //     const lesson = lessons.find((l: any) => l.id === Number(selectedLessonId));
+    //     if (lesson) {
+    //         setStartTime(formatDateForInput(lesson.startTime));
+    //         setEndTime(formatDateForInput(lesson.endTime));
+    //     }
+    // }
+
+     const lesons = lessons.map((lesson: any) => ({
+        id: lesson.id.toString(),
+        name: `${lesson.name}`,
+    })) || [];
 
     return (
         <form className="flex flex-col gap-6 " onSubmit={onSubmit}>
@@ -107,6 +117,31 @@ const ExamForm = ({
                 />
 
                 <div className="flex flex-col gap-1 w-full">
+                    <Controller
+                        name="lessonId"
+                        control={control}
+                        render={({ field }) => (
+                            <MultiSelect
+                                id="lessonId"
+                                label="Ora"
+                                options={lesons}
+                                placeholder="Selectează ora"
+                                selectedIds={field.value ? [field.value.toString()] : []}
+                                onSelectionChange={async (ids) => {
+                                    const selectedId = ids[0];
+                                    field.onChange(selectedId ? Number(selectedId) : "");
+                                }}
+                            />
+                        )}
+                    />
+                    {errors.lessonId?.message && (
+                        <p className="text-xs text-red-400">
+                            {errors.lessonId.message.toString()}
+                        </p>
+                    )}
+                </div>
+
+                {/* <div className="flex flex-col gap-1 w-full">
                     <div className="flex items-center gap-1">
                         <label className="text-xs text-gray-400">Lecția</label>
                         <span
@@ -132,7 +167,7 @@ const ExamForm = ({
                     {errors.lessonId?.message && (
                         <p className="text-xs text-red-400">{errors.lessonId.message.toString()}</p>
                     )}
-                </div>
+                </div> */}
 
                 <InputField
                     label="Dată și oră început"
