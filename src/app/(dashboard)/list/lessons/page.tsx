@@ -69,13 +69,7 @@ const LessonListPage = async ({ searchParams }: { searchParams: { [key: string]:
             <td className="hidden md:table-cell">{item.teacher.name + " " + item.teacher.surname}</td>
             <td>
 
-                {item.startTime ? new Date(item.startTime).toLocaleString('ro-RO', {
-                    year: 'numeric',
-                    month: 'numeric',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                }) : 'N/A'}
+                {item.startTime ? new Date(item.startTime).toLocaleString('ro-RO') : 'N/A'}
             </td>
             <td>
                 <div className="flex items-center gap-2">

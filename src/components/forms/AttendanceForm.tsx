@@ -90,7 +90,7 @@ const AttendanceForm = ({
 
     const lesons = lessons.map((lesson: any) => ({
         id: lesson.id.toString(),
-        name: `${lesson.subject.name} - ${lesson.class.name} (${lesson.name})`,
+        name: `${lesson.name} - ${lesson.class.name} (${new Date(lesson.startTime).toLocaleDateString("ro-RO")})`,
     })) || [];
 
     const stdents = students.map((student: any) => ({
@@ -104,7 +104,7 @@ const AttendanceForm = ({
             <h1 className="text-xl font-semibold">{type === "create" ? "Adaugă o nouă prezență" : "Actualizează prezența"}</h1>
 
             <div className="flex flex-col gap-4 w-full">
-                
+
                 <div className="flex flex-col gap-1 w-full">
                     <Controller
                         name="lessonId"
