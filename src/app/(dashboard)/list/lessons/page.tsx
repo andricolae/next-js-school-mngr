@@ -6,7 +6,7 @@ import prisma from "@/lib/prisma"
 import { ITEM_PER_PAGE } from "@/lib/settings"
 import { auth } from "@clerk/nextjs/server"
 import { Class, Lesson, Prisma, Subject, Teacher } from "@prisma/client"
-import { TokenData } from "@/lib/utils";
+import { formatDateForInput, TokenData } from "@/lib/utils";
 import LessonFilterForm from "@/components/forms/LessonFilterForm";
 import { availableModules } from "@/lib/modules";
 import { deleteSelectedLessons } from "@/lib/actions"
@@ -68,8 +68,7 @@ const LessonListPage = async ({ searchParams }: { searchParams: { [key: string]:
             <td>{item.class.name}</td>
             <td className="hidden md:table-cell">{item.teacher.name + " " + item.teacher.surname}</td>
             <td>
-
-                {item.startTime ? new Date(item.startTime).toLocaleString('ro-RO') : 'N/A'}
+                {item.startTime ? formatDateForInput(item.startTime) : 'N/A'}
             </td>
             <td>
                 <div className="flex items-center gap-2">
