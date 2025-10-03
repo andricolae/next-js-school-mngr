@@ -514,7 +514,7 @@ export const createAssignment = async (currentState: CurrentState, data: Assignm
             data: {
                 title: data.title,
                 description: data.description,
-                startDate: data.startDate,
+                startDate: data.startDate || new Date(),
                 dueDate: data.dueDate,
                 lessonId: data.lessonId,
             },
@@ -554,7 +554,7 @@ export const updateAssignment = async (currentState: CurrentState, data: Assignm
             data: {
                 title: data.title,
                 description: data.description,
-                startDate: data.startDate,
+                startDate: data.startDate || new Date(),
                 dueDate: data.dueDate,
                 lessonId: data.lessonId,
             },
@@ -1253,6 +1253,52 @@ export const createLesson = async (currentState: CurrentState, data: LessonSchem
         if (role === "teacher" && data.teacherId !== userId) {
             return { success: false, error: true };
         }
+
+
+        const overlappingLesson = await prisma.lesson.findFirst({
+            where: {
+                OR: [
+                    { teacherId: data.teacherId },
+                    { classId: data.classId }
+                ],
+                AND: [
+                    {
+                        OR: [
+                            {
+                                AND: [
+                                    { startTime: { lte: data.startTime } },
+                                    { endTime: { gt: data.startTime } }
+                                ]
+                            },
+                            {
+                                AND: [
+                                    { startTime: { lt: data.endTime } },
+                                    { endTime: { gte: data.endTime } }
+                                ]
+                            },
+                            {
+                                AND: [
+                                    { startTime: { gte: data.startTime } },
+                                    { endTime: { lte: data.endTime } }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        });
+
+        if (overlappingLesson) {
+            const conflictType = overlappingLesson.teacherId === data.teacherId
+                ? "Profesorul"
+                : "Clasa";
+            return {
+                success: false,
+                error: true,
+                message: `${conflictType} are altă oră în acest interval orar`
+            };
+        }
+
 
         const status = await prisma.lesson.create({
             data: {

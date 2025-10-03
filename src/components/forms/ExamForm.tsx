@@ -87,7 +87,7 @@ const ExamForm = ({
 
     const lesons = lessons.map((lesson: any) => ({
         id: lesson.id.toString(),
-        name: `${lesson.name}`,
+        name: `${lesson.name} - ${lesson.class.name} (${new Date(lesson.startTime).toLocaleDateString("ro-RO")})`,
     })) || [];
 
     return (
@@ -116,10 +116,12 @@ const ExamForm = ({
                                 options={lesons}
                                 placeholder="Selectează ora"
                                 selectedIds={field.value ? [field.value.toString()] : []}
-                                onSelectionChange={async (ids) => {
-                                    const selectedId = ids[0];
-                                    field.onChange(selectedId ? Number(selectedId) : "");
-                                }}
+                                onSelectionChange={(ids) => field.onChange(Number(ids[0]) ?? "")
+                                    // async (ids) => {
+                                    //     const selectedId = ids[0];
+                                    //     field.onChange(selectedId ? Number(selectedId) : "");
+                                    // }
+                                }
                             />
                         )}
                     />

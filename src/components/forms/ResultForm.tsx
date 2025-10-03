@@ -84,7 +84,7 @@ const ResultForm = ({
         return err?.message;
     };
 
-    const stdents: any[] = students?.map((stud: any) => ({
+    const stdents = students?.map((stud: any) => ({
         id: stud.id.toString(),
         name: stud.name + " " + stud.surname,
     })) || [];
@@ -159,8 +159,8 @@ const ResultForm = ({
                                 label="Elev"
                                 options={stdents}
                                 placeholder="Selectează un elev"
-                                selectedIds={field.value ? [field.value] : []}
-                                onSelectionChange={(ids) => field.onChange(ids[0] ?? "")}
+                                selectedIds={field.value ? [field.value.toString()] : []}
+                                onSelectionChange={(ids) => field.onChange(ids[0])}
                             />
                         )}
                     />

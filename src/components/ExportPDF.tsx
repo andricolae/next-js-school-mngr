@@ -198,7 +198,8 @@ function addEnhancedStatistics(doc: jsPDF, startY: number, stats: any) {
         weekday: 'long',
         year: 'numeric',
         month: 'long',
-        day: 'numeric'
+        day: 'numeric',
+        timeZone: 'Europe/Bucharest'
     })}`, 100, contentY + 14);
 
     return startY + 50;
@@ -360,7 +361,8 @@ export function GenerateResultsPDF(
         new Intl.DateTimeFormat("ro-RO", {
             year: 'numeric',
             month: 'short',
-            day: 'numeric'
+            day: 'numeric',
+            timeZone: 'Europe/Bucharest'
         }).format(new Date(item.resultDate))
     ]);
 

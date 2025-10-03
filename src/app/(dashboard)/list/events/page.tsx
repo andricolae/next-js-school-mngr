@@ -63,11 +63,13 @@ const EventListPage = async ({ searchParams }: { searchParams: { [key: string]: 
             <td className="hidden md:table-cell">{item.startTime.toLocaleTimeString("ro-RO", {
                 hour: "2-digit",
                 minute: "2-digit",
+                timeZone: 'Europe/Bucharest',
                 hour12: false,
             })}</td>
             <td className="hidden md:table-cell">{item.endTime.toLocaleTimeString("ro-RO", {
                 hour: "2-digit",
                 minute: "2-digit",
+                timeZone: 'Europe/Bucharest',
                 hour12: false,
             })}</td>
             <td>

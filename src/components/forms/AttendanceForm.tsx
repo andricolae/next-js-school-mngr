@@ -174,7 +174,7 @@ const AttendanceForm = ({
                                 options={stdents}
                                 placeholder="Selectează un elev"
                                 selectedIds={field.value ? [field.value] : []}
-                                onSelectionChange={(ids) => field.onChange(ids[0] ?? "")}
+                                onSelectionChange={(ids) => field.onChange(ids[0])}
                             />
                         )}
                     />

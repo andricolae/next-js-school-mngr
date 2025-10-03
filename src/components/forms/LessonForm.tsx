@@ -541,7 +541,7 @@ const LessonForm = ({
                 </div>
 
                 <div className="w-full h-fit flex flex-col items-center justify-center mt-12 mb-8">
-                    {state.error && <span className="text-red-500">Ceva nu a funcționat. Încearcă mai târziu.</span>}
+                    {state.error && <span className="text-red-500">{state?.message}</span>}
 
                     <button
                         type="submit"
