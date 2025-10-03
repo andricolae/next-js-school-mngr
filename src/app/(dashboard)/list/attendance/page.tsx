@@ -174,6 +174,7 @@ const AttendanceListPage = async ({ searchParams }: { searchParams: { [key: stri
         select: {
             id: true,
             name: true,
+            startTime: true,
             subject: { select: { name: true } },
             class: { select: { name: true, id: true } }
         }

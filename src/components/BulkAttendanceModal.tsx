@@ -7,6 +7,7 @@ import BulkAttendanceMarker from "./BulkAttendanceMarker";
 type Lesson = {
     id: number;
     name: string;
+    startTime: Date,
     subject: { name: string };
     class: { name: string; id: number };
 };
