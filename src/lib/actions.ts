@@ -1,6 +1,8 @@
 "use server"
 import { auth, clerkClient } from "@clerk/nextjs/server";
-import { CreateAnnouncementSchema, UpdateAnnouncementSchema, AssignmentSchema, AttendanceActionData, ClassSchema, EventSchema, ExamSchema, LessonSchema, ParentSchema, ResultSchema, StudentSchema, SubjectSchema, TeacherSchema, AttendanceFormData } from "./formValidationSchemas";
+import { CreateAnnouncementSchema, UpdateAnnouncementSchema, AssignmentSchema, AttendanceActionData, ClassSchema, 
+    EventSchema, CreateExamSchema, UpdateExamSchema, UpdateLessonSchema, CreateLessonSchema, ParentSchema, ResultSchema, 
+    StudentSchema, SubjectSchema, TeacherSchema, AttendanceFormData } from "./formValidationSchemas";
 import prisma from "./prisma";
 import { TokenData } from "@/lib/utils";
 import { Day } from "@prisma/client";
@@ -391,7 +393,7 @@ export const deleteStudent = async (currentState: CurrentState, data: FormData) 
     }
 }
 
-export const createExam = async (currentState: CurrentState, data: ExamSchema) => {
+export const createExam = async (currentState: CurrentState, data: CreateExamSchema) => {
     const { userId, sessionClaims } = await auth();
     let tokenData;
     if (sessionClaims !== null) {
@@ -427,7 +429,7 @@ export const createExam = async (currentState: CurrentState, data: ExamSchema) =
     }
 }
 
-export const updateExam = async (currentState: CurrentState, data: ExamSchema) => {
+export const updateExam = async (currentState: CurrentState, data: UpdateExamSchema) => {
     const { userId, sessionClaims } = await auth();
     let tokenData;
     if (sessionClaims !== null) {
@@ -514,7 +516,7 @@ export const createAssignment = async (currentState: CurrentState, data: Assignm
             data: {
                 title: data.title,
                 description: data.description,
-                startDate: data.startDate || new Date(),
+                startDate: new Date(data.startDate),
                 dueDate: data.dueDate,
                 lessonId: data.lessonId,
             },
@@ -554,7 +556,7 @@ export const updateAssignment = async (currentState: CurrentState, data: Assignm
             data: {
                 title: data.title,
                 description: data.description,
-                startDate: data.startDate || new Date(),
+                startDate: new Date(data.startDate),
                 dueDate: data.dueDate,
                 lessonId: data.lessonId,
             },
@@ -1231,7 +1233,7 @@ export const deleteAttendance = async (currentState: CurrentState, data: FormDat
     }
 }
 
-const getDayFromDate = (date: Date): LessonSchema["day"] => {
+const getDayFromDate = (date: Date): CreateLessonSchema["day"] => {
     switch (date.getDay()) {
         case 1: return "MONDAY";
         case 2: return "TUESDAY";
@@ -1241,7 +1243,7 @@ const getDayFromDate = (date: Date): LessonSchema["day"] => {
     }
 };
 
-export const createLesson = async (currentState: CurrentState, data: LessonSchema) => {
+export const createLesson = async (currentState: CurrentState, data: CreateLessonSchema) => {
     const { userId, sessionClaims } = await auth();
     let tokenData;
     if (sessionClaims !== null) {
@@ -1319,7 +1321,7 @@ export const createLesson = async (currentState: CurrentState, data: LessonSchem
     }
 }
 
-export const updateLesson = async (currentState: CurrentState, data: LessonSchema) => {
+export const updateLesson = async (currentState: CurrentState, data: UpdateLessonSchema) => {
     const { userId, sessionClaims } = await auth();
     let tokenData;
     if (sessionClaims !== null) {
@@ -1392,7 +1394,7 @@ export const deleteLesson = async (currentState: CurrentState, data: FormData) =
     }
 }
 
-export const createRecurringLessons = async (lessonsData: LessonSchema[]) => {
+export const createRecurringLessons = async (lessonsData: CreateLessonSchema[]) => {
     try {
         let successCount = 0;
         for (const lessonData of lessonsData) {
@@ -1522,6 +1524,9 @@ export const deleteSelectedLessons = async (currentState: CurrentState, formData
         return { success: true, error: false }
     } catch (e) {
         console.error(e)
+        if ((e as any).code === "P2003") {
+            return { error: "P2003", success: false }
+        }
         return { error: true, success: false }
     }
 }

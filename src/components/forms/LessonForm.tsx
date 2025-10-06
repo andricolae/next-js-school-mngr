@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import InputField from "../InputField";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { lessonSchema, LessonSchema } from "@/lib/formValidationSchemas";
+import { CreateLessonSchema, createLessonSchema, updateLessonSchema } from "@/lib/formValidationSchemas";
 import { createLesson, updateLesson, createRecurringLessons } from "@/lib/actions";
 import { useFormState } from "react-dom";
 import { useRouter } from "next/navigation";
@@ -14,6 +14,7 @@ import { useTransition } from "react";
 import { availableModules } from "@/lib/modules";
 import { nationalHolidays } from "@/lib/holidays";
 import { formatDateForInput } from "@/lib/utils";
+import z from "zod";
 
 type ModuleType = {
     id: number;
@@ -49,31 +50,8 @@ const LessonForm = ({
     relatedData?: any;
 }) => {
 
-    // const availableModules: ModuleType[] = [
-    //     {
-    //         id: 1,
-    //         name: "Semester 1",
-    //         startDate: "2025-07-01",
-    //         endDate: "2025-07-31"
-    //     },
-    //     {
-    //         id: 2,
-    //         name: "Semester 2 ",
-    //         startDate: "2025-08-01",
-    //         endDate: "2025-08-31"
-    //     },
-    //     {
-    //         id: 3,
-    //         name: "Semester 3",
-    //         startDate: "2025-09-01",
-    //         endDate: "2025-09-30"
-    //     }
-    // ];
-
-    const [isRecurring, setIsRecurring] = useState(false);
-    const [selectedModuleId, setSelectedModuleId] = useState<number | null>(null);
-    const [isCreatingRecurring, setIsCreatingRecurring] = useState(false);
-    const [isPending, startTransition] = useTransition();
+    const schema = type === "create" ? createLessonSchema : updateLessonSchema;
+    type FormValues = z.infer<typeof schema>;
 
     const {
         register,
@@ -81,14 +59,19 @@ const LessonForm = ({
         formState: { errors, touchedFields, isSubmitted },
         setValue,
         watch,
-    } = useForm<LessonSchema>({
-        resolver: zodResolver(lessonSchema),
+    } = useForm<FormValues>({
+        resolver: zodResolver(schema),
         defaultValues: {
             // startTime: data?.startTime ? new Date(data.startTime) : undefined,
             // endTime: data?.endTime ? new Date(data.endTime) : undefined,
             isRecurring: false,
         }
     });
+
+    const [isRecurring, setIsRecurring] = useState(false);
+    const [selectedModuleId, setSelectedModuleId] = useState<number | null>(null);
+    const [isCreatingRecurring, setIsCreatingRecurring] = useState(false);
+    const [isPending, startTransition] = useTransition();
 
     useEffect(() => {
         setValue("isRecurring", isRecurring);
@@ -101,7 +84,7 @@ const LessonForm = ({
 
     const router = useRouter();
 
-    const getDayOfWeek = (dayString: LessonSchema['day']): number => {
+    const getDayOfWeek = (dayString: CreateLessonSchema['day']): number => {
         switch (dayString) {
             case "MONDAY": return 1;
             case "TUESDAY": return 2;
@@ -168,7 +151,7 @@ const LessonForm = ({
         return date;
     };
 
-    const generateRecurringLessons = async (lessonData: LessonSchema, moduleId: number) => {
+    const generateRecurringLessons = async (lessonData: CreateLessonSchema, moduleId: number) => {
         const selectedModule = availableModules.find(mod => mod.id === moduleId);
         if (!selectedModule) return { total: 0, success: 0 };
 

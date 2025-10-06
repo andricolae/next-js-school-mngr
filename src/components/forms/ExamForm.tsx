@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import InputField from "../InputField";
-import { examSchema, ExamSchema } from "@/lib/formValidationSchemas";
+import { createExamSchema, updateExamSchema } from "@/lib/formValidationSchemas";
 import { createExam, updateExam } from "@/lib/actions";
 import { useFormState } from "react-dom";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
@@ -13,6 +13,7 @@ import LoadingPopup from "@/components/LoadingPopup";
 import { useTransition } from "react";
 import { formatDateForInput } from "@/lib/utils";
 import { MultiSelect } from "./FilterForm";
+import z from "zod";
 
 const ExamForm = ({
     type,
@@ -25,6 +26,10 @@ const ExamForm = ({
     setOpen: Dispatch<SetStateAction<boolean>>;
     relatedData?: any;
 }) => {
+
+    const schema = type === "create" ? createExamSchema : updateExamSchema;
+    type FormValues = z.infer<typeof schema>;
+
     const {
         register,
         handleSubmit,
@@ -32,8 +37,8 @@ const ExamForm = ({
         formState: { errors, touchedFields, isSubmitted },
         setValue,
         watch
-    } = useForm<ExamSchema>({
-        resolver: zodResolver(examSchema),
+    } = useForm<FormValues>({
+        resolver: zodResolver(schema),
         defaultValues: type === "update" && data ? {
             lessonId: data?.lessonId || "",
         } : {}
