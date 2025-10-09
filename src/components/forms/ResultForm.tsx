@@ -36,9 +36,11 @@ const ResultForm = ({
         defaultValues: type === "update" && data ? {
             // id: data.id,
             // score: data.score,
-            studentId: data.studentId || "",
+
+            studentId: data?.studentId ?? "",
             examId: data.examId || undefined,
             assignmentId: data.assignmentId || undefined,
+
             // resultDate: data.resultDate,
         } : {}
     });
@@ -52,10 +54,27 @@ const ResultForm = ({
     const onSubmit = handleSubmit(formData => {
         startTransition(() => {
             setIsSubmitting(true);
-            const submissionData = {
+            let submissionData = {
                 ...formData,
                 ...(type === "update" && data?.id && { id: data.id }),
             };
+            if (formData.assignmentId === "") {
+                submissionData = {
+                    ...submissionData,
+                    assignmentId: null,
+                };
+            } else if (formData.examId === "") {
+                submissionData = {
+                    ...submissionData,
+                    examId: null,
+                };
+            }
+            const x = submissionData.resultDate;
+            submissionData = {
+                ...submissionData,
+                resultDate: new Date(x).toISOString(),
+            };
+            console.log(submissionData)
             formAction(submissionData);
         });
     })
@@ -84,7 +103,7 @@ const ResultForm = ({
         return err?.message;
     };
 
-    const stdents = students?.map((stud: any) => ({
+    const stdents: any[] = students?.map((stud: any) => ({
         id: stud.id.toString(),
         name: stud.name + " " + stud.surname,
     })) || [];
@@ -98,6 +117,14 @@ const ResultForm = ({
         id: assign.id.toString(),
         name: assign.title + " - " + assign.lesson.subject.name + " (" + assign.lesson.class.name + ")",
     })) || [];
+
+    const [resultDate, setResultDate] = useState<string | undefined>(data?.resultDate ? new Date(data.resultDate).toISOString().split("T")[0] : undefined);
+
+    useEffect(() => {
+        if (data?.resultDate) {
+            setResultDate(new Date(data.resultDate).toISOString().split("T")[0]);
+        }
+    }, [data?.resultDate]);
 
     return (
         <form className="flex flex-col gap-6 mx-auto" onSubmit={onSubmit}>
@@ -160,7 +187,10 @@ const ResultForm = ({
                                 options={stdents}
                                 placeholder="Selectează un elev"
                                 selectedIds={field.value ? [field.value.toString()] : []}
-                                onSelectionChange={(ids) => field.onChange(ids[0])}
+                                onSelectionChange={(ids) => {
+                                    setValue("studentId", ids[0]);
+                                    field.onChange(ids[0] ? ids[0] : "");
+                                }}
                             />
                         )}
                     />
@@ -170,15 +200,6 @@ const ResultForm = ({
                         </p>
                     )}
                 </div>
-
-                <InputField
-                    label="Data obținerii notei"
-                    name="resultDate"
-                    type="date"
-                    defaultValue={data?.resultDate ? new Date(data?.resultDate).toISOString().split("T")[0] : undefined}
-                    register={register}
-                    error={getDateError("resultDate")}
-                />
 
                 <div className="flex flex-col gap-2 w-full">
                     <Controller
@@ -191,7 +212,19 @@ const ResultForm = ({
                                 options={exms}
                                 placeholder="Selectează un test"
                                 selectedIds={field.value?.toString() ? [field.value.toString()] : []}
-                                onSelectionChange={(ids) => field.onChange(ids[0] ?? "")}
+                                onSelectionChange={async (ids) => {
+                                    await setValue("examId", Number(ids[0]));
+                                    const selectedId = ids[0];
+                                    field.onChange(selectedId ? Number(selectedId) : "");
+                                    if (selectedId) {
+                                        await setValue("assignmentId", "");
+                                        const exm = exams.find((ex: any) => ex.id.toString() === selectedId);
+                                        if (exm) {
+                                            const newDate = new Date(exm.startTime).toISOString().split("T")[0];
+                                            await setValue("resultDate", newDate);
+                                        }
+                                    }
+                                }}
                             />
                         )}
                     />
@@ -213,7 +246,19 @@ const ResultForm = ({
                                 options={asignments}
                                 placeholder="Selectează o temă"
                                 selectedIds={field.value?.toString() ? [field.value.toString()] : []}
-                                onSelectionChange={(ids) => field.onChange(ids[0] ?? "")}
+                                onSelectionChange={async (ids) => {
+                                    await setValue("assignmentId", Number(ids[0]));
+                                    const selectedId = ids[0];
+                                    field.onChange(selectedId ? Number(selectedId) : "");
+                                    if (selectedId) {
+                                        await setValue("examId", "");
+                                        const assignmnt = assignments.find((assign: any) => assign.id.toString() === selectedId);
+                                        if (assignmnt) {
+                                            const newDate = new Date(assignmnt.dueDate).toISOString().split("T")[0];
+                                            await setValue("resultDate", newDate);
+                                        }
+                                    }
+                                }}
                             />
                         )}
                     />
@@ -223,6 +268,17 @@ const ResultForm = ({
                         </p>
                     )}
                 </div>
+
+                <InputField
+                    label="Data obținerii notei"
+                    name="resultDate"
+                    type="date"
+                    defaultValue={resultDate}
+                    // defaultValue={data?.resultDate ? new Date(data?.resultDate).toISOString().split("T")[0] : undefined}
+                    register={register}
+                    // error={getDateError("resultDate")}
+                    readOnly={true}
+                />
             </div>
 
             {state.error && (
@@ -230,6 +286,7 @@ const ResultForm = ({
                     {state.message || "Ceva nu a funcționat. Încearcă mai târziu."}
                 </span>
             )}
+
             <div className="flex justify-center mt-2 mb-8">
                 <button
                     type="submit"

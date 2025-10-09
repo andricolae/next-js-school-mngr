@@ -29,6 +29,7 @@ const AssignmentForm = ({
         handleSubmit,
         control,
         formState: { errors, touchedFields, isSubmitted },
+        setValue,
     } = useForm<AssignmentSchema>({
         resolver: zodResolver(assignmentSchema),
         defaultValues: type === "update" && data ? {
@@ -121,6 +122,7 @@ const AssignmentForm = ({
                                         const lesson = lessons.find((lesn: any) => lesn.id.toString() === selectedId);
                                         if (lesson) {
                                             await setStartDate(new Date(lesson.startTime).toISOString().split("T")[0]);
+                                            await setValue("startDate", new Date(lesson.startTime).toISOString().split("T")[0]);
                                         }
                                     }
                                 }}

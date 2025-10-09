@@ -304,26 +304,12 @@ export type AssignmentSchema = z.infer<typeof assignmentSchema>;
 export const resultSchema = z.object({
     id: z.coerce.number().optional(),
     score: z.string().min(1, { message: "Nota este obligatorie!" }),
-    examId: z.coerce.number().optional(),
-    assignmentId: z.coerce.number().optional(),
+    examId: z.any().optional(),
+    assignmentId: z.any().optional(),
     studentId: z.string({ required_error: "Elevul este obligatoriu!" }),
-    resultDate: z.coerce.date({ message: "Data cand s-a obtinut nota este obligatorie!" })
-        .refine(
-            (val) => {
-                return !isWeekend(val);
-            }, { message: "Nu puteți pune note în zile de weekend!" }
-        ).refine(
-            (val) => {
-                return !isHoliday(val);
-            }, { message: "Nu puteți programa ore în zile libere naționale!" }
-        ).refine(
-            (val) => {
-                if (!dateTimeRegex.test(val.toString())) return true;
-                const d = new Date(val);
-                return isDateInModules(d);
-            }, { message: "Nu puteți programa ore în zile de vacanță!" })
+    resultDate: z.any().optional()
 }).refine(
-    (data) =>
+    (data) => 
         ((data.examId && data.examId !== 0) && !data.assignmentId) ||
         ((!data.examId || data.examId === 0) && data.assignmentId),
     {

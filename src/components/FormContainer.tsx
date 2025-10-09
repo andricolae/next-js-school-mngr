@@ -173,7 +173,8 @@ const FormContainer = async ({ table, type, data, id }: FormContainerProps) => {
                                 subject: { select: { name: true } },
                                 class: { select: { name: true } }
                             }
-                        }
+                        },
+                        startTime: true,
                     },
                 });
                 const resultAssignments = await prisma.assignment.findMany({
@@ -190,7 +191,8 @@ const FormContainer = async ({ table, type, data, id }: FormContainerProps) => {
                                 subject: { select: { name: true } },
                                 class: { select: { name: true } }
                             }
-                        }
+                        },
+                        dueDate: true,
                     },
                 });
                 relatedData = {

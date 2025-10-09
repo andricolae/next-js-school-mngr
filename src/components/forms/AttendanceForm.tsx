@@ -29,6 +29,7 @@ const AttendanceForm = ({
         handleSubmit,
         control,
         formState: { errors, touchedFields, isSubmitted },
+        setValue,
     } = useForm<AttendanceFormData>({
         resolver: zodResolver(attendanceSchema),
         defaultValues: type === "update" && data ? {
@@ -116,13 +117,14 @@ const AttendanceForm = ({
                                 options={lesons}
                                 placeholder="Selectează ora"
                                 selectedIds={field.value ? [field.value.toString()] : []}
-                                onSelectionChange={(ids) => {
+                                onSelectionChange={async (ids) => {
                                     const selectedId = ids[0];
                                     field.onChange(selectedId ? Number(selectedId) : "");
                                     if (selectedId) {
                                         const lesson = lessons.find((lesn: any) => lesn.id.toString() === selectedId);
                                         if (lesson) {
-                                            setDate(new Date(lesson.startTime).toISOString().split("T")[0]);
+                                            await setDate(new Date(lesson.startTime).toISOString().split("T")[0]);
+                                            await setValue("date", new Date(lesson.startTime).toISOString().split("T")[0]);
                                         }
                                     }
                                 }}
@@ -174,7 +176,7 @@ const AttendanceForm = ({
                                 options={stdents}
                                 placeholder="Selectează un elev"
                                 selectedIds={field.value ? [field.value] : []}
-                                onSelectionChange={(ids) => field.onChange(ids[0])}
+                                onSelectionChange={ids => field.onChange(ids[0] ? ids[0] : "")}
                             />
                         )}
                     />

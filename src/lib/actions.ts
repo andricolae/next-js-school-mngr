@@ -679,8 +679,8 @@ export const updateResult = async (currentState: CurrentState, data: ResultSchem
             data: {
                 score: data.score,
                 studentId: data.studentId,
-                ...(data.examId && { examId: data.examId }),
-                ...(data.assignmentId && { assignmentId: data.assignmentId }),
+                examId: data.examId,
+                assignmentId: data.assignmentId,
                 resultDate: data.resultDate
             },
         });
