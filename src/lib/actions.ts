@@ -1,8 +1,10 @@
 "use server"
 import { auth, clerkClient } from "@clerk/nextjs/server";
-import { CreateAnnouncementSchema, UpdateAnnouncementSchema, AssignmentSchema, AttendanceActionData, ClassSchema, 
-    EventSchema, CreateExamSchema, UpdateExamSchema, UpdateLessonSchema, CreateLessonSchema, ParentSchema, ResultSchema, 
-    StudentSchema, SubjectSchema, TeacherSchema, AttendanceFormData } from "./formValidationSchemas";
+import {
+    CreateAnnouncementSchema, UpdateAnnouncementSchema, AssignmentSchema, AttendanceActionData, ClassSchema,
+    EventSchema, CreateExamSchema, UpdateExamSchema, UpdateLessonSchema, CreateLessonSchema, ParentSchema, ResultSchema,
+    StudentSchema, SubjectSchema, TeacherSchema, AttendanceFormData
+} from "./formValidationSchemas";
 import prisma from "./prisma";
 import { TokenData } from "@/lib/utils";
 import { Day } from "@prisma/client";
@@ -1578,6 +1580,81 @@ export const studentsAssignedToAnExam = async (examId: number) => {
 //     });
 //     return assignmentClassStudents?.lesson?.class?.students;
 // }
+
+type Item = {
+    exams: any[];
+    assignments: any[];
+};
+
+const mergeData = (items: Item[]): { exams: any[]; assignments: any[] } => {
+    return items.reduce(
+        (acc, curr) => {
+            acc.exams = acc.exams.concat(curr.exams);
+            acc.assignments = acc.assignments.concat(curr.assignments);
+            return acc;
+        },
+        { exams: [] as any[], assignments: [] as any[] }
+    );
+};
+
+export const getClassExamsAndAssignments = async (clsId: number) => {
+    try {
+        const assignmentsAndExamsData = await prisma.lesson.findMany({
+            where: { classId: clsId },
+            select: {
+                exams: {
+                    select: {
+                        id: true,
+                        title: true,
+                        lesson: {
+                            select: {
+                                subject: {
+                                    select: {
+                                        name: true,
+                                    }
+                                },
+                                class: {
+                                    select: {
+                                        name: true,
+                                    }
+                                }
+                            }
+                        }
+                    },
+                },
+                assignments: {
+                    select: {
+                        id: true,
+                        title: true,
+                        lesson: {
+                            select: {
+                                subject: {
+                                    select: {
+                                        name: true,
+                                    }
+                                },
+                                class: {
+                                    select: {
+                                        name: true,
+                                    }
+                                }
+                            }
+                        }
+                    },
+                },
+            },
+        });
+
+        if (!assignmentsAndExamsData) {
+            throw new Error("Eroare! Încearcă din nou mai târziu!");
+        }
+        const aux = mergeData(assignmentsAndExamsData);
+        return aux;
+    } catch (error) {
+        console.error("Error fetching exams and assignments:", error);
+        throw error;
+    }
+};
 
 export const readAttendanceData = async (studentId: any, yearMonth: string) => {
     const { sessionClaims } = await auth();

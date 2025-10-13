@@ -157,7 +157,7 @@ const FormContainer = async ({ table, type, data, id }: FormContainerProps) => {
                             }
                         } : {}),
                     },
-                    select: { id: true, name: true, surname: true },
+                    select: { id: true, name: true, surname: true, classId: true },
                 });
                 const resultExams = await prisma.exam.findMany({
                     where: {

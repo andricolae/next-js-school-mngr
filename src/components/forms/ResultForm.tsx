@@ -5,7 +5,7 @@ import InputField from "@/components/InputField";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { resultSchema, ResultSchema } from "@/lib/formValidationSchemas";
 import { useFormState } from "react-dom";
-import { createResult, updateResult } from "@/lib/actions";
+import { createResult, getClassExamsAndAssignments, updateResult } from "@/lib/actions";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import LoadingPopup from "@/components/LoadingPopup";
@@ -74,7 +74,6 @@ const ResultForm = ({
                 ...submissionData,
                 resultDate: new Date(x).toISOString(),
             };
-            console.log(submissionData)
             formAction(submissionData);
         });
     })
@@ -108,15 +107,15 @@ const ResultForm = ({
         name: stud.name + " " + stud.surname,
     })) || [];
 
-    const exms: any[] = exams?.map((exam: any) => ({
+    const [exms, setExms] = useState(exams?.map((exam: any) => ({
         id: exam.id.toString(),
         name: exam.title + " - " + exam.lesson.subject.name + " (" + exam.lesson.class.name + ")",
-    })) || [];
+    })) || []);
 
-    const asignments: any[] = assignments?.map((assign: any) => ({
+    const [asignments, setAsignments] = useState(assignments?.map((assign: any) => ({
         id: assign.id.toString(),
         name: assign.title + " - " + assign.lesson.subject.name + " (" + assign.lesson.class.name + ")",
-    })) || [];
+    })) || []);
 
     const [resultDate, setResultDate] = useState<string | undefined>(data?.resultDate ? new Date(data.resultDate).toISOString().split("T")[0] : undefined);
 
@@ -125,6 +124,32 @@ const ResultForm = ({
             setResultDate(new Date(data.resultDate).toISOString().split("T")[0]);
         }
     }, [data?.resultDate]);
+
+    const updateExamsAndAssignments = (studentId: string) => {
+        startTransition(async () => {
+            if (studentId !== undefined) {
+                const classId = students.find((stud: any) => stud.id === studentId)?.classId;
+                const studentExamsAndAssignments = await getClassExamsAndAssignments(classId);
+                await setExms(studentExamsAndAssignments.exams?.map((exam: any) => ({
+                    id: exam.id.toString(),
+                    name: exam.title + " - " + exam.lesson.subject.name + " (" + exam.lesson.class.name + ")",
+                })) || []);
+                await setAsignments(studentExamsAndAssignments.assignments?.map((assign: any) => ({
+                    id: assign.id.toString(),
+                    name: assign.title + " - " + assign.lesson.subject.name + " (" + assign.lesson.class.name + ")",
+                })) || []);
+            } else {
+                await setExms(exams?.map((exam: any) => ({
+                    id: exam.id.toString(),
+                    name: exam.title + " - " + exam.lesson.subject.name + " (" + exam.lesson.class.name + ")",
+                })) || []);
+                await setAsignments(assignments?.map((assign: any) => ({
+                    id: assign.id.toString(),
+                    name: assign.title + " - " + assign.lesson.subject.name + " (" + assign.lesson.class.name + ")",
+                })) || []);
+            }
+        });
+    };
 
     return (
         <form className="flex flex-col gap-6 mx-auto" onSubmit={onSubmit}>
@@ -190,6 +215,7 @@ const ResultForm = ({
                                 onSelectionChange={(ids) => {
                                     setValue("studentId", ids[0]);
                                     field.onChange(ids[0] ? ids[0] : "");
+                                    updateExamsAndAssignments(ids[0]);
                                 }}
                             />
                         )}

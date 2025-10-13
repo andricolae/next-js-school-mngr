@@ -94,11 +94,26 @@ const AttendanceForm = ({
         name: `${lesson.name} - ${lesson.class.name} (${new Date(lesson.startTime).toLocaleDateString("ro-RO")})`,
     })) || [];
 
-    const stdents = students.map((student: any) => ({
+    const [stdents, setStdents] = useState(students.map((student: any) => ({
         id: student.id.toString(),
         name: `${student.name} - ${student.surname} (${student.username})`,
-    })) || [];
+    })) || []);
 
+    const updateStdents = (lessonId: string) => {
+        const classOfSelectedLesson = lessons.find((leson: any) => leson.id === Number(lessonId))?.classId;
+        if (classOfSelectedLesson !== undefined) {
+            const stdts = students.filter((stdent: any) => stdent.classId === classOfSelectedLesson);
+            setStdents(stdts.map((student: any) => ({
+                id: student.id.toString(),
+                name: `${student.name} - ${student.surname} (${student.username})`,
+            })) || []);
+        } else {
+            setStdents(students.map((student: any) => ({
+                id: student.id.toString(),
+                name: `${student.name} - ${student.surname} (${student.username})`,
+            })) || []);
+        }
+    };
 
     return (
         <form className="flex flex-col gap-6 w-full" onSubmit={onSubmit}>
@@ -127,6 +142,7 @@ const AttendanceForm = ({
                                             await setValue("date", new Date(lesson.startTime).toISOString().split("T")[0]);
                                         }
                                     }
+                                    updateStdents(ids[0]);
                                 }}
                             />
                         )}
