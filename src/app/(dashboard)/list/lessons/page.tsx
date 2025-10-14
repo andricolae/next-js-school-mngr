@@ -112,22 +112,27 @@ const LessonListPage = async ({ searchParams }: { searchParams: { [key: string]:
         for (const [key, value] of Object.entries(queryParams)) {
             if (value !== undefined && value !== '') {
                 switch (key) {
-                    case "classId":
-                        queryConditions.push({ classId: parseInt(value) });
+                    case "classId": {
+                        const classIds = value.split(',').map(v => parseInt(v));
+                        queryConditions.push({ classId: { in: classIds } });
                         break;
-                    case "teacherId":
-                        queryConditions.push({ teacherId: value });
+                    }
+                    case "teacherId": {
+                        const teacherIds = value.split(',');
+                        queryConditions.push({ teacherId: { in: teacherIds } });
                         break;
-                    case "subjectId":
-                        queryConditions.push({ subjectId: parseInt(value) });
+                    }
+                    case "subjectId": {
+                        const subjectIds = value.split(',').map(v => parseInt(v));
+                        queryConditions.push({ subjectId: { in: subjectIds } });
                         break;
-                    case "moduleId":
+                    }
+                    case "moduleId": {
                         const selectedModuleId = parseInt(value);
                         const selectedModule = availableModules.find(mod => mod.id === selectedModuleId);
                         if (selectedModule) {
                             const moduleStartDate = new Date(selectedModule.startDate);
                             const moduleEndDate = new Date(selectedModule.endDate);
-
                             moduleEndDate.setHours(23, 59, 59, 999);
 
                             queryConditions.push({
@@ -138,7 +143,8 @@ const LessonListPage = async ({ searchParams }: { searchParams: { [key: string]:
                             });
                         }
                         break;
-                    case "search":
+                    }
+                    case "search": {
                         queryConditions.push({
                             OR: [
                                 { subject: { name: { contains: value, mode: "insensitive" } } },
@@ -148,6 +154,7 @@ const LessonListPage = async ({ searchParams }: { searchParams: { [key: string]:
                             ]
                         });
                         break;
+                    }
                     default:
                         break;
                 }
