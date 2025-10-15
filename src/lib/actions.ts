@@ -625,7 +625,8 @@ export const createResult = async (currentState: CurrentState, data: ResultSchem
                 studentId: data.studentId,
                 ...(data.examId && { examId: data.examId }),
                 ...(data.assignmentId && { assignmentId: data.assignmentId }),
-                resultDate: data.resultDate
+                resultDate: data.resultDate,
+                observations: data.observations,
             },
         });
         return { success: true, error: false }
@@ -683,7 +684,8 @@ export const updateResult = async (currentState: CurrentState, data: ResultSchem
                 studentId: data.studentId,
                 examId: data.examId,
                 assignmentId: data.assignmentId,
-                resultDate: data.resultDate
+                resultDate: data.resultDate,
+                observations: data.observations || "",
             },
         });
         return { success: true, error: false }

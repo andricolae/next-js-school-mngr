@@ -305,6 +305,13 @@ const ResultForm = ({
                     // error={getDateError("resultDate")}
                     readOnly={true}
                 />
+                <InputField
+                    label="Observații"
+                    name="observations"
+                    defaultValue={data?.observations}
+                    register={register}
+                    error={errors?.observations}
+                />
             </div>
 
             {state.error && (

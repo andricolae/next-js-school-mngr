@@ -307,7 +307,8 @@ export const resultSchema = z.object({
     examId: z.any().optional(),
     assignmentId: z.any().optional(),
     studentId: z.string({ required_error: "Elevul este obligatoriu!" }),
-    resultDate: z.any().optional()
+    resultDate: z.any().optional(),
+    observations: z.union([z.string(), z.null()]).optional(),
 }).refine(
     (data) => 
         ((data.examId && data.examId !== 0) && !data.assignmentId) ||

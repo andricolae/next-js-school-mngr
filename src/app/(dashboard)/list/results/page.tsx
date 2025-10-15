@@ -421,6 +421,7 @@ const ResultListPage = async ({
             examId: item.examId,
             assignmentId: item.assignmentId,
             subject: assessment.lesson.subject.name,
+            observations: item.observations,
         };
     }).filter(Boolean) as ResultList[];
 
