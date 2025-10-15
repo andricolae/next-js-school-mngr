@@ -94,7 +94,7 @@ const AttendanceListPage = async ({ searchParams }: { searchParams: { [key: stri
     const { page, sort, ...queryParams } = searchParams;
     const p = page ? parseInt(page) : 1;
 
-    const query: Prisma.AttendanceWhereInput = {}
+    let query: Prisma.AttendanceWhereInput = {}
 
     if (queryParams) {
         for (const [key, value] of Object.entries(queryParams)) {
@@ -109,9 +109,45 @@ const AttendanceListPage = async ({ searchParams }: { searchParams: { [key: stri
                         query.studentId = value;
                         break;
                     case "search":
-                        query.student = {
-                            name: { contains: value, mode: "insensitive" }
-                        };
+                        const normalized = value.trim().toLowerCase();
+                        const OR: any[] = [
+                            {
+                                student: {
+                                    OR: [
+                                        { name: { contains: value, mode: "insensitive" } },
+                                        { surname: { contains: value, mode: "insensitive" } },
+                                        { username: { contains: value, mode: "insensitive" } },
+                                    ],
+                                },
+                            },
+                            {
+                                lesson: {
+                                    is: {
+                                        subject: { is: { name: { contains: value, mode: "insensitive" } } },
+                                    },
+                                },
+                            },
+                            {
+                                lesson: {
+                                    is: { name: { contains: value, mode: "insensitive" } },
+                                },
+                            },
+                            {
+                                lesson: {
+                                    is: { class: { is: { name: { contains: value, mode: "insensitive" } } } },
+                                },
+                            },
+                        ];
+
+                        if (["prezent", "absent"].includes(normalized)) {
+                            OR.push({ present: { equals: normalized === "prezent" } });
+                        }
+
+                        if (["motivat", "nemotivat"].includes(normalized)) {
+                            OR.push({ excused: { equals: normalized === "motivat" } });
+                        }
+
+                        query = { OR };
                         break;
                     default:
                         break;

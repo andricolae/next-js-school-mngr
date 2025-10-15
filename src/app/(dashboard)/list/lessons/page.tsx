@@ -147,6 +147,7 @@ const LessonListPage = async ({ searchParams }: { searchParams: { [key: string]:
                     case "search": {
                         queryConditions.push({
                             OR: [
+                                { name: { contains: value, mode: "insensitive" } },
                                 { subject: { name: { contains: value, mode: "insensitive" } } },
                                 { teacher: { name: { contains: value, mode: "insensitive" } } },
                                 { teacher: { surname: { contains: value, mode: "insensitive" } } },

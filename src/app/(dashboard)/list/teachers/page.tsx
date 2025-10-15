@@ -96,7 +96,7 @@ const TeacherListPage = async ({ searchParams }: { searchParams: { [key: string]
     const { page, sort, ...queryParams } = searchParams;
     const p = page ? parseInt(page) : 1;
 
-    const query: Prisma.TeacherWhereInput = {}
+    const query: Prisma.TeacherWhereInput = {};
 
     if (queryParams) {
         for (const [key, value] of Object.entries(queryParams)) {
@@ -110,7 +110,26 @@ const TeacherListPage = async ({ searchParams }: { searchParams: { [key: string]
                         };
                         break;
                     case "search":
-                        query.name = { contains: value, mode: "insensitive" };
+                        query.OR = [
+                            { name: { contains: value, mode: "insensitive" } },
+                            { surname: { contains: value, mode: "insensitive" } },
+                            { username: { contains: value, mode: "insensitive" } },
+                            { email: { contains: value, mode: "insensitive" } },
+                            {
+                                subjects: {
+                                    some: {
+                                        name: { contains: value, mode: "insensitive" },
+                                    },
+                                },
+                            },
+                            {
+                                classes: {
+                                    some: {
+                                        name: { contains: value, mode: "insensitive" },
+                                    },
+                                },
+                            },
+                        ];
                         break;
                     default:
                         break;

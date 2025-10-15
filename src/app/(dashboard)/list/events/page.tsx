@@ -95,7 +95,10 @@ const EventListPage = async ({ searchParams }: { searchParams: { [key: string]: 
             if (value !== undefined) {
                 switch (key) {
                     case "search":
-                        query.title = { contains: value, mode: "insensitive" };
+                        query.OR = [
+                            { title: { contains: value, mode: "insensitive" } },
+                            { class: { name: { contains: value, mode: "insensitive" } } }
+                        ];
                         break;
                     default:
                         break;

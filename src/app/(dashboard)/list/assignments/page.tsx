@@ -95,9 +95,55 @@ const AssignmentListPage = async ({ searchParams }: { searchParams: { [key: stri
                         query.lesson.teacherId = value;
                         break;
                     case "search":
-                        query.lesson.subject = {
-                            name: { contains: value, mode: "insensitive" }
-                        };
+                        query.OR = [
+                            {
+                                title: { contains: value, mode: "insensitive" },
+                            },
+                            {
+                                lesson: {
+                                    is: {
+                                        name: { contains: value, mode: "insensitive" },
+                                    },
+                                },
+                            },
+                            {
+                                lesson: {
+                                    is: {
+                                        subject: {
+                                            is: {
+                                                name: { contains: value, mode: "insensitive" },
+                                            },
+                                        },
+                                    },
+                                },
+                            },
+                            {
+                                lesson: {
+                                    is: {
+                                        class: {
+                                            is: {
+                                                name: { contains: value, mode: "insensitive" },
+                                            },
+                                        },
+                                    },
+                                },
+                            },
+                            {
+                                lesson: {
+                                    is: {
+                                        teacher: {
+                                            is: {
+                                                OR: [
+                                                    { name: { contains: value, mode: "insensitive" } },
+                                                    { surname: { contains: value, mode: "insensitive" } },
+                                                    { username: { contains: value, mode: "insensitive" } },
+                                                ],
+                                            },
+                                        },
+                                    },
+                                },
+                            },
+                        ];
                         break;
                     default:
                         break;
