@@ -66,7 +66,9 @@ const BulkDeleteForm = ({
             setOpen(false);
             router.refresh();
         }
-        if (state?.error) {
+        if (state?.error === "P2003") {
+            setError("Orele asociate cu alte informații școlare nu pot fi șterse!");
+        } else if (state?.error) {
             setError("A intervenit o eroare la ștergerea lecțiilor!");
         }
     }, [state]);
@@ -108,8 +110,7 @@ const BulkDeleteForm = ({
 
                             <span className="text-center font-medium">
                                 Toate datele vor fi pierdute. Ești sigur/ă că vrei să ștergi{" "}
-                                {selectedIds.length} {translatedTable}
-                                {selectedIds.length > 1 ? "s" : ""}?
+                                {selectedIds.length} {translatedTable}?
                             </span>
 
                             <div className="flex gap-2 justify-center">

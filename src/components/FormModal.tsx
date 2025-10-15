@@ -106,11 +106,11 @@ const FormModal = ({ table, type, data, id, results, relatedData, title, student
     const [open, setOpen] = useState(false);
 
     const modalWidthClass =
-        (table === "teacher" || table === "student" || table === "lesson") && (type === "create" || type === "update")
+        (table === "teacher" || table === "student" || table === "lesson" || table === "result") && (type === "create" || type === "update")
             ? "w-[40%] p-3 h-[80%]"
             : table === "subject" && (type === "create" || type === "update")
                 ? "w-[30%] p-5 h-[70%]"
-                : ["exam", "assignment", "result", "attendance"].includes(table)
+                : ["exam", "assignment", "attendance"].includes(table)
                     ? "w-[40%] p-6 h-fit"
                     : ["announcement", "event", "lesson", "class", "teacher", "student", "parent"].includes(table)
                         ? "w-[40%] p-3 h-fit"

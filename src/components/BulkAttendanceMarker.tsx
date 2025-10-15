@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import Image from "next/image";
+import { useTransition } from "react";
+import LoadingPopup from "@/components/LoadingPopup";
 
 type Student = {
     id: string;
@@ -15,8 +17,14 @@ type Student = {
 type Lesson = {
     id: number;
     name: string;
+    startTime: Date,
     subject: { name: string };
     class: { name: string; id: number };
+};
+
+type AttendanceStatus = {
+    present: boolean;
+    excused: boolean;
 };
 
 const BulkAttendanceMarker = ({
@@ -26,12 +34,14 @@ const BulkAttendanceMarker = ({
     lessons: Lesson[];
     onClose: () => void;
 }) => {
+    const [filteredLessons, setFilteredLessons] = useState<Lesson[]>(lessons.filter(lesson => lesson.startTime.toDateString() === new Date().toDateString()));
     const [selectedLesson, setSelectedLesson] = useState<number | null>(null);
     const [students, setStudents] = useState<Student[]>([]);
-    const [attendanceData, setAttendanceData] = useState<Record<string, boolean>>({});
+    const [attendanceData, setAttendanceData] = useState<Record<string, AttendanceStatus>>({});
     const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
     const [loading, setLoading] = useState(false);
     const router = useRouter();
+    const [isPending, startTransition] = useTransition();
 
     useEffect(() => {
         if (selectedLesson) {
@@ -42,18 +52,20 @@ const BulkAttendanceMarker = ({
 
     const fetchClassStudents = async (lessonId: number) => {
         try {
-            const lesson = lessons.find(l => l.id === lessonId);
-            if (!lesson) return;
+            startTransition(async () => {
+                const lesson = lessons.find(l => l.id === lessonId);
+                if (!lesson) return;
 
-            const response = await fetch(`/api/students/by-class/${lesson.class.id}`);
-            const studentsData = await response.json();
-            setStudents(studentsData);
+                const response = await fetch(`/api/students/by-class/${lesson.class.id}`);
+                const studentsData = await response.json();
+                setStudents(studentsData);
 
-            const initialAttendance: Record<string, boolean> = {};
-            studentsData.forEach((student: Student) => {
-                initialAttendance[student.id] = true;
+                const initialAttendance: Record<string, AttendanceStatus> = {};
+                studentsData.forEach((student: Student) => {
+                    initialAttendance[student.id] = { present: true, excused: true };
+                });
+                setAttendanceData(initialAttendance);
             });
-            setAttendanceData(initialAttendance);
         } catch (error) {
             console.error('A apărut o eroare în preluarea datelor despre elevi!', error);
             toast.error('A apărut o eroare în preluarea datelor despre elevi!');
@@ -63,34 +75,40 @@ const BulkAttendanceMarker = ({
     const toggleAttendance = (studentId: string) => {
         setAttendanceData(prev => ({
             ...prev,
-            [studentId]: !prev[studentId]
+            [studentId]: {
+                ...prev[studentId],
+                present: !prev[studentId]?.present,
+                excused: true
+            }
         }));
     };
 
     const markAllPresent = () => {
-        const allPresent: Record<string, boolean> = {};
+        const allPresent: Record<string, AttendanceStatus> = {};
         students.forEach(student => {
-            allPresent[student.id] = true;
+            allPresent[student.id] = { present: true, excused: true };
         });
         setAttendanceData(allPresent);
     };
 
     const markAllAbsent = () => {
-        const allAbsent: Record<string, boolean> = {};
+        const allAbsent: Record<string, AttendanceStatus> = {};
         students.forEach(student => {
-            allAbsent[student.id] = false;
+            allAbsent[student.id] = { present: false, excused: false };
         });
         setAttendanceData(allAbsent);
     };
 
     const submitAttendance = async () => {
+
         if (!selectedLesson || students.length === 0) return;
 
         setLoading(true);
         try {
             const attendanceRecords = students.map(student => ({
                 date: new Date(selectedDate),
-                present: attendanceData[student.id],
+                present: attendanceData[student.id]?.present ?? false,
+                excused: attendanceData[student.id]?.excused ?? false,
                 studentId: student.id,
                 lessonId: selectedLesson
             }));
@@ -118,8 +136,23 @@ const BulkAttendanceMarker = ({
         }
     };
 
-    const presentCount = Object.values(attendanceData).filter(Boolean).length;
+    const presentCount = Object.values(attendanceData).filter(s => s.present).length;
     const absentCount = students.length - presentCount;
+
+    const markExcused = (studentId: string) => {
+        setAttendanceData(prev => ({
+            ...prev,
+            [studentId]: {
+                ...prev[studentId],
+                excused: !prev[studentId]?.excused
+            }
+        }));
+    };
+
+    const updateFilteredLessons = (dateToFilter: string) => {
+        setFilteredLessons(lessons.filter(lesson => lesson.startTime.toDateString() === new Date(dateToFilter).toDateString()));
+        setStudents([]);
+    };
 
     return (
         <div className="flex flex-col gap-6">
@@ -134,30 +167,35 @@ const BulkAttendanceMarker = ({
             </div>
 
             <div className="flex gap-4 flex-wrap">
-                <div className="flex flex-col gap-2 min-w-[200px]">
-                    <label className="text-xs text-gray-400">Selectează ora</label>
-                    <select
-                        className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm"
-                        value={selectedLesson || ""}
-                        onChange={(e) => setSelectedLesson(Number(e.target.value))}
-                    >
-                        <option value="">Alege o oră</option>
-                        {lessons.map((lesson) => (
-                            <option key={lesson.id} value={lesson.id}>
-                                {lesson.subject.name} - {lesson.class.name}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-
                 <div className="flex flex-col gap-2">
                     <label className="text-xs text-gray-400">Data</label>
                     <input
                         type="date"
                         className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm"
                         value={selectedDate}
-                        onChange={(e) => setSelectedDate(e.target.value)}
+                        onChange={(e) => {
+                            setSelectedDate(e.target.value);
+                            updateFilteredLessons(e.target.value);
+                            setSelectedLesson(null);
+                        }}
                     />
+                </div>
+                <div className="flex flex-col gap-2 min-w-[200px]">
+                    <label className="text-xs text-gray-400">Selectează ora</label>
+                    <select
+                        name="oraSelectata"
+                        className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm"
+                        value={selectedLesson || ""}
+                        onChange={(e) => setSelectedLesson(Number(e.target.value))}
+                    >
+                        <option value="">Alege o oră</option>
+                        {filteredLessons?.map((lesson) => (
+                            <option key={lesson.id} value={lesson.id}>
+                                {lesson.name} - {lesson.class.name} ({new Date(lesson.startTime).toLocaleDateString("ro-RO")})
+                            </option>
+                        ))}
+                    </select>
+                    {isPending && <LoadingPopup />}
                 </div>
             </div>
 
@@ -171,13 +209,13 @@ const BulkAttendanceMarker = ({
                         </div>
                         <div className="flex gap-2">
                             <button
-                                onClick={markAllPresent}
+                                onClick={() => { markAllPresent() }}
                                 className="px-3 py-1 bg-green-100 text-green-800 rounded text-xs hover:bg-green-200"
                             >
                                 Marchează toți elevii „Prezent”
                             </button>
                             <button
-                                onClick={markAllAbsent}
+                                onClick={() => { markAllAbsent() }}
                                 className="px-3 py-1 bg-red-100 text-red-800 rounded text-xs hover:bg-red-200"
                             >
                                 Marchează toți elevii „Absent”
@@ -190,14 +228,13 @@ const BulkAttendanceMarker = ({
                             {students.map((student) => (
                                 <div
                                     key={student.id}
-                                    className={`flex items-center justify-between p-3 rounded-lg border cursor-pointer transition-colors ${attendanceData[student.id]
+                                    className={`flex items-center justify-between p-3 rounded-lg border cursor-pointer transition-colors ${attendanceData[student.id].present
                                         ? "bg-green-50 border-green-200"
                                         : "bg-red-50 border-red-200"
                                         }`}
-                                    onClick={() => toggleAttendance(student.id)}
                                 >
-                                    <div className="flex items-center gap-3">
-                                        <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${attendanceData[student.id]
+                                    <div className="flex items-center gap-3" onClick={() => toggleAttendance(student.id)}>
+                                        <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${attendanceData[student.id].present
                                             ? "bg-green-500 border-green-500"
                                             : "border-red-300"
                                             }`}>
@@ -212,12 +249,22 @@ const BulkAttendanceMarker = ({
                                             <p className="text-xs text-gray-500">{student.username}</p>
                                         </div>
                                     </div>
-                                    <span className={`px-2 py-1 rounded text-xs font-medium ${attendanceData[student.id]
-                                        ? "bg-green-100 text-green-800"
-                                        : "bg-red-100 text-red-800"
-                                        }`}>
-                                        {attendanceData[student.id] ? "Present" : "Absent"}
-                                    </span>
+                                    <div>
+                                        <button className={`px-2 py-1 rounded text-xs font-medium mr-5 ${attendanceData[student.id].present
+                                            ? "bg-green-100 text-green-800"
+                                            : "bg-red-100 text-red-800"
+                                            }`} onClick={() => toggleAttendance(student.id)}>
+                                            {attendanceData[student.id]?.present ? "Present" : "Absent"}
+                                        </button>
+                                        <button className={`px-2 py-1 rounded text-xs font-medium ${attendanceData[student.id].excused
+                                            ? "bg-green-100 text-green-800"
+                                            : "bg-red-100 text-red-800"
+                                            }`} onClick={() => { markExcused(student.id) }}
+                                            disabled={attendanceData[student.id].present}
+                                        >
+                                            {attendanceData[student.id]?.excused ? "Motivat" : "Nemotivat"}
+                                        </button>
+                                    </div>
                                 </div>
                             ))}
                         </div>

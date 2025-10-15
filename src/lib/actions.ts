@@ -1,6 +1,10 @@
 "use server"
 import { auth, clerkClient } from "@clerk/nextjs/server";
-import { CreateAnnouncementSchema, UpdateAnnouncementSchema, AssignmentSchema, AttendanceActionData, ClassSchema, EventSchema, ExamSchema, LessonSchema, ParentSchema, ResultSchema, StudentSchema, SubjectSchema, TeacherSchema, AttendanceFormData } from "./formValidationSchemas";
+import {
+    CreateAnnouncementSchema, UpdateAnnouncementSchema, AssignmentSchema, AttendanceActionData, ClassSchema,
+    EventSchema, CreateExamSchema, UpdateExamSchema, UpdateLessonSchema, CreateLessonSchema, ParentSchema, ResultSchema,
+    StudentSchema, SubjectSchema, TeacherSchema, AttendanceFormData
+} from "./formValidationSchemas";
 import prisma from "./prisma";
 import { TokenData } from "@/lib/utils";
 import { Day } from "@prisma/client";
@@ -391,7 +395,7 @@ export const deleteStudent = async (currentState: CurrentState, data: FormData) 
     }
 }
 
-export const createExam = async (currentState: CurrentState, data: ExamSchema) => {
+export const createExam = async (currentState: CurrentState, data: CreateExamSchema) => {
     const { userId, sessionClaims } = await auth();
     let tokenData;
     if (sessionClaims !== null) {
@@ -427,7 +431,7 @@ export const createExam = async (currentState: CurrentState, data: ExamSchema) =
     }
 }
 
-export const updateExam = async (currentState: CurrentState, data: ExamSchema) => {
+export const updateExam = async (currentState: CurrentState, data: UpdateExamSchema) => {
     const { userId, sessionClaims } = await auth();
     let tokenData;
     if (sessionClaims !== null) {
@@ -514,7 +518,7 @@ export const createAssignment = async (currentState: CurrentState, data: Assignm
             data: {
                 title: data.title,
                 description: data.description,
-                startDate: data.startDate,
+                startDate: new Date(data.startDate),
                 dueDate: data.dueDate,
                 lessonId: data.lessonId,
             },
@@ -554,7 +558,7 @@ export const updateAssignment = async (currentState: CurrentState, data: Assignm
             data: {
                 title: data.title,
                 description: data.description,
-                startDate: data.startDate,
+                startDate: new Date(data.startDate),
                 dueDate: data.dueDate,
                 lessonId: data.lessonId,
             },
@@ -621,7 +625,8 @@ export const createResult = async (currentState: CurrentState, data: ResultSchem
                 studentId: data.studentId,
                 ...(data.examId && { examId: data.examId }),
                 ...(data.assignmentId && { assignmentId: data.assignmentId }),
-                resultDate: data.resultDate
+                resultDate: data.resultDate,
+                observations: data.observations,
             },
         });
         return { success: true, error: false }
@@ -677,9 +682,10 @@ export const updateResult = async (currentState: CurrentState, data: ResultSchem
             data: {
                 score: data.score,
                 studentId: data.studentId,
-                ...(data.examId && { examId: data.examId }),
-                ...(data.assignmentId && { assignmentId: data.assignmentId }),
-                resultDate: data.resultDate
+                examId: data.examId,
+                assignmentId: data.assignmentId,
+                resultDate: data.resultDate,
+                observations: data.observations || "",
             },
         });
         return { success: true, error: false }
@@ -1231,7 +1237,7 @@ export const deleteAttendance = async (currentState: CurrentState, data: FormDat
     }
 }
 
-const getDayFromDate = (date: Date): LessonSchema["day"] => {
+const getDayFromDate = (date: Date): CreateLessonSchema["day"] => {
     switch (date.getDay()) {
         case 1: return "MONDAY";
         case 2: return "TUESDAY";
@@ -1241,7 +1247,7 @@ const getDayFromDate = (date: Date): LessonSchema["day"] => {
     }
 };
 
-export const createLesson = async (currentState: CurrentState, data: LessonSchema) => {
+export const createLesson = async (currentState: CurrentState, data: CreateLessonSchema) => {
     const { userId, sessionClaims } = await auth();
     let tokenData;
     if (sessionClaims !== null) {
@@ -1253,6 +1259,52 @@ export const createLesson = async (currentState: CurrentState, data: LessonSchem
         if (role === "teacher" && data.teacherId !== userId) {
             return { success: false, error: true };
         }
+
+
+        const overlappingLesson = await prisma.lesson.findFirst({
+            where: {
+                OR: [
+                    { teacherId: data.teacherId },
+                    { classId: data.classId }
+                ],
+                AND: [
+                    {
+                        OR: [
+                            {
+                                AND: [
+                                    { startTime: { lte: data.startTime } },
+                                    { endTime: { gt: data.startTime } }
+                                ]
+                            },
+                            {
+                                AND: [
+                                    { startTime: { lt: data.endTime } },
+                                    { endTime: { gte: data.endTime } }
+                                ]
+                            },
+                            {
+                                AND: [
+                                    { startTime: { gte: data.startTime } },
+                                    { endTime: { lte: data.endTime } }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        });
+
+        if (overlappingLesson) {
+            const conflictType = overlappingLesson.teacherId === data.teacherId
+                ? "Profesorul"
+                : "Clasa";
+            return {
+                success: false,
+                error: true,
+                message: `${conflictType} are altă oră în acest interval orar`
+            };
+        }
+
 
         const status = await prisma.lesson.create({
             data: {
@@ -1273,7 +1325,7 @@ export const createLesson = async (currentState: CurrentState, data: LessonSchem
     }
 }
 
-export const updateLesson = async (currentState: CurrentState, data: LessonSchema) => {
+export const updateLesson = async (currentState: CurrentState, data: UpdateLessonSchema) => {
     const { userId, sessionClaims } = await auth();
     let tokenData;
     if (sessionClaims !== null) {
@@ -1346,7 +1398,7 @@ export const deleteLesson = async (currentState: CurrentState, data: FormData) =
     }
 }
 
-export const createRecurringLessons = async (lessonsData: LessonSchema[]) => {
+export const createRecurringLessons = async (lessonsData: CreateLessonSchema[]) => {
     try {
         let successCount = 0;
         for (const lessonData of lessonsData) {
@@ -1476,6 +1528,9 @@ export const deleteSelectedLessons = async (currentState: CurrentState, formData
         return { success: true, error: false }
     } catch (e) {
         console.error(e)
+        if ((e as any).code === "P2003") {
+            return { error: "P2003", success: false }
+        }
         return { error: true, success: false }
     }
 }
@@ -1527,6 +1582,81 @@ export const studentsAssignedToAnExam = async (examId: number) => {
 //     });
 //     return assignmentClassStudents?.lesson?.class?.students;
 // }
+
+type Item = {
+    exams: any[];
+    assignments: any[];
+};
+
+const mergeData = (items: Item[]): { exams: any[]; assignments: any[] } => {
+    return items.reduce(
+        (acc, curr) => {
+            acc.exams = acc.exams.concat(curr.exams);
+            acc.assignments = acc.assignments.concat(curr.assignments);
+            return acc;
+        },
+        { exams: [] as any[], assignments: [] as any[] }
+    );
+};
+
+export const getClassExamsAndAssignments = async (clsId: number) => {
+    try {
+        const assignmentsAndExamsData = await prisma.lesson.findMany({
+            where: { classId: clsId },
+            select: {
+                exams: {
+                    select: {
+                        id: true,
+                        title: true,
+                        lesson: {
+                            select: {
+                                subject: {
+                                    select: {
+                                        name: true,
+                                    }
+                                },
+                                class: {
+                                    select: {
+                                        name: true,
+                                    }
+                                }
+                            }
+                        }
+                    },
+                },
+                assignments: {
+                    select: {
+                        id: true,
+                        title: true,
+                        lesson: {
+                            select: {
+                                subject: {
+                                    select: {
+                                        name: true,
+                                    }
+                                },
+                                class: {
+                                    select: {
+                                        name: true,
+                                    }
+                                }
+                            }
+                        }
+                    },
+                },
+            },
+        });
+
+        if (!assignmentsAndExamsData) {
+            throw new Error("Eroare! Încearcă din nou mai târziu!");
+        }
+        const aux = mergeData(assignmentsAndExamsData);
+        return aux;
+    } catch (error) {
+        console.error("Error fetching exams and assignments:", error);
+        throw error;
+    }
+};
 
 export const readAttendanceData = async (studentId: any, yearMonth: string) => {
     const { sessionClaims } = await auth();

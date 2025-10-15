@@ -10,6 +10,7 @@ type InputFieldProps = {
     inputProps?: React.InputHTMLAttributes<HTMLInputElement>;
     hidden?: boolean;
     className?: string;
+    readOnly?: boolean;
 };
 
 const InputField = ({
@@ -22,6 +23,7 @@ const InputField = ({
     inputProps,
     hidden,
     className = "",
+    readOnly,
 }: InputFieldProps) => {
     const errorMessage = typeof error === "string" ? error : error?.message;
 
@@ -36,6 +38,7 @@ const InputField = ({
                 className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
                 {...inputProps}
                 defaultValue={defaultValue}
+                readOnly={readOnly}
             />
             {errorMessage && (
                 <p className="text-xs text-red-400">{errorMessage.toString()}</p>

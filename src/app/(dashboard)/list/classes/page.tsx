@@ -84,7 +84,18 @@ const ClassListPage = async ({ searchParams }: { searchParams: { [key: string]: 
                         query.supervisorId = value;
                         break;
                     case "search":
-                        query.name = { contains: value, mode: "insensitive" };
+                        query.OR = [
+                            { name: { contains: value, mode: "insensitive" } },
+                            {
+                                supervisor: {
+                                    OR: [
+                                        { name: { contains: value, mode: "insensitive" } },
+                                        { surname: { contains: value, mode: "insensitive" } },
+                                        { username: { contains: value, mode: "insensitive" } },
+                                    ],
+                                },
+                            },
+                        ];
                         break;
                     default:
                         break;

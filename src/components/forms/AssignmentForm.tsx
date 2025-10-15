@@ -29,6 +29,7 @@ const AssignmentForm = ({
         handleSubmit,
         control,
         formState: { errors, touchedFields, isSubmitted },
+        setValue,
     } = useForm<AssignmentSchema>({
         resolver: zodResolver(assignmentSchema),
         defaultValues: type === "update" && data ? {
@@ -47,7 +48,7 @@ const AssignmentForm = ({
             setIsSubmitting(true);
             const formattedData = {
                 ...data,
-                startDate: new Date(data.startDate),
+                startDate: data.startDate,
                 dueDate: new Date(data.dueDate)
             };
             formAction(formattedData);
@@ -69,17 +70,14 @@ const AssignmentForm = ({
         }
     }, [state, router, type, setOpen]);
 
-    const getDateError = (field: "startDate" | "dueDate") => {
+    const getDateError = (field: "dueDate") => {
         const err = errors[field];
+
         if (isSubmitted && !touchedFields[field] && !err) {
-            return field === "startDate"
-                ? "Data de început este obligatorie!"
-                : "Data limită este obligatorie!";
+            return "Data limită este obligatorie!";
         }
         if (err?.message === "Invalid date") {
-            return field === "startDate"
-                ? "Data de început este obligatorie!"
-                : "Data limită este obligatorie!";
+            return "Data limită este obligatorie!";
         }
         return err?.message;
     };
@@ -90,7 +88,7 @@ const AssignmentForm = ({
 
     const lesons = lessons.map((lesson: any) => ({
         id: lesson.id.toString(),
-        name: `${lesson.name}`,
+        name: `${lesson.name} - ${lesson.class.name} (${new Date(lesson.startTime).toLocaleDateString("ro-RO")})`,
     })) || [];
 
     return (
@@ -124,6 +122,7 @@ const AssignmentForm = ({
                                         const lesson = lessons.find((lesn: any) => lesn.id.toString() === selectedId);
                                         if (lesson) {
                                             await setStartDate(new Date(lesson.startTime).toISOString().split("T")[0]);
+                                            await setValue("startDate", new Date(lesson.startTime).toISOString().split("T")[0]);
                                         }
                                     }
                                 }}
@@ -151,8 +150,9 @@ const AssignmentForm = ({
                     // defaultValue={data?.startDate ? new Date(data.startDate).toISOString().split('T')[0] : undefined}
                     defaultValue={startDate}
                     register={register}
-                    error={getDateError("startDate")}
+                    // error={getDateError("startDate")}
                     type="date"
+                    readOnly={true}
                 />
                 <InputField
                     label="Dată limită"

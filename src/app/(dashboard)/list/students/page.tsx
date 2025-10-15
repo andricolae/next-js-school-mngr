@@ -78,7 +78,7 @@ const StudentListPage = async ({ searchParams }: { searchParams: { [key: string]
                     </Link>
                     {role === "admin" && (
                         <>
-                            <FormContainer table="student" type="update" data={""} id={item.id}/>
+                            <FormContainer table="student" type="update" data={""} id={item.id} />
                             <FormContainer table="student" type="delete" id={item.id} />
                         </>
                     )}
@@ -106,7 +106,22 @@ const StudentListPage = async ({ searchParams }: { searchParams: { [key: string]
                         };
                         break;
                     case "search":
-                        query.name = { contains: value, mode: "insensitive" };
+                        query.OR = [
+                            { name: { contains: value, mode: "insensitive" } },
+                            { surname: { contains: value, mode: "insensitive" } },
+                            { username: { contains: value, mode: "insensitive" } },
+                            { email: { contains: value, mode: "insensitive" } },
+                            { class: { name: { contains: value, mode: "insensitive" } } },
+                            {
+                                parent: {
+                                    OR: [
+                                        { name: { contains: value, mode: "insensitive" } },
+                                        { surname: { contains: value, mode: "insensitive" } },
+                                        { username: { contains: value, mode: "insensitive" } },
+                                    ],
+                                }
+                            },
+                        ];
                         break;
                     default:
                         break;

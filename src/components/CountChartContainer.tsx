@@ -39,7 +39,7 @@ const CountChartContainer = async () => {
                     <div className="w-5 h-5 bg-orangeLight rounded-full" />
                     <h1 className="font-bold">{others}</h1>
                     <h2 className="text-xs text-gray-300">
-                        Prefer să nu spun ({Math.round((others / (girls + boys + others)) * 100)}%)
+                        Nemenționat ({Math.round((others / (girls + boys + others)) * 100)}%)
                     </h2>
                 </div>
             </div>
