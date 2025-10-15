@@ -18,6 +18,7 @@ const EventList = async ({ dateParam }: { dateParam: string | undefined }) => {
                 <span className="text-gray-300 text-s">{event.startTime.toLocaleTimeString('ro-RO', {
                     hour: "2-digit",
                     minute: "2-digit",
+                    timeZone: 'Europe/Bucharest',
                     hour12: false,
                 })}</span>
             </div>

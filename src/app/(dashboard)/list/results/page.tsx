@@ -222,10 +222,42 @@ const ResultListPage = async ({
 
                         andConditions.push({
                             OR: [
+                                { score: { contains: value, mode: "insensitive" } },
+                                { student: { name: { contains: value, mode: "insensitive" } } },
+                                { student: { surname: { contains: value, mode: "insensitive" } } },
+                                { student: { username: { contains: value, mode: "insensitive" } } },
                                 { exam: { title: { contains: value, mode: "insensitive" } } },
                                 { assignment: { title: { contains: value, mode: "insensitive" } } },
-                                { student: { name: { contains: value, mode: "insensitive" } } },
-                                { student: { surname: { contains: value, mode: "insensitive" } } }
+                                { exam: { lesson: { subject: { name: { contains: value, mode: "insensitive" } } } } },
+                                { assignment: { lesson: { subject: { name: { contains: value, mode: "insensitive" } } } } },
+                                {
+                                    exam: {
+                                        lesson: {
+                                            teacher: {
+                                                OR: [
+                                                    { name: { contains: value, mode: "insensitive" } },
+                                                    { surname: { contains: value, mode: "insensitive" } },
+                                                    { username: { contains: value, mode: "insensitive" } }
+                                                ]
+                                            }
+                                        }
+                                    }
+                                },
+                                {
+                                    assignment: {
+                                        lesson: {
+                                            teacher: {
+                                                OR: [
+                                                    { name: { contains: value, mode: "insensitive" } },
+                                                    { surname: { contains: value, mode: "insensitive" } },
+                                                    { username: { contains: value, mode: "insensitive" } },
+                                                ]
+                                            }
+                                        }
+                                    }
+                                },
+                                { exam: { lesson: { class: { name: { contains: value, mode: "insensitive" } } } } },
+                                { assignment: { lesson: { class: { name: { contains: value, mode: "insensitive" } } } } },
                             ]
                         });
                         break;
@@ -421,6 +453,7 @@ const ResultListPage = async ({
             examId: item.examId,
             assignmentId: item.assignmentId,
             subject: assessment.lesson.subject.name,
+            observations: item.observations,
         };
     }).filter(Boolean) as ResultList[];
 

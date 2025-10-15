@@ -144,6 +144,7 @@ model Result {
   exam         Exam?       @relation(fields: [examId], references: [id])
   student      Student     @relation(fields: [studentId], references: [id])
   resultDate   DateTime
+  observations String
 }
 
 model Attendance {

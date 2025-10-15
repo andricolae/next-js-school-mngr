@@ -63,11 +63,13 @@ const EventListPage = async ({ searchParams }: { searchParams: { [key: string]: 
             <td className="hidden md:table-cell">{item.startTime.toLocaleTimeString("ro-RO", {
                 hour: "2-digit",
                 minute: "2-digit",
+                timeZone: 'Europe/Bucharest',
                 hour12: false,
             })}</td>
             <td className="hidden md:table-cell">{item.endTime.toLocaleTimeString("ro-RO", {
                 hour: "2-digit",
                 minute: "2-digit",
+                timeZone: 'Europe/Bucharest',
                 hour12: false,
             })}</td>
             <td>
@@ -93,7 +95,10 @@ const EventListPage = async ({ searchParams }: { searchParams: { [key: string]: 
             if (value !== undefined) {
                 switch (key) {
                     case "search":
-                        query.title = { contains: value, mode: "insensitive" };
+                        query.OR = [
+                            { title: { contains: value, mode: "insensitive" } },
+                            { class: { name: { contains: value, mode: "insensitive" } } }
+                        ];
                         break;
                     default:
                         break;

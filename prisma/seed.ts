@@ -165,7 +165,8 @@ async function main() {
                 score: "9",
                 studentId: `student${i}`,
                 ...(i <= 5 ? { examId: i } : { assignmentId: i - 5 }),
-                resultDate: new Date()
+                resultDate: new Date(),
+                observations: "-",
             },
         });
     }

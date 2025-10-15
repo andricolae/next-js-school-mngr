@@ -29,6 +29,7 @@ const AttendanceForm = ({
         handleSubmit,
         control,
         formState: { errors, touchedFields, isSubmitted },
+        setValue,
     } = useForm<AttendanceFormData>({
         resolver: zodResolver(attendanceSchema),
         defaultValues: type === "update" && data ? {
@@ -90,21 +91,36 @@ const AttendanceForm = ({
 
     const lesons = lessons.map((lesson: any) => ({
         id: lesson.id.toString(),
-        name: `${lesson.subject.name} - ${lesson.class.name} (${lesson.name})`,
+        name: `${lesson.name} - ${lesson.class.name} (${new Date(lesson.startTime).toLocaleDateString("ro-RO")})`,
     })) || [];
 
-    const stdents = students.map((student: any) => ({
+    const [stdents, setStdents] = useState(students.map((student: any) => ({
         id: student.id.toString(),
         name: `${student.name} - ${student.surname} (${student.username})`,
-    })) || [];
+    })) || []);
 
+    const updateStdents = (lessonId: string) => {
+        const classOfSelectedLesson = lessons.find((leson: any) => leson.id === Number(lessonId))?.classId;
+        if (classOfSelectedLesson !== undefined) {
+            const stdts = students.filter((stdent: any) => stdent.classId === classOfSelectedLesson);
+            setStdents(stdts.map((student: any) => ({
+                id: student.id.toString(),
+                name: `${student.name} - ${student.surname} (${student.username})`,
+            })) || []);
+        } else {
+            setStdents(students.map((student: any) => ({
+                id: student.id.toString(),
+                name: `${student.name} - ${student.surname} (${student.username})`,
+            })) || []);
+        }
+    };
 
     return (
         <form className="flex flex-col gap-6 w-full" onSubmit={onSubmit}>
             <h1 className="text-xl font-semibold">{type === "create" ? "Adaugă o nouă prezență" : "Actualizează prezența"}</h1>
 
             <div className="flex flex-col gap-4 w-full">
-                
+
                 <div className="flex flex-col gap-1 w-full">
                     <Controller
                         name="lessonId"
@@ -116,15 +132,17 @@ const AttendanceForm = ({
                                 options={lesons}
                                 placeholder="Selectează ora"
                                 selectedIds={field.value ? [field.value.toString()] : []}
-                                onSelectionChange={(ids) => {
+                                onSelectionChange={async (ids) => {
                                     const selectedId = ids[0];
                                     field.onChange(selectedId ? Number(selectedId) : "");
                                     if (selectedId) {
                                         const lesson = lessons.find((lesn: any) => lesn.id.toString() === selectedId);
                                         if (lesson) {
-                                            setDate(new Date(lesson.startTime).toISOString().split("T")[0]);
+                                            await setDate(new Date(lesson.startTime).toISOString().split("T")[0]);
+                                            await setValue("date", new Date(lesson.startTime).toISOString().split("T")[0]);
                                         }
                                     }
+                                    updateStdents(ids[0]);
                                 }}
                             />
                         )}
@@ -174,7 +192,7 @@ const AttendanceForm = ({
                                 options={stdents}
                                 placeholder="Selectează un elev"
                                 selectedIds={field.value ? [field.value] : []}
-                                onSelectionChange={(ids) => field.onChange(ids[0] ?? "")}
+                                onSelectionChange={ids => field.onChange(ids[0] ? ids[0] : "")}
                             />
                         )}
                     />
