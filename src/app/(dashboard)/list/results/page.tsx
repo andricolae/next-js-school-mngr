@@ -1,17 +1,17 @@
-import dynamic from "next/dynamic";
 import prisma from "@/lib/prisma";
 import { ITEM_PER_PAGE } from "@/lib/settings";
 import { Prisma } from "@prisma/client";
 import { auth } from "@clerk/nextjs/server";
 import { TokenData } from "@/lib/utils";
-const FormContainer = dynamic(() => import("@/components/FormContainer"), { ssr: false });
+import dynamic from "next/dynamic";
+const Table = dynamic(() => import("@/components/Table"));
+const FormContainer = dynamic(() => import("@/components/FormContainer"));
+const AverageCalculator = dynamic(() => import("@/components/AverageCalculator"));
 const Pagination = dynamic(() => import("@/components/Pagination"), { ssr: false });
-const Table = dynamic(() => import("@/components/Table"), { ssr: false });
 const TableSearch = dynamic(() => import("@/components/TableSearch"), { ssr: false });
 const SortButton = dynamic(() => import("@/components/SortButton"), { ssr: false });
 const FilterForm = dynamic(() => import("@/components/forms/FilterForm"), { ssr: false });
 const DownloadButton = dynamic(() => import("@/components/DownloadButton"), { ssr: false });
-const AverageCalculator = dynamic(() => import("@/components/AverageCalculator"), { ssr: false });
 
 type ResultList = {
     id: number;

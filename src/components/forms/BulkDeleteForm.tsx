@@ -13,6 +13,8 @@ type DeleteLessonsState = {
     error: boolean | string;
 };
 
+const TABLE_MAP: Record<string, string> = { lesson: "ore" };
+
 const BulkDeleteForm = ({
     formActionWrapper,
     table,
@@ -54,11 +56,7 @@ const BulkDeleteForm = ({
 
     const router = useRouter();
 
-    const tableMap: Record<string, string> = {
-        lesson: "ore"
-    };
-
-    const translatedTable = tableMap[table] ?? table;
+    const translatedTable = TABLE_MAP[table] ?? table;
 
     useEffect(() => {
         if (!state) return;

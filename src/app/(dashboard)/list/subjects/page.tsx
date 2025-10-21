@@ -1,12 +1,12 @@
-import dynamic from "next/dynamic";
 import prisma from "@/lib/prisma";
 import { ITEM_PER_PAGE } from "@/lib/settings";
 import { Subject, Teacher, Prisma } from "@prisma/client";
 import { auth } from "@clerk/nextjs/server";
 import { TokenData } from "@/lib/utils";
-const FormContainer = dynamic(() => import("@/components/FormContainer"), { ssr: false });
+import dynamic from "next/dynamic";
+const Table = dynamic(() => import("@/components/Table"));
+const FormContainer = dynamic(() => import("@/components/FormContainer"));
 const Pagination = dynamic(() => import("@/components/Pagination"), { ssr: false });
-const Table = dynamic(() => import("@/components/Table"), { ssr: false });
 const TableSearch = dynamic(() => import("@/components/TableSearch"), { ssr: false });
 const SortButton = dynamic(() => import("@/components/SortButton"), { ssr: false });
 

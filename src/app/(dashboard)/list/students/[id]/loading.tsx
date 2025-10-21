@@ -1,5 +1,5 @@
 import dynamic from "next/dynamic";
-const LoadingPopup = dynamic(() => import("@/components/LoadingPopup"), { ssr: false });
+const LoadingPopup = dynamic(() => import("@/components/LoadingPopup"));
 
 const Loading = () => {
     return (

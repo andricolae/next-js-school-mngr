@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image"
 import dynamic from "next/dynamic";
 const Menu = dynamic(() => import("@/components/Menu"), { ssr: false });
-const Navbar = dynamic(() => import("@/components/Navbar"), { ssr: false });
+const Navbar = dynamic(() => import("@/components/Navbar"));
 
 export default function DashboardLayout({
     children,

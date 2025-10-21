@@ -4,7 +4,7 @@ import {
     CreateAnnouncementSchema, UpdateAnnouncementSchema, AssignmentSchema, AttendanceActionData, ClassSchema,
     EventSchema, CreateExamSchema, UpdateExamSchema, UpdateLessonSchema, CreateLessonSchema, ParentSchema, ResultSchema,
     StudentSchema, SubjectSchema, TeacherSchema, AttendanceFormData
-} from "./formValidationSchemas";
+} from "@/lib/formValidationSchemas";
 import prisma from "@/lib/prisma";
 import { TokenData } from "@/lib/utils";
 import { Day } from "@prisma/client";

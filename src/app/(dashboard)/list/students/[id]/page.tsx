@@ -1,4 +1,3 @@
-import dynamic from "next/dynamic";
 import prisma from "@/lib/prisma";
 import Image from "next/image";
 import Link from "next/link";
@@ -7,11 +6,12 @@ import { Student, Class, Prisma } from "@prisma/client";
 import { auth } from "@clerk/nextjs/server";
 import { TokenData } from "@/lib/utils";
 import { Suspense } from "react";
-const FormContainer = dynamic(() => import("@/components/FormContainer"), { ssr: false });
+import dynamic from "next/dynamic";
+const FormContainer = dynamic(() => import("@/components/FormContainer"));
+const Announcements = dynamic(() => import("@/components/Announcements"));
+const StudentAttendanceCard = dynamic(() => import("@/components/StudentAttendanceCard"));
+const BigCalendarContainer = dynamic(() => import("@/components/BigCalendarContainer"));
 const FormModal = dynamic(() => import("@/components/FormModal"), { ssr: false });
-const StudentAttendanceCard = dynamic(() => import("@/components/StudentAttendanceCard"), { ssr: false });
-const BigCalendarContainer = dynamic(() => import("@/components/BigCalendarContainer"), { ssr: false });
-const Announcements = dynamic(() => import("@/components/Announcements"), { ssr: false });
 
 const SingleStudentPage = async ({
     params: { id },

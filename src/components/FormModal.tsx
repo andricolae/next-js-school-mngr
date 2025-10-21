@@ -1,7 +1,6 @@
 "use client"
 
 import { deleteAnnouncement, deleteAssignment, deleteAttendance, deleteClass, deleteEvent, deleteExam, deleteLesson, deleteParent, deleteResult, deleteStudent, deleteSubject, deleteTeacher } from "@/lib/actions";
-import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useFormState } from "react-dom";
@@ -9,6 +8,7 @@ import { toast } from "react-toastify";
 import { FormContainerProps } from "@/components/FormContainer";
 import { useTransition } from "react";
 import ReactDOM from "react-dom";
+import dynamic from "next/dynamic";
 const LoadingPopup = dynamic(() => import("@/components/LoadingPopup"), { ssr: false });
 
 const deleteActionMap = {
@@ -29,49 +29,49 @@ const deleteActionMap = {
     absente: deleteStudent,
 }
 
-const TeacherForm = dynamic(() => import("./forms/TeacherForm"), {
+const TeacherForm = dynamic(() => import("@/components/forms/TeacherForm"), { ssr: false,
     loading: () => <LoadingPopup />,
 });
-const StudentForm = dynamic(() => import("./forms/StudentForm"), {
+const StudentForm = dynamic(() => import("@/components/forms/StudentForm"), { ssr: false,
     loading: () => <LoadingPopup />,
 });
-const SubjectForm = dynamic(() => import("./forms/SubjectForm"), {
+const SubjectForm = dynamic(() => import("@/components/forms/SubjectForm"), { ssr: false,
     loading: () => <LoadingPopup />,
 });
-const ClassForm = dynamic(() => import("./forms/ClassForm"), {
+const ClassForm = dynamic(() => import("@/components/forms/ClassForm"), { ssr: false,
     loading: () => <LoadingPopup />,
 });
-const ExamForm = dynamic(() => import("./forms/ExamForm"), {
+const ExamForm = dynamic(() => import("@/components/forms/ExamForm"), { ssr: false,
     loading: () => <LoadingPopup />
 });
-const AssignmentForm = dynamic(() => import("./forms/AssignmentForm"), {
+const AssignmentForm = dynamic(() => import("@/components/forms/AssignmentForm"), { ssr: false,
     loading: () => <LoadingPopup />
 });
-const ResultForm = dynamic(() => import("./forms/ResultForm"), {
+const ResultForm = dynamic(() => import("@/components/forms/ResultForm"), { ssr: false,
     loading: () => <LoadingPopup />
 });
-const EventForm = dynamic(() => import("./forms/EventForm"), {
+const EventForm = dynamic(() => import("@/components/forms/EventForm"), { ssr: false,
     loading: () => <LoadingPopup />
 });
-const ParentForm = dynamic(() => import("./forms/ParentForm"), {
+const ParentForm = dynamic(() => import("@/components/forms/ParentForm"), { ssr: false,
     loading: () => <LoadingPopup />
 });
-const LessonForm = dynamic(() => import("./forms/LessonForm"), {
+const LessonForm = dynamic(() => import("@/components/forms/LessonForm"), { ssr: false,
     loading: () => <LoadingPopup />
 });
-const AttendanceForm = dynamic(() => import("./forms/AttendanceForm"), {
+const AttendanceForm = dynamic(() => import("@/components/forms/AttendanceForm"), { ssr: false,
     loading: () => <LoadingPopup />
 });
-const AnnouncementForm = dynamic(() => import("./forms/AnnouncementForm"), {
+const AnnouncementForm = dynamic(() => import("@/components/forms/AnnouncementForm"), { ssr: false,
     loading: () => <LoadingPopup />
 });
-const AdeverintaElevForm = dynamic(() => import("./forms/AdeverintaElevForm"), {
+const AdeverintaElevForm = dynamic(() => import("@/components/forms/AdeverintaElevForm"), { ssr: false,
     loading: () => <LoadingPopup />,
 });
-const FoaieMatricolaForm = dynamic(() => import("./forms/FoaieMatricolaForm"), {
+const FoaieMatricolaForm = dynamic(() => import("@/components/forms/FoaieMatricolaForm"), { ssr: false,
     loading: () => <LoadingPopup />,
 });
-const RaportAbsenteForm = dynamic(() => import("./forms/RaportAbsenteForm"), {
+const RaportAbsenteForm = dynamic(() => import("@/components/forms/RaportAbsenteForm"), { ssr: false,
     loading: () => <LoadingPopup />,
 });
 

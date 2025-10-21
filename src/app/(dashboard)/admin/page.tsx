@@ -1,9 +1,9 @@
 import dynamic from "next/dynamic";
 const UserCard = dynamic(() => import("@/components/UserCard"));
-const Announcements = dynamic(() => import("@/components/Announcements"), { ssr: false });
-const CountChartContainer = dynamic(() => import("@/components/CountChartContainer"), { ssr: false });
-const AttendanceChartContainer = dynamic(() => import("@/components/AttendanceChartContainer"), { ssr: false });
-const EventCalendarContainer = dynamic(() => import("@/components/EventCalendarContainer"), { ssr: false });
+const Announcements = dynamic(() => import("@/components/Announcements"));
+const CountChartContainer = dynamic(() => import("@/components/CountChartContainer"));
+const AttendanceChartContainer = dynamic(() => import("@/components/AttendanceChartContainer"));
+const EventCalendarContainer = dynamic(() => import("@/components/EventCalendarContainer"));
 
 const AdminPage = ({
     searchParams

@@ -1,6 +1,6 @@
 import dynamic from "next/dynamic";
 const EventCalendar = dynamic(() => import("@/components/EventCalendar"), { ssr: false });
-const EventList = dynamic(() => import("@/components/EventList"), { ssr: false });
+const EventList = dynamic(() => import("@/components/EventList"));
 
 const EventCalendarContainer = async ({
     searchParams
