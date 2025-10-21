@@ -1,7 +1,8 @@
-import Announcements from "@/components/Announcements"
-import BigCalendarContainer from "@/components/BigCalendarContainer"
-import EventCalendarContainer from "@/components/EventCalendarContainer"
-import { auth } from "@clerk/nextjs/server"
+import dynamic from "next/dynamic";
+import { auth } from "@clerk/nextjs/server";
+const Announcements = dynamic(() => import("@/components/Announcements"), { ssr: false });
+const BigCalendarContainer = dynamic(() => import("@/components/BigCalendarContainer"), { ssr: false });
+const EventCalendarContainer = dynamic(() => import("@/components/EventCalendarContainer"), { ssr: false });
 
 const TeacherPage = async ({
     searchParams

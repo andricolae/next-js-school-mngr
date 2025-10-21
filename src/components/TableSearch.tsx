@@ -1,10 +1,11 @@
 'use client';
 
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import LoadingPopup from "@/components/LoadingPopup";
 import { useTransition } from "react";
+import dynamic from "next/dynamic";
+import ReactDOM from "react-dom";
+const LoadingPopup = dynamic(() => import("@/components/LoadingPopup"), { ssr: false });
 
 const TableSearch = () => {
     const router = useRouter();
@@ -31,7 +32,7 @@ const TableSearch = () => {
 
     return (
         <form onSubmit={(e) => e.preventDefault()} className="w-full md:w-auto flex items-center gap-2 text-xs rounded-full ring-[1.5px] ring-gray-300 px-2">
-            <Image src="/search.png" alt="" width={14} height={14} />
+            <img src="/search.svg" alt="" width={14} height={14} />
             <input
                 type="text"
                 placeholder="Căutare..."
@@ -39,7 +40,10 @@ const TableSearch = () => {
                 onChange={(e) => setSearch(e.target.value)}
                 className="w-[200px] p-2 bg-transparent outline-none"
             />
-            {isPending && <LoadingPopup />}
+            {isPending &&
+                typeof window !== "undefined" &&
+                ReactDOM.createPortal(<LoadingPopup />, document.getElementById("global-loading-root")!)
+            }
         </form>
     );
 };

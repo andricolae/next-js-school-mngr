@@ -1,17 +1,18 @@
-import FormContainer from "@/components/FormContainer"
-import Pagination from "@/components/Pagination"
-import TableSearch from "@/components/TableSearch"
-import SortButton from "@/components/SortButton"
-import prisma from "@/lib/prisma"
-import { ITEM_PER_PAGE } from "@/lib/settings"
-import { auth } from "@clerk/nextjs/server"
-import { Class, Lesson, Prisma, Subject, Teacher } from "@prisma/client"
+import dynamic from "next/dynamic";
+import prisma from "@/lib/prisma";
+import { ITEM_PER_PAGE } from "@/lib/settings";
+import { Lesson, Subject, Teacher, Class, Prisma } from "@prisma/client";
+import { auth } from "@clerk/nextjs/server";
 import { TokenData } from "@/lib/utils";
-import LessonFilterForm from "@/components/forms/LessonFilterForm";
 import { availableModules } from "@/lib/modules";
-import { deleteSelectedLessons } from "@/lib/actions"
-import BulkDeleteForm from "@/components/forms/BulkDeleteForm"
-import Table from "@/components/Table"
+import { deleteSelectedLessons } from "@/lib/actions";
+const FormContainer = dynamic(() => import("@/components/FormContainer"), { ssr: false });
+const Pagination = dynamic(() => import("@/components/Pagination"), { ssr: false });
+const Table = dynamic(() => import("@/components/Table"), { ssr: false });
+const TableSearch = dynamic(() => import("@/components/TableSearch"), { ssr: false });
+const SortButton = dynamic(() => import("@/components/SortButton"), { ssr: false });
+const BulkDeleteForm = dynamic(() => import("@/components/forms/BulkDeleteForm"), { ssr: false });
+const LessonFilterForm = dynamic(() => import("@/components/forms/LessonFilterForm"), { ssr: false });
 
 type LessonList = Lesson & { subject: Subject } & { class: Class } & { teacher: Teacher }
 

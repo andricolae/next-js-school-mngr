@@ -2,16 +2,18 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
-import InputField from "../InputField";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { AttendanceFormData, attendanceSchema } from "@/lib/formValidationSchemas";
 import { createAttendance, updateAttendance } from "@/lib/actions";
 import { useFormState } from "react-dom";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
-import LoadingPopup from "@/components/LoadingPopup";
 import { useTransition } from "react";
 import { MultiSelect } from "@/components/forms/FilterForm";
+import ReactDOM from "react-dom";
+import dynamic from "next/dynamic";
+const LoadingPopup = dynamic(() => import("@/components/LoadingPopup"), { ssr: false });
+const InputField = dynamic(() => import("@/components/InputField"), { ssr: false });
 
 const AttendanceForm = ({
     type,
@@ -62,10 +64,13 @@ const AttendanceForm = ({
     const router = useRouter();
 
     useEffect(() => {
+        if (!state) return;
         if (state.success) {
             toast(`Prezență ${type === "create" ? "adăugată" : "actualizată"} cu succes!`);
             setOpen(false);
-            router.refresh();
+            startTransition(() => {
+                router.refresh();
+            });
         }
         if (state.error) {
             const errorMessage = state.message || "Ceva nu a funcționat. Încearcă mai târziu.";
@@ -255,7 +260,10 @@ const AttendanceForm = ({
                     {type === "create" ? "Adaugă prezența" : "Actualizează prezența"}
                 </button>
             </div >
-            {isPending && <LoadingPopup />}
+            {isPending &&
+                typeof window !== "undefined" &&
+                ReactDOM.createPortal(<LoadingPopup />, document.getElementById("global-loading-root")!)
+            }
         </form >
     )
 };

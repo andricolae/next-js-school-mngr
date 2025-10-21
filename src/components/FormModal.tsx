@@ -2,14 +2,14 @@
 
 import { deleteAnnouncement, deleteAssignment, deleteAttendance, deleteClass, deleteEvent, deleteExam, deleteLesson, deleteParent, deleteResult, deleteStudent, deleteSubject, deleteTeacher } from "@/lib/actions";
 import dynamic from "next/dynamic";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useFormState } from "react-dom";
 import { toast } from "react-toastify";
-import { FormContainerProps } from "./FormContainer";
-import LoadingPopup from "@/components/LoadingPopup";
+import { FormContainerProps } from "@/components/FormContainer";
 import { useTransition } from "react";
+import ReactDOM from "react-dom";
+const LoadingPopup = dynamic(() => import("@/components/LoadingPopup"), { ssr: false });
 
 const deleteActionMap = {
     subject: deleteSubject,
@@ -149,10 +149,13 @@ const FormModal = ({ table, type, data, id, results, relatedData, title, student
         const translatedTable = tableMap[table] ?? table;
 
         useEffect(() => {
+            if (!state) return;
             if (state.success) {
                 toast(`${translatedTable} a fost șters cu succes!`);
                 setOpen(false);
-                router.refresh();
+                startTransition(() => {
+                    router.refresh();
+                });
             }
             if (state.error) {
                 toast(`${translatedTable} nu a putut fi șters.`);
@@ -165,7 +168,10 @@ const FormModal = ({ table, type, data, id, results, relatedData, title, student
                 <input type="text|number" name="id" value={id} hidden readOnly />
                 <span className="text-center font-medium">Toate datele vor fi pierdute. Ești sigur/ă că vrei să ștergi {translatedTable}?</span>
                 <button className="bg-red-600 text-white py-3 px-4 rounded-md border-none w-max self-center">Șterge</button>
-                {isPending && <LoadingPopup />}
+                {isPending &&
+                    typeof window !== "undefined" &&
+                    ReactDOM.createPortal(<LoadingPopup />, document.getElementById("global-loading-root")!)
+                }
             </form>
         ) : type === "create" || type === "update" ? (
             forms[table](setOpen, type, data, relatedData, student, results)
@@ -178,7 +184,7 @@ const FormModal = ({ table, type, data, id, results, relatedData, title, student
             onClick={() => { setOpen(true); }}
             title={title !== undefined ? `${title}` : type === "create" ? "Adaugă" : type === "delete" ? "Șterge" : "Editează"}
         >
-            {title !== undefined ? <div>{title}</div> : <Image src={`/${type}.png`} alt="" width={16} height={16} />}
+            {title !== undefined ? <div>{title}</div> : <img src={`/${type}.svg`} alt="" width={16} height={16} />}
         </button>
         {open && (
             <div className="w-screen h-screen absolute left-0 top-0 bg-black bg-opacity-60 z-50 flex items-center justify-center">
@@ -188,7 +194,7 @@ const FormModal = ({ table, type, data, id, results, relatedData, title, student
 
                     <Form />
                     <div className="absolute top-4 right-4 cursor-pointer" onClick={() => setOpen(false)}>
-                        <Image src="/close.png" alt="" width={14} height={14} />
+                        <img src="/close.svg" alt="" width={14} height={14} />
                     </div>
                 </div>
             </div>

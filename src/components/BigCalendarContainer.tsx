@@ -1,6 +1,7 @@
 import prisma from "@/lib/prisma";
-import BigCalendar from "./BigCalendar";
 import { adjustScheduleToCurrentWeek } from "@/lib/utils";
+import dynamic from "next/dynamic";
+const BigCalendar = dynamic(() => import("@/components/BigCalendar"), { ssr: false });
 
 const BigCalendarContainer = async (
     { type, id, }

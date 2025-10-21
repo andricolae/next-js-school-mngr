@@ -1,9 +1,10 @@
 "use client"
 
-import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
-import LoadingPopup from "@/components/LoadingPopup";
 import { useTransition } from "react";
+import dynamic from "next/dynamic";
+import ReactDOM from "react-dom";
+const LoadingPopup = dynamic(() => import("@/components/LoadingPopup"), { ssr: false });
 
 interface SortButtonProps {
     currentSort?: string;
@@ -31,13 +32,16 @@ const SortButton = ({ currentSort }: SortButtonProps) => {
 
     return (
         <>
-            {isPending && <LoadingPopup />}
+            {isPending &&
+                typeof window !== "undefined" &&
+                ReactDOM.createPortal(<LoadingPopup />, document.getElementById("global-loading-root")!)
+            }
             <button
                 className="w-8 h-8 flex items-center justify-center rounded-full bg-yellow hover:bg-yellow/80 transition-colors"
                 onClick={handleSort}
                 title={`Sort ${currentSort === "asc" ? "descending" : "ascending"}`}
             >
-                <Image src="/sort.png" alt="Sort" width={14} height={14} />
+                <img src="/sort.svg" alt="Sort" width={14} height={14} />
             </button>
         </>
     );

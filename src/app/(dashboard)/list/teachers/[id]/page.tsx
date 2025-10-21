@@ -1,13 +1,14 @@
-import Announcements from '@/components/Announcements'
-import BigCalendarContainer from '@/components/BigCalendarContainer'
-import FormContainer from '@/components/FormContainer'
-import prisma from '@/lib/prisma'
-import { auth } from '@clerk/nextjs/server'
-import { Teacher } from '@prisma/client'
-import Image from 'next/image'
-import Link from 'next/link'
-import { notFound } from 'next/navigation'
+import dynamic from "next/dynamic";
+import prisma from "@/lib/prisma";
+import Image from "next/image";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { auth } from "@clerk/nextjs/server";
 import { TokenData } from "@/lib/utils";
+import { Teacher } from "@prisma/client";
+const FormContainer = dynamic(() => import("@/components/FormContainer"), { ssr: false });
+const BigCalendarContainer = dynamic(() => import("@/components/BigCalendarContainer"), { ssr: false });
+const Announcements = dynamic(() => import("@/components/Announcements"), { ssr: false });
 
 const SingleTeacherPage = async ({
     params: { id },
@@ -46,8 +47,8 @@ const SingleTeacherPage = async ({
                 <div className="flex flex-col lg:flex-row gap-4">
                     <div className="bg-sky py-6 px-4 rounded-md flex-1 flex gap-4">
                         <div className="w-1/3">
-                            <Image
-                                src={teacher.img || "/noAvatar.png"}
+                            <img
+                                src={teacher.img || "/noAvatar.svg"}
                                 alt=""
                                 width={152}
                                 height={144}
@@ -66,15 +67,15 @@ const SingleTeacherPage = async ({
                             </div>
                             <div className="flex flex-col items-start gap-2 text-sm font-medium text-gray-600">
                                 <div className="flex items-center gap-3 w-full rounded-md hover:bg-gray-50 transition-colors">
-                                    <Image src="/date.png" alt="Date of birth" width={16} height={16} />
+                                    <img src="/date.svg" alt="Date of birth" width={16} height={16} />
                                     <span>{new Intl.DateTimeFormat("ro-RO").format(teacher.birthday)}</span>
                                 </div>
                                 <div className="flex items-center gap-3 w-full rounded-md hover:bg-gray-50 transition-colors">
-                                    <Image src="/mail.png" alt="Email" width={16} height={16} />
+                                    <img src="/mail.svg" alt="Email" width={16} height={16} />
                                     <span>{teacher.email || "-"}</span>
                                 </div>
                                 <div className="flex items-center gap-3 w-full rounded-md hover:bg-gray-50 transition-colors">
-                                    <Image src="/phone.png" alt="Phone" width={16} height={16} />
+                                    <img src="/phone.svg" alt="Phone" width={16} height={16} />
                                     <span>{teacher.phone || "-"}</span>
                                 </div>
                             </div>

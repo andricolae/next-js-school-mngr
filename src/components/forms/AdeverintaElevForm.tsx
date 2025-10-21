@@ -1,7 +1,7 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, SetStateAction, startTransition, useEffect, useState } from "react";
 import { assignmentSchema, AssignmentSchema } from "@/lib/formValidationSchemas";
 import { createAssignment, updateAssignment } from "@/lib/actions";
 import { useFormState } from "react-dom";
@@ -73,12 +73,14 @@ const AdeverintaElevForm = ({
     const router = useRouter();
 
     useEffect(() => {
+        if (!state) return;
         if (state.success) {
             toast(`Assignment has been ${type === "create" ? "created" : "updated"} successfully!`);
             setOpen(false);
-            router.refresh();
+            startTransition(() => {
+                router.refresh();
+            });
         }
-
         if (state.error) {
             const errorMessage = state.message || "Something went wrong!";
             setIsSubmitting(false);

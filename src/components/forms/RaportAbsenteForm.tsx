@@ -9,8 +9,10 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { generateRaportAbsentePDF } from "@/components/RaportAbsente";
 import { schoolData } from "@/lib/schoolData";
-import { useTransition } from "react"
-import LoadingPopup from "@/components/LoadingPopup";
+import { useTransition } from "react";
+import ReactDOM from "react-dom";
+import dynamic from "next/dynamic";
+const LoadingPopup = dynamic(() => import("@/components/LoadingPopup"), { ssr: false });
 
 const RaportAbsenteForm = ({
     type,
@@ -74,12 +76,14 @@ const RaportAbsenteForm = ({
     const router = useRouter();
 
     useEffect(() => {
+        if (!state) return;
         if (state.success) {
             toast(`Assignment has been ${type === "create" ? "created" : "updated"} successfully!`);
             setOpen(false);
-            router.refresh();
+            startTransition(() => {
+                router.refresh();
+            });
         }
-
         if (state.error) {
             const errorMessage = state.message || "Something went wrong!";
             setIsSubmitting(false);
@@ -147,7 +151,10 @@ const RaportAbsenteForm = ({
             >
                 {type === "create" ? "Descarca" : "Update"}
             </button>
-            {isPending && <LoadingPopup />}
+            {isPending &&
+                typeof window !== "undefined" &&
+                ReactDOM.createPortal(<LoadingPopup />, document.getElementById("global-loading-root")!)
+            }
         </form>
     )
 };

@@ -5,10 +5,10 @@ import {
     EventSchema, CreateExamSchema, UpdateExamSchema, UpdateLessonSchema, CreateLessonSchema, ParentSchema, ResultSchema,
     StudentSchema, SubjectSchema, TeacherSchema, AttendanceFormData
 } from "./formValidationSchemas";
-import prisma from "./prisma";
+import prisma from "@/lib/prisma";
 import { TokenData } from "@/lib/utils";
 import { Day } from "@prisma/client";
-import { translateClerkError } from "./clerkErrorMessage";
+import { translateClerkError } from "@/lib/clerkErrorMessage";
 
 type CurrentState = { success: boolean; error: boolean | string };
 export const createSubject = async (currentState: CurrentState, data: SubjectSchema) => {

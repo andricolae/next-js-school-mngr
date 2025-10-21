@@ -2,19 +2,21 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import InputField from "../InputField";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { CreateLessonSchema, createLessonSchema, updateLessonSchema } from "@/lib/formValidationSchemas";
 import { createLesson, updateLesson, createRecurringLessons } from "@/lib/actions";
 import { useFormState } from "react-dom";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
-import LoadingPopup from "@/components/LoadingPopup";
 import { useTransition } from "react";
 import { availableModules } from "@/lib/modules";
 import { nationalHolidays } from "@/lib/holidays";
 import { formatDateForInput } from "@/lib/utils";
 import z from "zod";
+import ReactDOM from "react-dom";
+import dynamic from "next/dynamic";
+const LoadingPopup = dynamic(() => import("@/components/LoadingPopup"), { ssr: false });
+const InputField = dynamic(() => import("@/components/InputField"), { ssr: false });
 
 type ModuleType = {
     id: number;
@@ -238,7 +240,9 @@ const LessonForm = ({
                     if (result && result.success > 0) {
                         toast.success(`Au fost create cu succes ${result.success} din ${result.total} ore recurente!`);
                         setOpen(false);
-                        router.refresh();
+                        startTransition(() => {
+                            router.refresh();
+                        });
                     } else {
                         toast.error("A intervenit o eroare la crearea orelor recurente. Încearcă mai târziu.");
                     }
@@ -264,7 +268,9 @@ const LessonForm = ({
         if (state.success && !isRecurring) {
             toast(`Oră ${type === "create" ? "creată" : "actualizată"} cu succes!`);
             setOpen(false);
-            router.refresh();
+            startTransition(() => {
+                router.refresh();
+            });
         }
     }, [state, router, type, setOpen, isRecurring]);
 
@@ -538,7 +544,10 @@ const LessonForm = ({
                     </button>
                 </div>
             </div>
-            {isPending && <LoadingPopup />}
+            {isPending &&
+                typeof window !== "undefined" &&
+                ReactDOM.createPortal(<LoadingPopup />, document.getElementById("global-loading-root")!)
+            }
         </form >
     );
 };

@@ -2,15 +2,17 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, Controller } from "react-hook-form";
-import InputField from "../InputField";
 import { subjectSchema, SubjectSchema } from "@/lib/formValidationSchemas";
 import { createSubject, updateSubject } from "@/lib/actions";
 import { useFormState } from "react-dom";
 import { Dispatch, SetStateAction, useEffect, useState, useRef } from "react";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
-import LoadingPopup from "@/components/LoadingPopup";
 import { useTransition } from "react";
+import ReactDOM from "react-dom";
+import dynamic from "next/dynamic";
+const LoadingPopup = dynamic(() => import("@/components/LoadingPopup"), { ssr: false });
+const InputField = dynamic(() => import("@/components/InputField"), { ssr: false });
 
 interface FilterOption {
     id: string;
@@ -219,12 +221,14 @@ const SubjectForm = ({
     const [isPending, startTransition] = useTransition();
 
     useEffect(() => {
+        if (!state) return;
         if (state.success) {
             toast(`Materie ${type === "create" ? "creată" : "actualizată"} cu succes!`);
             setOpen(false);
-            router.refresh();
+            startTransition(() => {
+                router.refresh();
+            });
         }
-
         if (state.error) {
             toast.error(state.message || "Ceva nu a funcționat. Încearcă mai târziu.");
             setIsSubmitting(false);
@@ -287,7 +291,10 @@ const SubjectForm = ({
                     {type === "create" ? "Adaugă" : "Actualizează"} materia
                 </button>
             </div>
-            {isPending && <LoadingPopup />}
+            {isPending &&
+                typeof window !== "undefined" &&
+                ReactDOM.createPortal(<LoadingPopup />, document.getElementById("global-loading-root")!)
+            }
         </form>
     );
 };

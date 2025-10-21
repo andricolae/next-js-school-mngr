@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma";
-import FinanceChart from "./FinanceChart";
+import dynamic from "next/dynamic";
+const FinanceChart = dynamic(() => import("@/components/FinanceChart"), { ssr: false });
 
 const FinanceChartContainer = async () => {
     const [studentCount, teacherCount, adminCount] = await Promise.all([

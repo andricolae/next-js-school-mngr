@@ -1,16 +1,17 @@
-import Announcements from '@/components/Announcements'
-import BigCalendarContainer from '@/components/BigCalendarContainer'
-import FormContainer from '@/components/FormContainer'
-import StudentAttendanceCard from '@/components/StudentAttendanceCard'
-import prisma from '@/lib/prisma'
-import { auth } from '@clerk/nextjs/server'
-import { Class, Prisma, Student } from '@prisma/client'
-import Image from 'next/image'
-import Link from 'next/link'
-import { notFound } from 'next/navigation'
-import { Suspense } from 'react'
+import dynamic from "next/dynamic";
+import prisma from "@/lib/prisma";
+import Image from "next/image";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { Student, Class, Prisma } from "@prisma/client";
+import { auth } from "@clerk/nextjs/server";
 import { TokenData } from "@/lib/utils";
-import FormModal from '@/components/FormModal'
+import { Suspense } from "react";
+const FormContainer = dynamic(() => import("@/components/FormContainer"), { ssr: false });
+const FormModal = dynamic(() => import("@/components/FormModal"), { ssr: false });
+const StudentAttendanceCard = dynamic(() => import("@/components/StudentAttendanceCard"), { ssr: false });
+const BigCalendarContainer = dynamic(() => import("@/components/BigCalendarContainer"), { ssr: false });
+const Announcements = dynamic(() => import("@/components/Announcements"), { ssr: false });
 
 const SingleStudentPage = async ({
     params: { id },
@@ -72,8 +73,8 @@ const SingleStudentPage = async ({
                 <div className="flex flex-col lg:flex-row gap-4">
                     <div className="bg-sky py-6 px-4 rounded-md flex-1 flex gap-4">
                         <div className="w-1/3">
-                            <Image
-                                src={student.img || "/noAvatar.png"}
+                            <img
+                                src={student.img || "/noAvatar.svg"}
                                 alt=""
                                 width={144}
                                 height={144}
@@ -91,15 +92,15 @@ const SingleStudentPage = async ({
                             </div>
                             <div className="flex flex-col items-start gap-2 text-sm font-medium text-gray-600">
                                 <div className="flex items-center gap-3 w-full rounded-md hover:bg-gray-50 transition-colors">
-                                    <Image src="/date.png" alt="Date of birth" width={16} height={16} />
+                                    <img src="/date.svg" alt="Date of birth" width={16} height={16} />
                                     <span>{new Intl.DateTimeFormat("ro-RO").format(student.birthday)}</span>
                                 </div>
                                 <div className="flex items-center gap-3 w-full rounded-md hover:bg-gray-50 transition-colors">
-                                    <Image src="/mail.png" alt="Email" width={16} height={16} />
+                                    <img src="/mail.svg" alt="Email" width={16} height={16} />
                                     <span>{student.email || "-"}</span>
                                 </div>
                                 <div className="flex items-center gap-3 w-full rounded-md hover:bg-gray-50 transition-colors">
-                                    <Image src="/phone.png" alt="Phone" width={16} height={16} />
+                                    <img src="/phone.svg" alt="Phone" width={16} height={16} />
                                     <span>{student.phone || "-"}</span>
                                 </div>
                             </div>
