@@ -175,10 +175,15 @@ const LessonListPage = async ({ searchParams }: { searchParams: { [key: string]:
         { subject: { name: "asc" } }
     ];
 
+    let whereClause = { ...query };
+
+    if (role === "teacher") {
+        whereClause.teacherId = currentUserId?.toString();
+    }
 
     const [data, count] = await prisma.$transaction([
         prisma.lesson.findMany({
-            where: query,
+            where: whereClause,
             include: {
                 subject: { select: { name: true } },
                 class: { select: { name: true } },
@@ -188,9 +193,8 @@ const LessonListPage = async ({ searchParams }: { searchParams: { [key: string]:
             take: ITEM_PER_PAGE,
             skip: ITEM_PER_PAGE * (p - 1)
         }),
-        prisma.lesson.count({ where: query })
+        prisma.lesson.count({ where: whereClause })
     ]);
-
 
     const title = hasSpecificFilters ? "Ore filtrate" : "Orele de azi";
     // const selectedIds = data.map(item => item.id);
