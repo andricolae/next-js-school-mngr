@@ -3,6 +3,7 @@ import { ITEM_PER_PAGE } from "@/lib/settings";
 import { Prisma } from "@prisma/client";
 import { auth } from "@clerk/nextjs/server";
 import { TokenData } from "@/lib/utils";
+import { availableModules } from "@/lib/modules";
 import dynamic from "next/dynamic";
 const Table = dynamic(() => import("@/components/Table"));
 const FormContainer = dynamic(() => import("@/components/FormContainer"));
@@ -28,14 +29,14 @@ type ResultList = {
 };
 
 
-const fetchModules = async () => {
+// const fetchModules = async () => {
 
-    return [
-        { id: "1", name: "Semester 1", startDate: "06/01/2025", endDate: "06/30/2025" },
-        { id: "2", name: "Semester 2", startDate: "07/01/2025", endDate: "07/31/2025" },
-        { id: "3", name: "Semester 3", startDate: "08/01/2025", endDate: "08/31/2025" }
-    ];
-};
+//     return [
+//         { id: "1", name: "Semester 1", startDate: "06/01/2025", endDate: "06/30/2025" },
+//         { id: "2", name: "Semester 2", startDate: "07/01/2025", endDate: "07/31/2025" },
+//         { id: "3", name: "Semester 3", startDate: "08/01/2025", endDate: "08/31/2025" }
+//     ];
+// };
 
 const ResultListPage = async ({
     searchParams,
@@ -50,7 +51,7 @@ const ResultListPage = async ({
     let role = tokenData?.userPblcMtdt?.role;
     const currentUserId = userId;
 
-    const modulesData = await fetchModules();
+    // const modulesData = await fetchModules();
 
 
     const [subjectsData, classesData, studentsData, teachersData] = await Promise.all([
@@ -265,15 +266,11 @@ const ResultListPage = async ({
 
                     case "moduleId":
                         const selectedModuleId = value;
-                        const selectedModule = modulesData.find(mod => mod.id === selectedModuleId);
+                        const selectedModule = availableModules.find(mod => mod.id.toString() === selectedModuleId);
 
                         if (selectedModule) {
-
-                            const [startMonth, startDay, startYear] = selectedModule.startDate.split('/');
-                            const [endMonth, endDay, endYear] = selectedModule.endDate.split('/');
-
-                            const moduleStartDate = new Date(parseInt(startYear), parseInt(startMonth) - 1, parseInt(startDay), 0, 0, 0, 0);
-                            const moduleEndDate = new Date(parseInt(endYear), parseInt(endMonth) - 1, parseInt(endDay), 23, 59, 59, 999);
+                            const moduleStartDate = new Date(selectedModule.startDate);
+                            const moduleEndDate = new Date(selectedModule.endDate);
 
 
                             andConditions.push({
@@ -519,7 +516,7 @@ const ResultListPage = async ({
                             classes={classes}
                             students={formattedStudents}
                             teachers={formattedTeachers}
-                            modules={modulesData}
+                            modules={availableModules}
                         />
 
                         <DownloadButton

@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useTransition } from "react";
 import ReactDOM from "react-dom";
 import dynamic from "next/dynamic";
+import { ModuleType } from "@/lib/modules";
 const LoadingPopup = dynamic(() => import("@/components/LoadingPopup"), { ssr: false });
 
 export interface FilterOption {
@@ -18,14 +19,7 @@ interface FilterFormProps {
     classes: FilterOption[];
     students: FilterOption[];
     teachers: FilterOption[];
-    modules: ModuleOption[];
-}
-
-interface ModuleOption {
-    id: string;
-    name: string;
-    startDate: string;
-    endDate: string;
+    modules: ModuleType[];
 }
 
 const SORT_DATE_OPTIONS = [
@@ -416,7 +410,7 @@ const FilterForm: React.FC<FilterFormProps> = ({
                                     <option value="">Selectează module</option>
                                     {modules.map((moduleOption) => (
                                         <option key={moduleOption.id} value={moduleOption.id}>
-                                            {moduleOption.name} (Starts: {moduleOption.startDate}, Ends: {moduleOption.endDate})
+                                            {moduleOption.name} (început: {moduleOption.startDate}, sfârșit: {moduleOption.endDate})
                                         </option>
                                     ))}
                                 </select>
