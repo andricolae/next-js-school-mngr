@@ -2,16 +2,18 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import InputField from "../InputField";
 import { eventSchema, EventSchema } from "@/lib/formValidationSchemas";
-import { Dispatch, SetStateAction, useEffect, useState } from "react"; // added useState
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useFormState } from "react-dom";
 import { useRouter } from "next/navigation";
 import { createEvent, updateEvent } from "@/lib/actions";
 import { toast } from "react-toastify";
-import LoadingPopup from "@/components/LoadingPopup";
 import { useTransition } from "react";
 import { formatDateForInput } from "@/lib/utils";
+import ReactDOM from "react-dom";
+import dynamic from "next/dynamic";
+const LoadingPopup = dynamic(() => import("@/components/LoadingPopup"), { ssr: false });
+const InputField = dynamic(() => import("@/components/InputField"), { ssr: false });
 
 const EventForm = ({
     type,
@@ -54,10 +56,13 @@ const EventForm = ({
     const router = useRouter();
 
     useEffect(() => {
+        if (!state) return;
         if (state.success) {
             toast(`Eveniment ${type === "create" ? "creat" : "actualizat"} cu succes!`);
             setOpen(false);
-            router.refresh();
+            startTransition(() => {
+                router.refresh();
+            });
         }
         if (state.error) {
             const errorMessage = state.message || "A apărut o eroare. Încearcă mai târziu.";
@@ -179,7 +184,10 @@ const EventForm = ({
                     {type === "create" ? "Adaugă eveniment" : "Actualizează evenimentul"}
                 </button>
             </div>
-            {isPending && <LoadingPopup />}
+            {isPending &&
+                typeof window !== "undefined" &&
+                ReactDOM.createPortal(<LoadingPopup />, document.getElementById("global-loading-root")!)
+            }
         </form>
     )
 };

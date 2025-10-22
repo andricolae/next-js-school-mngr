@@ -3,7 +3,9 @@
 import { ITEM_PER_PAGE } from "@/lib/settings";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
-import LoadingPopup from "@/components/LoadingPopup";
+import ReactDOM from "react-dom";
+import dynamic from "next/dynamic";
+const LoadingPopup = dynamic(() => import("@/components/LoadingPopup"), { ssr: false });
 
 
 const Pagination = ({ page, count }: { page: number; count: number }) => {
@@ -31,7 +33,10 @@ const Pagination = ({ page, count }: { page: number; count: number }) => {
             >
                 Înapoi
             </button>
-            {isPending && <LoadingPopup />}
+            {isPending &&
+                typeof window !== "undefined" &&
+                ReactDOM.createPortal(<LoadingPopup />, document.getElementById("global-loading-root")!)
+            }
             <div className="flex items-center gap-2">
                 {Array.from(
                     { length: Math.ceil(count / ITEM_PER_PAGE) },

@@ -1,8 +1,9 @@
 import prisma from "@/lib/prisma";
-import FormModal from "./FormModal";
 import { auth } from "@clerk/nextjs/server";
 import { TokenData } from "@/lib/utils";
-import { number } from "zod";
+// import { number } from "zod";
+import dynamic from "next/dynamic";
+const FormModal = dynamic(() => import("@/components/FormModal"), { ssr: false });
 
 export type FormContainerProps = {
     table:

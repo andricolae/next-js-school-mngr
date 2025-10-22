@@ -1,13 +1,14 @@
-import FormContainer from "@/components/FormContainer";
-import Pagination from "@/components/Pagination";
-import Table from "@/components/Table";
-import TableSearch from "@/components/TableSearch";
 import prisma from "@/lib/prisma";
 import { ITEM_PER_PAGE } from "@/lib/settings";
 import { Announcement, Class, Prisma } from "@prisma/client";
 import { auth } from "@clerk/nextjs/server";
-import SortButton from "@/components/SortButton";
 import { TokenData } from "@/lib/utils";
+import dynamic from "next/dynamic";
+const Table = dynamic(() => import("@/components/Table"));
+const FormContainer = dynamic(() => import("@/components/FormContainer"));
+const Pagination = dynamic(() => import("@/components/Pagination"), { ssr: false });
+const TableSearch = dynamic(() => import("@/components/TableSearch"), { ssr: false });
+const SortButton = dynamic(() => import("@/components/SortButton"), { ssr: false });
 
 type AnnouncementList = Announcement & { class: Class };
 const AnnouncementListPage = async ({
@@ -157,10 +158,10 @@ const AnnouncementListPage = async ({
                     <TableSearch />
                     <div className="flex items-center gap-4 self-end">
                         {/* <button className="w-8 h-8 flex items-center justify-center rounded-full bg-yellow">
-                            <Image src="/filter.png" alt="" width={14} height={14} />
+                            <img src="/filter.svg" alt="" width={14} height={14} />
                         </button> */}
                         {/* <button className="w-8 h-8 flex items-center justify-center rounded-full bg-yellow">
-                            <Image src="/sort.png" alt="" width={14} height={14} />
+                            <img src="/sort.svg" alt="" width={14} height={14} />
                         </button> */}
                         <SortButton currentSort={sort} />
                         {role === "admin" && (

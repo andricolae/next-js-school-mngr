@@ -1,9 +1,10 @@
-import Announcements from "@/components/Announcements"
-import BigCalendarContainer from "@/components/BigCalendarContainer";
-import EventCalendarContainer from "@/components/EventCalendarContainer";
+import dynamic from "next/dynamic";
 import prisma from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
+const Announcements = dynamic(() => import("@/components/Announcements"));
+const BigCalendarContainer = dynamic(() => import("@/components/BigCalendarContainer"));
+const EventCalendarContainer = dynamic(() => import("@/components/EventCalendarContainer"));
 
 const ParentPage = async ({
     searchParams

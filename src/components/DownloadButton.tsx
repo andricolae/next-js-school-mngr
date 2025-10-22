@@ -1,6 +1,5 @@
 "use client";
 import React from 'react';
-import Image from "next/image";
 import { GenerateResultsPDF } from "@/components/ExportPDF";
 import { ResultItemForPdf } from '@/lib/sharedInterfaces';
 
@@ -29,9 +28,9 @@ const DownloadButton: React.FC<DownloadButtonProps> = ({
         <button
             className="w-8 h-8 flex items-center justify-center rounded-full bg-yellow"
             onClick={handleDownloadPdf}
-            title="Descarca"
+            title="Descarcă"
         >
-            <Image src="/download.png" alt="Download PDF" width={19} height={19} />
+            <img src="/download.svg" alt="Download PDF" width={19} height={19} />
         </button>
     );
 };

@@ -1,5 +1,7 @@
-import EventCalendar from "./EventCalendar"
-import EventList from "./EventList"
+import dynamic from "next/dynamic";
+const EventCalendar = dynamic(() => import("@/components/EventCalendar"), { ssr: false });
+const EventList = dynamic(() => import("@/components/EventList"));
+
 const EventCalendarContainer = async ({
     searchParams
 }: {
@@ -13,7 +15,7 @@ const EventCalendarContainer = async ({
             <EventCalendar />
             <div className="flex items-center justify-between">
                 <h1 className="text-xl font-semibold my-4">Evenimente</h1>
-                {/* <Image src="/moreDark.png" alt="" width={20} height={20} /> */}
+                {/* <img src="/moreDark.svg" alt="" width={20} height={20} /> */}
             </div>
             <div className="flex flex-col gap-4">
                 <EventList dateParam={date} />

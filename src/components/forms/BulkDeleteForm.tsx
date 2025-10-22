@@ -1,16 +1,19 @@
 "use client";
 
 import { useEffect, useState, useTransition } from "react";
-import Image from "next/image";
 import { useFormState } from "react-dom";
 import { toast } from "react-toastify";
-import LoadingPopup from "@/components/LoadingPopup";
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
+import ReactDOM from "react-dom";
+const LoadingPopup = dynamic(() => import("@/components/LoadingPopup"), { ssr: false });
 
 type DeleteLessonsState = {
     success: boolean;
     error: boolean | string;
 };
+
+const TABLE_MAP: Record<string, string> = { lesson: "ore" };
 
 const BulkDeleteForm = ({
     formActionWrapper,
@@ -53,18 +56,17 @@ const BulkDeleteForm = ({
 
     const router = useRouter();
 
-    const tableMap: Record<string, string> = {
-        lesson: "ore"
-    };
-
-    const translatedTable = tableMap[table] ?? table;
+    const translatedTable = TABLE_MAP[table] ?? table;
 
     useEffect(() => {
+        if (!state) return;
         if (state?.success) {
             toast(`Lecțiile au fost șterse cu succes!`);
             setSelectedIds([]);
             setOpen(false);
-            router.refresh();
+            startTransition(() => {
+                router.refresh();
+            });
         }
         if (state?.error === "P2003") {
             setError("Orele asociate cu alte informații școlare nu pot fi șterse!");
@@ -81,7 +83,7 @@ const BulkDeleteForm = ({
                 onClick={handleOpen}
                 title="Șterge lecțiile selectate"
             >
-                <Image src={`/delete.png`} alt="Sterge" width={16} height={16} />
+                <img src="/delete.svg" alt="Sterge" width={16} height={16} />
             </button>
 
             {open && (
@@ -94,7 +96,7 @@ const BulkDeleteForm = ({
                             className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
                             aria-label="Close"
                         >
-                            <Image src={`/close.png`} alt="" width={16} height={16} />
+                            <img src="/close.svg" alt="" width={16} height={16} />
                         </button>
 
                         <form action={formActionWithTransition} className="flex flex-col gap-4">
@@ -128,7 +130,10 @@ const BulkDeleteForm = ({
                                 </span>
                             )}
 
-                            {isPending && <LoadingPopup />}
+                            {isPending &&
+                                typeof window !== "undefined" &&
+                                ReactDOM.createPortal(<LoadingPopup />, document.getElementById("global-loading-root")!)
+                            }
                         </form>
                     </div>
                 </div>

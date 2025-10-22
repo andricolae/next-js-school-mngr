@@ -2,15 +2,17 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import InputField from "../InputField";
 import { classSchema, ClassSchema } from "@/lib/formValidationSchemas";
 import { createClass, updateClass } from "@/lib/actions";
 import { useFormState } from "react-dom";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
-import LoadingPopup from "@/components/LoadingPopup";
 import { useTransition } from "react";
+import ReactDOM from "react-dom";
+import dynamic from "next/dynamic";
+const LoadingPopup = dynamic(() => import("@/components/LoadingPopup"), { ssr: false });
+const InputField = dynamic(() => import("@/components/InputField"), { ssr: false });
 
 const ClassForm = ({
     type,
@@ -55,12 +57,14 @@ const ClassForm = ({
     const router = useRouter();
 
     useEffect(() => {
+        if (!state) return;
         if (state.success) {
             toast(`Clasă ${type === "create" ? "creată" : "actualizată"} cu succes!`);
             setOpen(false);
-            router.refresh();
+            startTransition(() => {
+                router.refresh();
+            });
         }
-
         if (state.error) {
             toast.error(state.message || "Ceva nu a funcționat. Încearcă mai târziu.");
             setIsSubmitting(false);
@@ -161,7 +165,10 @@ const ClassForm = ({
                     {type === "create" ? "Adaugă clasa" : "Actualizează clasa"}
                 </button>
             </div>
-            {isPending && <LoadingPopup />}
+            {isPending &&
+                typeof window !== "undefined" &&
+                ReactDOM.createPortal(<LoadingPopup />, document.getElementById("global-loading-root")!)
+            }
         </form>
     );
 };

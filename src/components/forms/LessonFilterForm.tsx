@@ -1,12 +1,12 @@
-// components/forms/LessonFilterForm.tsx
 "use client";
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import Image from "next/image";
-import { ModuleType } from "@/lib/modules"; // Asigură-te că acest import este corect și că fișierul lib/modules.ts există
-import LoadingPopup from "@/components/LoadingPopup";
+import { ModuleType } from "@/lib/modules";
 import { useTransition } from "react";
+import ReactDOM from "react-dom";
+import dynamic from "next/dynamic";
+const LoadingPopup = dynamic(() => import("@/components/LoadingPopup"), { ssr: false });
 
 interface FilterOption {
     id: string;
@@ -18,7 +18,7 @@ interface LessonFilterFormProps {
     subjects: FilterOption[];
     classes: FilterOption[];
     teachers: FilterOption[];
-    modules: ModuleType[]; // <--- Props-ul nou pentru module
+    modules: ModuleType[];
 }
 
 interface MultiSelectProps {
@@ -284,14 +284,17 @@ const LessonFilterForm: React.FC<LessonFilterFormProps> = ({
                 className="w-8 h-8 flex items-center justify-center rounded-full bg-yellow relative"
                 onClick={() => setIsOpen(true)}
             >
-                <Image src="/filter.png" alt="Filter" width={14} height={14} />
+                <img src="/filter.svg" alt="Filter" width={14} height={14} />
                 {activeFiltersCount > 0 && (
                     <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                         {activeFiltersCount}
                     </span>
                 )}
             </button>
-            {isPending && <LoadingPopup />}
+            {isPending &&
+                typeof window !== "undefined" &&
+                ReactDOM.createPortal(<LoadingPopup />, document.getElementById("global-loading-root")!)
+            }
 
             {isOpen && (
                 <div className="filter-modal-overlay fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -309,7 +312,7 @@ const LessonFilterForm: React.FC<LessonFilterFormProps> = ({
                                 className="filter-modal-close-button text-gray-500 hover:text-gray-700"
                                 onClick={() => setIsOpen(false)}
                             >
-                                <Image src="/close.png" alt="Close" width={16} height={16} />
+                                <img src="/close.svg" alt="Close" width={16} height={16} />
                             </button>
                         </div>
 

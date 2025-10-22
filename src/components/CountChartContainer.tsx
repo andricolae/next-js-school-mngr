@@ -1,6 +1,6 @@
 import prisma from "@/lib/prisma";
-import CountChart from "./CountChart"
-import Image from "next/image";
+import dynamic from "next/dynamic";
+const CountChart = dynamic(() => import("@/components/CountChart"), { ssr: false });
 
 const CountChartContainer = async () => {
 
@@ -17,7 +17,7 @@ const CountChartContainer = async () => {
         <div className="bg-white rounded-xl w-full h-full p-4">
             <div className="flex justify-between items-center">
                 <h1 className="text-lg font-semibold">Elevi</h1>
-                {/* <Image src="/moreDark.png" alt="" width={20} height={20} /> */}
+                {/* <img src="/moreDark.svg" alt="" width={20} height={20} /> */}
             </div>
             <CountChart girls={girls} others={others} boys={boys} />
             <div className="flex justify-center gap-16">

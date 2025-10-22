@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { nationalHolidays } from "./holidays";
-import { availableModules } from "./modules";
+import { nationalHolidays } from "@/lib/holidays";
+import { availableModules } from "@/lib/modules";
 
 export const subjectSchema = z.object({
     id: z.coerce.number().optional(),
