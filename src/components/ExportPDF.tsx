@@ -101,7 +101,7 @@ function addProfessionalHeader(doc: jsPDF, headerDetails?: PdfHeaderDetails) {
     doc.setFillColor(...[20, 43, 94]);
     doc.rect(0, 0, doc.internal.pageSize.width, 35, 'F');
 
-    doc.addImage(imgData, "PNG", 17, 10, 16, 16); 
+    doc.addImage(imgData, "PNG", 17, 10, 16, 16);
 
     doc.setTextColor(...[255, 255, 255]);
     doc.setFontSize(20);

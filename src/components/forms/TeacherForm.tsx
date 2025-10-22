@@ -1,7 +1,6 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, Controller } from "react-hook-form";
-import InputField from "../InputField";
 import Image from "next/image";
 import { Dispatch, SetStateAction, useEffect, useState, useRef } from "react";
 import { teacherSchema, TeacherSchema } from "@/lib/formValidationSchemas";
@@ -10,10 +9,12 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { useFormState } from "react-dom";
 import { CldUploadWidget } from "next-cloudinary";
-import LoadingPopup from "@/components/LoadingPopup";
 import { useTransition } from "react";
-import InputFieldPassword from "@/components/InputFieldPassword";
-import { formatDateForInput } from "@/lib/utils";
+import ReactDOM from "react-dom";
+import dynamic from "next/dynamic";
+const LoadingPopup = dynamic(() => import("@/components/LoadingPopup"), { ssr: false });
+const InputField = dynamic(() => import("@/components/InputField"), { ssr: false });
+const InputFieldPassword = dynamic(() => import("@/components/InputFieldPassword"), { ssr: false });
 
 interface FilterOption {
     id: string;
@@ -231,10 +232,13 @@ const TeacherForm = ({
     const [isPending, startTransition] = useTransition();
 
     useEffect(() => {
+        if (!state) return;
         if (state.success) {
             toast(`Profesor ${type === "create" ? "adăugat" : "actualizat"} cu succes!`);
             setOpen(false);
-            router.refresh();
+            startTransition(() => {
+                router.refresh();
+            });
         } else if (state.error) {
             const errorMessage = state.message || "Ceva nu a funcționat. Încearcă mai târziu.";
             toast.error(errorMessage);
@@ -308,8 +312,8 @@ const TeacherForm = ({
                         Încarcă o imagine
                     </label>
                     <div className="flex items-center gap-2">
-                        <Image
-                            src="/upload.png"
+                        <img
+                            src="/upload.svg"
                             alt="upload icon"
                             width={20}
                             height={20}
@@ -427,7 +431,10 @@ const TeacherForm = ({
                 </button>
             </div>
 
-            {isPending && <LoadingPopup />}
+            {isPending &&
+                typeof window !== "undefined" &&
+                ReactDOM.createPortal(<LoadingPopup />, document.getElementById("global-loading-root")!)
+            }
 
             <CldUploadWidget
                 uploadPreset="school-mgmt"

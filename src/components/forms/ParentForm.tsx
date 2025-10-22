@@ -1,16 +1,18 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import InputField from "../InputField";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { parentSchema, ParentSchema } from "@/lib/formValidationSchemas";
 import { createParent, updateParent } from "@/lib/actions";
 import { useFormState } from "react-dom";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
-import LoadingPopup from "@/components/LoadingPopup";
 import { useTransition } from "react";
-import InputFieldPassword from "@/components/InputFieldPassword";
+import ReactDOM from "react-dom";
+import dynamic from "next/dynamic";
+const LoadingPopup = dynamic(() => import("@/components/LoadingPopup"), { ssr: false });
+const InputField = dynamic(() => import("@/components/InputField"), { ssr: false });
+const InputFieldPassword = dynamic(() => import("@/components/InputFieldPassword"), { ssr: false });
 
 const ParentForm = ({
     type,
@@ -59,10 +61,13 @@ const ParentForm = ({
     const router = useRouter();
 
     useEffect(() => {
+        if (!state) return;
         if (state.success) {
             toast(`Părinte ${type === "create" ? "adăugat" : "actualizat"} cu succes!`);
             setOpen(false);
-            router.refresh();
+            startTransition(() => {
+                router.refresh();
+            });
         }
         if (state.error) {
             const errorMessage = state.message || "Ceva nu a funcționat. Încearcă mai târziu.";
@@ -159,7 +164,10 @@ const ParentForm = ({
                     {type === "create" ? "Adaugă" : "Actualizează"} părinte
                 </button>
             </div>
-            {isPending && <LoadingPopup />}
+            {isPending &&
+                typeof window !== "undefined" &&
+                ReactDOM.createPortal(<LoadingPopup />, document.getElementById("global-loading-root")!)
+            }
         </form>
     );
 };

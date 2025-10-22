@@ -1,8 +1,8 @@
 "use client"
 
 import { useState } from "react";
-import Image from "next/image";
-import BulkAttendanceMarker from "./BulkAttendanceMarker";
+import dynamic from "next/dynamic";
+const BulkAttendanceMarker = dynamic(() => import("@/components/BulkAttendanceMarker"), { ssr: false });
 
 type Lesson = {
     id: number;
@@ -21,7 +21,7 @@ const BulkAttendanceModal = ({ lessons }: { lessons: Lesson[] }) => {
                 onClick={() => setIsOpen(true)}
                 className="bg-blue-300 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-400 flex items-center gap-2"
             >
-                <Image src="/calendar.png" alt="" width={16} height={16} />
+                <img src="/calendar.svg" alt="" width={16} height={16} />
                 Marchează prezența pe clasă
             </button>
 

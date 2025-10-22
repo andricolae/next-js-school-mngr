@@ -8,6 +8,8 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useTransition } from "react";
+import dynamic from "next/dynamic";
+const LoadingPopup = dynamic(() => import("@/components/LoadingPopup"), { ssr: false });
 
 const LoginPage = () => {
     const { isLoaded, isSignedIn, user } = useUser();
@@ -51,7 +53,7 @@ const LoginPage = () => {
             <div className='h-screen flex items-center justify-center bg-slate-100'>
                 <div className="flex items-center gap-2">
                     <Image src="/logo.png" alt="logo" width={32} height={32} />
-                    <span className="text-gray-600">Se încarcă...</span>
+                    <LoadingPopup />
                 </div>
             </div>
         )

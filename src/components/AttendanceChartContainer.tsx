@@ -1,5 +1,7 @@
 import prisma from "@/lib/prisma"
-import AttendanceChart from "./AttendanceChart"
+import dynamic from "next/dynamic";
+const AttendanceChart = dynamic(() => import("@/components/AttendanceChart"), { ssr: false });
+
 const AttendanceChartContainer = async () => {
 
     const today = new Date();
@@ -61,7 +63,7 @@ const AttendanceChartContainer = async () => {
         <div className='bg-white rounded-lg p-4 h-full'>
             <div className='flex justify-between items-center'>
                 <h1 className='text-lg font-semibold'>Prezențe</h1>
-                {/* <Image src="/moreDark.png" alt="" width={20} height={20} /> */}
+                {/* <img src="/moreDark.svg" alt="" width={20} height={20} /> */}
             </div>
             <AttendanceChart data={data} />
         </div>

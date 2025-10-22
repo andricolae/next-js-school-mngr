@@ -2,85 +2,84 @@
 
 import { useAuth } from "@clerk/nextjs";
 import { usePathname } from 'next/navigation';
-import Image from "next/image";
 import Link from "next/link";
 import { TokenData } from "@/lib/utils";
 
 const menuItems = [
     {
-        icon: "/home.png",
+        icon: "/home.svg",
         label: "Acasă",
         href: "/",
         visible: ["admin", "teacher", "student", "parent"],
     },
     {
-        icon: "/teacher.png",
+        icon: "/teacher.svg",
         label: "Profesori",
         href: "/list/teachers",
         visible: ["admin", "teacher"],
     },
     {
-        icon: "/class.png",
+        icon: "/class.svg",
         label: "Clase",
         href: "/list/classes",
         visible: ["admin", "teacher"],
     },
     {
-        icon: "/parent.png",
+        icon: "/parent.svg",
         label: "Părinți",
         href: "/list/parents",
         visible: ["admin", "teacher"],
     },
     {
-        icon: "/student.png",
+        icon: "/student.svg",
         label: "Elevi",
         href: "/list/students",
         visible: ["admin", "teacher"],
     },
     {
-        icon: "/subject.png",
+        icon: "/subject.svg",
         label: "Materii",
         href: "/list/subjects",
         visible: ["admin"],
     },
     {
-        icon: "/lesson.png",
+        icon: "/lesson.svg",
         label: "Ore",
         href: "/list/lessons",
         visible: ["admin", "teacher"],
     },
     {
-        icon: "/exam.png",
+        icon: "/exam.svg",
         label: "Teste",
         href: "/list/exams",
         visible: ["admin", "teacher", "student", "parent"],
     },
     {
-        icon: "/assignment.png",
+        icon: "/assignment.svg",
         label: "Teme",
         href: "/list/assignments",
         visible: ["admin", "teacher", "student", "parent"],
     },
     {
-        icon: "/result.png",
+        icon: "/result.svg",
         label: "Rezultate",
         href: "/list/results",
         visible: ["admin", "teacher", "student", "parent"],
     },
     {
-        icon: "/attendance.png",
+        icon: "/attendance.svg",
         label: "Prezență",
         href: "/list/attendance",
         visible: ["admin", "teacher", "student", "parent"],
     },
     {
-        icon: "/calendar.png",
+        icon: "/calendar.svg",
         label: "Evenimente",
         href: "/list/events",
         visible: ["admin", "teacher", "student", "parent"],
     },
     {
-        icon: "/announcement.png",
+        icon: "/announcement.svg",
         label: "Anunțuri",
         href: "/list/announcements",
         visible: ["admin", "teacher", "student", "parent"],
@@ -121,7 +120,7 @@ const Menu = () => {
                                     : "text-gray-500 hover:bg-skyLight"
                                     }`}
                             >
-                                <Image src={item.icon} alt="" width={20} height={20} title={item.label} />
+                                <img src={item.icon} alt="" width={20} height={20} title={item.label} />
                                 <span className="hidden lg:block">{item.label}</span>
                             </Link>
                         </div>

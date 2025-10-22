@@ -3,9 +3,10 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
-import Image from "next/image";
 import { useTransition } from "react";
-import LoadingPopup from "@/components/LoadingPopup";
+import ReactDOM from "react-dom";
+import dynamic from "next/dynamic";
+const LoadingPopup = dynamic(() => import("@/components/LoadingPopup"), { ssr: false });
 
 type Student = {
     id: string;
@@ -123,7 +124,9 @@ const BulkAttendanceMarker = ({
             if (response.ok) {
                 toast.success('Statusul prezenței a fost marcat cu succes!');
                 onClose();
-                router.refresh();
+                startTransition(() => {
+                    router.refresh();
+                });
             } else {
                 throw new Error('A apărut o eroare la trimiterea prezenței!');
             }
@@ -161,7 +164,7 @@ const BulkAttendanceMarker = ({
                     onClick={onClose}
                     className="p-2 hover:bg-gray-100 rounded-full"
                 >
-                    <Image src="/close.png" alt="Close" width={16} height={16} />
+                    <img src="/close.svg" alt="Close" width={16} height={16} />
                 </button>
             </div>
 
@@ -194,7 +197,10 @@ const BulkAttendanceMarker = ({
                             </option>
                         ))}
                     </select>
-                    {isPending && <LoadingPopup />}
+                    {isPending &&
+                        typeof window !== "undefined" &&
+                        ReactDOM.createPortal(<LoadingPopup />, document.getElementById("global-loading-root")!)
+                    }
                 </div>
             </div>
 

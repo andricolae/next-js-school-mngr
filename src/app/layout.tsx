@@ -20,7 +20,10 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en">
-        <body className={inter.className}>{children} <ToastContainer position="bottom-right" theme="light" /></body>
+        <body className={inter.className}>{children} 
+            <ToastContainer position="bottom-right" theme="light" />
+            <div id="global-loading-root" />
+        </body>
       </html>
     </ClerkProvider>
   );

@@ -1,13 +1,14 @@
-import FormContainer from "@/components/FormContainer"
-import Pagination from "@/components/Pagination"
-import Table from "@/components/Table"
-import TableSearch from "@/components/TableSearch"
-import SortButton from "@/components/SortButton"
-import prisma from "@/lib/prisma"
-import { ITEM_PER_PAGE } from "@/lib/settings"
-import { auth } from "@clerk/nextjs/server"
-import { Prisma, Subject, Teacher } from "@prisma/client"
+import prisma from "@/lib/prisma";
+import { ITEM_PER_PAGE } from "@/lib/settings";
+import { Subject, Teacher, Prisma } from "@prisma/client";
+import { auth } from "@clerk/nextjs/server";
 import { TokenData } from "@/lib/utils";
+import dynamic from "next/dynamic";
+const Table = dynamic(() => import("@/components/Table"));
+const FormContainer = dynamic(() => import("@/components/FormContainer"));
+const Pagination = dynamic(() => import("@/components/Pagination"), { ssr: false });
+const TableSearch = dynamic(() => import("@/components/TableSearch"), { ssr: false });
+const SortButton = dynamic(() => import("@/components/SortButton"), { ssr: false });
 
 type SubjectList = Subject & { teachers: Teacher[] }
 
