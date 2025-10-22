@@ -90,7 +90,7 @@ const StudentListPage = async ({ searchParams }: { searchParams: { [key: string]
     const { page, sort, ...queryParams } = searchParams;
     const p = page ? parseInt(page) : 1;
 
-    const query: Prisma.StudentWhereInput = {}
+    let query: Prisma.StudentWhereInput = {}
 
     if (queryParams) {
         for (const [key, value] of Object.entries(queryParams)) {
@@ -135,6 +135,19 @@ const StudentListPage = async ({ searchParams }: { searchParams: { [key: string]
         orderBy = sort === "asc"
             ? { name: "asc" }
             : { name: "desc" };
+    }
+
+    if (role === "teacher") {
+        query = {
+            ...query,
+            class: {
+                lessons: {
+                    some: {
+                        teacherId: currentUserId?.toString(),
+                    },
+                },
+            },
+        };
     }
 
     const [data, count] = await prisma.$transaction([

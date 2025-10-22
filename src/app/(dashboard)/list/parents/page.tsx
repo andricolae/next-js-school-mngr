@@ -75,7 +75,7 @@ const ParentListPage = async ({ searchParams }: { searchParams: { [key: string]:
     const { page, sort, ...queryParams } = searchParams;
     const p = page ? parseInt(page) : 1;
 
-    const query: Prisma.ParentWhereInput = {}
+    let query: Prisma.ParentWhereInput = {}
 
     if (queryParams) {
         for (const [key, value] of Object.entries(queryParams)) {
@@ -106,6 +106,23 @@ const ParentListPage = async ({ searchParams }: { searchParams: { [key: string]:
         orderBy = sort === "asc"
             ? { name: "asc" }
             : { name: "desc" };
+    }
+
+    if (role === "teacher") {
+        query = {
+            ...query,
+            students: {
+                some: {
+                    class: {
+                        lessons: {
+                            some: {
+                                teacherId: currentUserId?.toString()
+                            }
+                        }
+                    }
+                }
+            }
+        };
     }
 
     const [data, count] = await prisma.$transaction([
