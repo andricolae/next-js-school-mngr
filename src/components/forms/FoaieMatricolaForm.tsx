@@ -8,7 +8,7 @@ import { useFormState } from "react-dom";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { generateTranscriptPDF } from "@/components/FoaieMatricola";
-import { FilterOption, MultiSelect } from "@/components/forms/FilterForm";
+import { FilterOption, MultiSelect } from "@/components/forms/ResultsFilterForm";
 
 type ResultItem = {
     score: number;
