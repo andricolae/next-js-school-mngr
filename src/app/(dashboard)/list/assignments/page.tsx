@@ -10,7 +10,7 @@ const FormContainer = dynamic(() => import("@/components/FormContainer"));
 const Pagination = dynamic(() => import("@/components/Pagination"), { ssr: false });
 const TableSearch = dynamic(() => import("@/components/TableSearch"), { ssr: false });
 const SortButton = dynamic(() => import("@/components/SortButton"), { ssr: false });
-const AssignmentFilterForm = dynamic(() => import("@/components/forms/AssignmentFilterForm"), { ssr: false });
+const AssignmentFilterForm = dynamic(() => import("@/components/forms/FilterForm"), { ssr: false });
 
 const AssignmentListPage = async ({ searchParams }: { searchParams: { [key: string]: string | undefined } }) => {
 

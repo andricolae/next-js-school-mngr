@@ -9,7 +9,7 @@ import { useFormState } from "react-dom";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { useTransition } from "react";
-import { MultiSelect } from "@/components/forms/FilterForm";
+import { MultiSelect } from "@/components/forms/ResultsFilterForm";
 import ReactDOM from "react-dom";
 import dynamic from "next/dynamic";
 const LoadingPopup = dynamic(() => import("@/components/LoadingPopup"), { ssr: false });

@@ -10,7 +10,7 @@ import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { formatDateForInput } from "@/lib/utils";
-import { MultiSelect } from "@/components/forms/FilterForm";
+import { MultiSelect } from "@/components/forms/ResultsFilterForm";
 import z from "zod";
 import ReactDOM from "react-dom";
 import dynamic from "next/dynamic";

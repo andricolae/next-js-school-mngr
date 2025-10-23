@@ -10,7 +10,7 @@ const FormContainer = dynamic(() => import("@/components/FormContainer"));
 const Pagination = dynamic(() => import("@/components/Pagination"), { ssr: false });
 const TableSearch = dynamic(() => import("@/components/TableSearch"), { ssr: false });
 const SortButton = dynamic(() => import("@/components/SortButton"), { ssr: false });
-const ExamFilterForm = dynamic(() => import("@/components/forms/ExamFilterForm"), { ssr: false });
+const FilterForm = dynamic(() => import("@/components/forms/FilterForm"), { ssr: false });
 
 const ExamListPage = async ({ searchParams }: { searchParams: { [key: string]: string | undefined } }) => {
 
@@ -269,7 +269,7 @@ const ExamListPage = async ({ searchParams }: { searchParams: { [key: string]: s
                     <TableSearch />
                     <div className='flex items-center gap-4 self-end'>
                         <SortButton currentSort={sort} />
-                        <ExamFilterForm
+                        <FilterForm
                             currentFilters={searchParams}
                             classes={classes}
                             teachers={formattedTeachers}
