@@ -410,7 +410,7 @@ const FilterForm: React.FC<FilterFormProps> = ({
                                     <option value="">Selectează module</option>
                                     {modules.map((moduleOption) => (
                                         <option key={moduleOption.id} value={moduleOption.id}>
-                                            {moduleOption.name} (început: {moduleOption.startDate}, sfârșit: {moduleOption.endDate})
+                                            {moduleOption.name} ({new Date(moduleOption.startDate).toLocaleDateString("ro-RO")} - {new Date(moduleOption.endDate).toLocaleDateString("ro-RO")})
                                         </option>
                                     ))}
                                 </select>

@@ -13,7 +13,7 @@ interface FilterOption {
     name: string;
 }
 
-interface LessonFilterFormProps {
+interface AssignmentFilterFormProps {
     currentFilters: { [key: string]: string | undefined };
     subjects: FilterOption[];
     classes: FilterOption[];
@@ -189,7 +189,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
     );
 };
 
-const LessonFilterForm: React.FC<LessonFilterFormProps> = ({
+const AssignmentFilterForm: React.FC<AssignmentFilterFormProps> = ({
     currentFilters,
     subjects,
     classes,
@@ -391,4 +391,4 @@ const LessonFilterForm: React.FC<LessonFilterFormProps> = ({
     );
 };
 
-export default LessonFilterForm;
+export default AssignmentFilterForm;

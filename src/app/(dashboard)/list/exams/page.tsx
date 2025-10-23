@@ -4,11 +4,13 @@ import { Prisma } from "@prisma/client";
 import { auth } from "@clerk/nextjs/server";
 import { TokenData } from "@/lib/utils";
 import dynamic from "next/dynamic";
+import { availableModules } from "@/lib/modules";
 const Table = dynamic(() => import("@/components/Table"));
 const FormContainer = dynamic(() => import("@/components/FormContainer"));
 const Pagination = dynamic(() => import("@/components/Pagination"), { ssr: false });
 const TableSearch = dynamic(() => import("@/components/TableSearch"), { ssr: false });
 const SortButton = dynamic(() => import("@/components/SortButton"), { ssr: false });
+const ExamFilterForm = dynamic(() => import("@/components/forms/ExamFilterForm"), { ssr: false });
 
 const ExamListPage = async ({ searchParams }: { searchParams: { [key: string]: string | undefined } }) => {
 
@@ -19,6 +21,16 @@ const ExamListPage = async ({ searchParams }: { searchParams: { [key: string]: s
     }
     let role = tokenData?.userPblcMtdt?.role;
     const currentUserId = userId;
+
+    const [classesData, teachersData, subjectsData] = await Promise.all([
+        prisma.class.findMany({ select: { id: true, name: true } }),
+        prisma.teacher.findMany({ select: { id: true, name: true, surname: true } }),
+        prisma.subject.findMany({ select: { id: true, name: true } })
+    ]);
+
+    const classes = classesData.map(c => ({ id: String(c.id), name: c.name }));
+    const formattedTeachers = teachersData.map(t => ({ id: t.id, name: `${t.name} ${t.surname}` }));
+    const subjects = subjectsData.map(s => ({ id: String(s.id), name: s.name }));
 
     const columns = [
         {
@@ -77,69 +89,96 @@ const ExamListPage = async ({ searchParams }: { searchParams: { [key: string]: s
     const { page, sort, ...queryParams } = searchParams;
     const p = page ? parseInt(page) : 1;
 
-    const query: Prisma.ExamWhereInput = {}
-    query.lesson = {};
+    const queryConditions: Prisma.ExamWhereInput[] = [];
 
     if (queryParams) {
         for (const [key, value] of Object.entries(queryParams)) {
             if (value !== undefined) {
                 switch (key) {
-                    case "classId":
-                        query.lesson.classId = parseInt(value);
+                    case "classId": {
+                        const classIds = value.split(',').map(v => parseInt(v));
+                        queryConditions.push({ lesson: { classId: { in: classIds } } });
                         break;
-                    case "teacherId":
-                        query.lesson.teacherId = value;
+                    }
+                    case "teacherId": {
+                        const teacherIds = value.split(',');
+                        queryConditions.push({ lesson: { teacherId: { in: teacherIds } } });
                         break;
+                    }
+                    case "subjectId": {
+                        const subjectIds = value.split(',').map(v => parseInt(v));
+                        queryConditions.push({ lesson: { subjectId: { in: subjectIds } } });
+                        break;
+                    }
+                    case "moduleId": {
+                        const selectedModuleId = parseInt(value);
+                        const selectedModule = availableModules.find(mod => mod.id === selectedModuleId);
+                        if (selectedModule) {
+                            const moduleStartDate = new Date(selectedModule.startDate);
+                            const moduleEndDate = new Date(selectedModule.endDate);
+                            moduleEndDate.setHours(23, 59, 59, 999);
+
+                            queryConditions.push({
+                                startTime: {
+                                    gte: moduleStartDate,
+                                    lte: moduleEndDate,
+                                },
+                            });
+                        }
+                        break;
+                    }
                     case "search":
-                        query.OR = [
-                            {
-                                title: { contains: value, mode: "insensitive" },
-                            },
-                            {
-                                lesson: {
-                                    is: {
-                                        name: { contains: value, mode: "insensitive" },
+                        queryConditions.push({
+                            OR: [
+                                {
+                                    title: { contains: value, mode: "insensitive" },
+                                },
+                                {
+                                    lesson: {
+                                        is: {
+                                            name: { contains: value, mode: "insensitive" },
+                                        },
                                     },
                                 },
-                            },
-                            {
-                                lesson: {
-                                    is: {
-                                        subject: {
-                                            is: {
-                                                name: { contains: value, mode: "insensitive" },
+                                {
+                                    lesson: {
+                                        is: {
+                                            subject: {
+                                                is: {
+                                                    name: { contains: value, mode: "insensitive" },
+                                                },
                                             },
                                         },
                                     },
                                 },
-                            },
-                            {
-                                lesson: {
-                                    is: {
-                                        class: {
-                                            is: {
-                                                name: { contains: value, mode: "insensitive" },
+                                {
+                                    lesson: {
+                                        is: {
+                                            class: {
+                                                is: {
+                                                    name: { contains: value, mode: "insensitive" },
+                                                },
                                             },
                                         },
                                     },
                                 },
-                            },
-                            {
-                                lesson: {
-                                    is: {
-                                        teacher: {
-                                            is: {
-                                                OR: [
-                                                    { name: { contains: value, mode: "insensitive" } },
-                                                    { surname: { contains: value, mode: "insensitive" } },
-                                                    { username: { contains: value, mode: "insensitive" } },
-                                                ],
+                                {
+                                    lesson: {
+                                        is: {
+                                            teacher: {
+                                                is: {
+                                                    OR: [
+                                                        { name: { contains: value, mode: "insensitive" } },
+                                                        { surname: { contains: value, mode: "insensitive" } },
+                                                        { username: { contains: value, mode: "insensitive" } },
+                                                    ],
+                                                },
                                             },
                                         },
                                     },
                                 },
-                            },
-                        ];
+                            ]
+                        })
                         break;
                     default:
                         break;
@@ -147,6 +186,11 @@ const ExamListPage = async ({ searchParams }: { searchParams: { [key: string]: s
             }
         }
     }
+
+    const query: Prisma.ExamWhereInput = {
+        AND: queryConditions.length > 0 ? queryConditions : undefined
+    };
+    query.lesson = {};
 
     switch (role) {
         case "admin":
@@ -225,6 +269,13 @@ const ExamListPage = async ({ searchParams }: { searchParams: { [key: string]: s
                     <TableSearch />
                     <div className='flex items-center gap-4 self-end'>
                         <SortButton currentSort={sort} />
+                        <ExamFilterForm
+                            currentFilters={searchParams}
+                            classes={classes}
+                            teachers={formattedTeachers}
+                            subjects={subjects}
+                            modules={availableModules}
+                        />
                         {(role === "admin" || role === "teacher") && (
                             <FormContainer table="exam" type="create" />
                         )}
