@@ -11,7 +11,7 @@ const AverageCalculator = dynamic(() => import("@/components/AverageCalculator")
 const Pagination = dynamic(() => import("@/components/Pagination"), { ssr: false });
 const TableSearch = dynamic(() => import("@/components/TableSearch"), { ssr: false });
 const SortButton = dynamic(() => import("@/components/SortButton"), { ssr: false });
-const FilterForm = dynamic(() => import("@/components/forms/FilterForm"), { ssr: false });
+const ResultsFilterForm = dynamic(() => import("@/components/forms/ResultsFilterForm"), { ssr: false });
 const DownloadButton = dynamic(() => import("@/components/DownloadButton"), { ssr: false });
 
 type ResultList = {
@@ -510,7 +510,7 @@ const ResultListPage = async ({
                     <TableSearch />
                     <div className="flex items-center gap-4 self-end">
                         <SortButton currentSort={sort} />
-                        <FilterForm
+                        <ResultsFilterForm
                             currentFilters={searchParams}
                             subjects={subjects}
                             classes={classes}

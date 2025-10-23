@@ -12,7 +12,7 @@ const Pagination = dynamic(() => import("@/components/Pagination"), { ssr: false
 const TableSearch = dynamic(() => import("@/components/TableSearch"), { ssr: false });
 const SortButton = dynamic(() => import("@/components/SortButton"), { ssr: false });
 const BulkDeleteForm = dynamic(() => import("@/components/forms/BulkDeleteForm"), { ssr: false });
-const LessonFilterForm = dynamic(() => import("@/components/forms/LessonFilterForm"), { ssr: false });
+const FilterForm = dynamic(() => import("@/components/forms/FilterForm"), { ssr: false });
 
 type LessonList = Lesson & { subject: Subject } & { class: Class } & { teacher: Teacher }
 
@@ -213,7 +213,7 @@ const LessonListPage = async ({ searchParams }: { searchParams: { [key: string]:
                     <TableSearch />
                     <div className='flex items-center gap-4 self-end'>
                         <SortButton currentSort={sort} />
-                        <LessonFilterForm
+                        <FilterForm
                             currentFilters={searchParams}
                             classes={classes}
                             teachers={formattedTeachers}
