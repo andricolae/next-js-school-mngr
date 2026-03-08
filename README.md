@@ -141,7 +141,7 @@ yarn install
 ```
 
 3. 🔒 Environment Configuration
-Create a .env file in the root directory
+   Create a .env file in the root directory
 
 ```bash
 # Database Configuration
@@ -265,6 +265,7 @@ The system supports the following user roles:
 ### Database Optimization
 
 The application uses Prisma with PostgreSQL for optimal performance:
+
 ```javascript
 // Connection pooling configuration
 datasource db {
@@ -282,6 +283,7 @@ include: {
 ### Authentication Flow
 
 Clerk middleware provides seamless authentication:
+
 ```javascript
 // Automatic route protection
 export default clerkMiddleware((auth, req) => {
@@ -342,11 +344,11 @@ Distributed under the MIT License. See LICENSE for more information.
 
 ## 📞 Contact
 
-Project Link: https://github.com/andricolae/school-mgmt
+Project Link: https://github.com/andreinicolaemartincalutiu/school-mgmt
 
 ## 🙏 Acknowledgements
 
-[Next.js](https://nextjs.org/)<br>
+[Next.js](https://nextjs.org/)`<br>`
 [Tailwind CSS](https://tailwindcss.com/)
 [Recharts](https://recharts.org/)
 [React Big Calendar](https://github.com/jquense/react-big-calendar)
