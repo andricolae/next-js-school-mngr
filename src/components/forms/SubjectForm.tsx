@@ -10,6 +10,7 @@ import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import ReactDOM from "react-dom";
+import { CldUploadWidget } from "next-cloudinary";
 import dynamic from "next/dynamic";
 const LoadingPopup = dynamic(() => import("@/components/LoadingPopup"), { ssr: false });
 const InputField = dynamic(() => import("@/components/InputField"), { ssr: false });
@@ -211,6 +212,7 @@ const SubjectForm = ({
         { success: false, error: false }
     );
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [doc, setDoc] = useState<any>();
     const router = useRouter();
 
     const teachers: FilterOption[] = relatedData?.teachers?.map((teacher: any) => ({
@@ -219,6 +221,7 @@ const SubjectForm = ({
     })) || [];
 
     const [isPending, startTransition] = useTransition();
+    let openUploadWidget: () => void = () => { };
 
     useEffect(() => {
         if (!state) return;
@@ -236,9 +239,13 @@ const SubjectForm = ({
     }, [state, router, type, setOpen]);
 
     const onSubmit = handleSubmit((formData) => {
+        const finalData = doc?.secure_url
+            ? { ...formData, name: `${formData.name}|${doc.secure_url}` }
+            : formData;
+
         startTransition(() => {
             setIsSubmitting(true);
-            formAction(formData);
+            formAction(finalData);
         });
     });
 
@@ -277,10 +284,51 @@ const SubjectForm = ({
                 </p>
             )}
 
+            {/* --- Upload document materie --- */}
+            <div
+                className="flex flex-col gap-1 cursor-pointer justify-center items-start"
+                onClick={() => openUploadWidget()}
+            >
+                <label className="text-sm font-medium text-gray-700 cursor-pointer select-none">
+                    Încarcă un document
+                </label>
+                <div className="flex items-center gap-2">
+                    <img
+                        src="/upload.svg"
+                        alt="upload icon"
+                        width={20}
+                        height={20}
+                        className="relative top-[2px]"
+                    />
+                    {doc ? (
+                        <span className="text-xs text-green-600 truncate max-w-[220px]">
+                            {doc.original_filename || "Document încărcat"}
+                        </span>
+                    ) : (
+                        <span className="text-xs text-gray-500">Click pentru a încărca</span>
+                    )}
+                </div>
+            </div>
+
+            <CldUploadWidget
+                uploadPreset="school-mgmt"
+                options={{ resourceType: "auto" }}
+                onSuccess={(result, { widget }) => {
+                    setDoc(result.info);
+                    widget.close();
+                }}
+            >
+                {({ open }) => {
+                    openUploadWidget = open;
+                    return <></>;
+                }}
+            </CldUploadWidget>
+
             {state.error && (
                 <span className="text-red-500 text-center">{state.message || "Ceva nu a funcționat. Încearcă mai târziu."}</span>
             )}
 
+            {/* --- Buton mutat mai jos, după secțiunea de upload --- */}
             <div className="flex justify-center mt-2 mb-8">
                 <button
                     type="submit"
