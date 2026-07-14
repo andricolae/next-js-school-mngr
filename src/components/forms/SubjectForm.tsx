@@ -328,7 +328,6 @@ const SubjectForm = ({
                 <span className="text-red-500 text-center">{state.message || "Ceva nu a funcționat. Încearcă mai târziu."}</span>
             )}
 
-            {/* --- Buton mutat mai jos, după secțiunea de upload --- */}
             <div className="flex justify-center mt-2 mb-8">
                 <button
                     type="submit"
