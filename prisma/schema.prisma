@@ -14,28 +14,28 @@ model Admin {
 }
 
 model Student {
-  id                String       @id
-  username          String       @unique
-  name              String
-  surname           String
-  email             String?      @unique
-  phone             String?      @unique
-  address           String
-  img               String?
-  CNP               String
-  registrationNo    String
-  gender            UserGender
-  createdAt         DateTime     @default(now())
-  parentId          String
-  classId           Int
-  gradeId           Int
-  attendances       Attendance[]
-  results           Result[]
-  class             Class        @relation(fields: [classId], references: [id])
-  grade             Grade        @relation(fields: [gradeId], references: [id])
-  parent            Parent       @relation(fields: [parentId], references: [id])
-  birthday          DateTime
-  birthplace        String?
+  id             String       @id
+  username       String       @unique
+  name           String
+  surname        String
+  email          String?      @unique
+  phone          String?      @unique
+  address        String
+  img            String?
+  CNP            String
+  registrationNo String
+  gender         UserGender
+  createdAt      DateTime     @default(now())
+  parentId       String
+  classId        Int
+  gradeId        Int
+  attendances    Attendance[]
+  results        Result[]
+  class          Class        @relation(fields: [classId], references: [id])
+  grade          Grade        @relation(fields: [gradeId], references: [id])
+  parent         Parent       @relation(fields: [parentId], references: [id])
+  birthday       DateTime
+  birthplace     String?
 }
 
 model Teacher {
@@ -92,6 +92,7 @@ model Class {
 model Subject {
   id       Int       @id @default(autoincrement())
   name     String    @unique
+  file     String?
   lessons  Lesson[]
   teachers Teacher[] @relation("SubjectToTeacher")
 }
