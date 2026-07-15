@@ -13,9 +13,19 @@ import { translateClerkError } from "@/lib/clerkErrorMessage";
 type CurrentState = { success: boolean; error: boolean | string };
 export const createSubject = async (currentState: CurrentState, data: SubjectSchema) => {
     try {
+        let subjectName = data.name;
+        let file: string | null = null;
+
+        if (data.name.includes("|")) {
+            const [name, url] = data.name.split("|");
+            subjectName = name;
+            file = url;
+        }
+
         await prisma.subject.create({
             data: {
-                name: data.name,
+                name: subjectName,
+                file: file,
                 teachers: {
                     connect: data.teachers.map((teacherId) => ({ id: teacherId })),
                 },
@@ -31,12 +41,29 @@ export const createSubject = async (currentState: CurrentState, data: SubjectSch
 
 export const updateSubject = async (currentState: CurrentState, data: SubjectSchema) => {
     try {
+        let subjectName = data.name;
+        let file: string | null = null;
+
+        if (data.name.includes("|")) {
+            const [name, url] = data.name.split("|");
+            subjectName = name;
+            file = url;
+        } else {
+            // No new file uploaded on this edit — keep whatever file already exists.
+            const existing = await prisma.subject.findUnique({
+                where: { id: data.id },
+                select: { file: true },
+            });
+            file = existing?.file ?? null;
+        }
+
         await prisma.subject.update({
             where: {
                 id: data.id
             },
             data: {
-                name: data.name,
+                name: subjectName,
+                file: file,
                 teachers: {
                     set: data.teachers.map((teacherId) => ({ id: teacherId })),
                 },

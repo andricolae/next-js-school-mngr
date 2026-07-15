@@ -181,7 +181,6 @@ const MultiSelect = ({
     );
 };
 
-const MAX_FILES = 5;
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
 const SubjectForm = ({
@@ -215,7 +214,7 @@ const SubjectForm = ({
         { success: false, error: false }
     );
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [docs, setDocs] = useState<any[]>([]);
+    const [doc, setDoc] = useState<any | null>(null);
     const router = useRouter();
 
     const teachers: FilterOption[] = relatedData?.teachers?.map((teacher: any) => ({
@@ -241,13 +240,13 @@ const SubjectForm = ({
         }
     }, [state, router, type, setOpen]);
 
-    const handleRemoveDoc = (index: number) => {
-        setDocs((prev) => prev.filter((_, i) => i !== index));
+    const handleRemoveDoc = () => {
+        setDoc(null);
     };
 
     const onSubmit = handleSubmit((formData) => {
-        const finalData = docs.length > 0
-            ? { ...formData, name: `${formData.name}|${docs.map((d) => d.secure_url).join(",")}` }
+        const finalData = doc
+            ? { ...formData, name: `${formData.name}|${doc.secure_url}` }
             : formData;
 
         startTransition(() => {
@@ -292,10 +291,10 @@ const SubjectForm = ({
 
             <div
                 className="flex flex-col gap-1 cursor-pointer justify-center items-start"
-                onClick={() => docs.length < MAX_FILES && openUploadWidget()}
+                onClick={() => !doc && openUploadWidget()}
             >
                 <label className="text-sm font-medium text-gray-700 cursor-pointer select-none">
-                    Încarcă documente (max. 5, max. 10MB fiecare)
+                    Încarcă document (max. 10MB)
                 </label>
                 <div className="flex items-center gap-2">
                     <img
@@ -305,50 +304,38 @@ const SubjectForm = ({
                         height={20}
                         className="relative top-[2px]"
                     />
-                    {docs.length > 0 ? (
-                        <span className="text-xs text-green-600">
-                            {docs.length} document{docs.length > 1 ? "e" : ""} încărcat{docs.length > 1 ? "e" : ""}
-                        </span>
+                    {doc ? (
+                        <span className="text-xs text-green-600">1 document încărcat</span>
                     ) : (
                         <span className="text-xs text-gray-500">Click pentru a încărca</span>
                     )}
                 </div>
             </div>
 
-            {docs.length > 0 && (
-                <ul className="flex flex-col gap-1">
-                    {docs.map((d, i) => (
-                        <li
-                            key={d.public_id || i}
-                            className="flex items-center justify-between text-xs text-gray-600 max-w-[280px]"
-                        >
-                            <span className="truncate">{d.original_filename || `Document ${i + 1}`}</span>
-                            <button
-                                type="button"
-                                onClick={() => handleRemoveDoc(i)}
-                                className="text-red-500 ml-2"
-                                aria-label="Elimină documentul"
-                            >
-                                ✕
-                            </button>
-                        </li>
-                    ))}
-                </ul>
+            {doc && (
+                <div className="flex items-center justify-between text-xs text-gray-600 max-w-[280px]">
+                    <span className="truncate">{doc.original_filename || "Document"}</span>
+                    <button
+                        type="button"
+                        onClick={handleRemoveDoc}
+                        className="text-red-500 ml-2"
+                        aria-label="Elimină documentul"
+                    >
+                        ✕
+                    </button>
+                </div>
             )}
 
             <CldUploadWidget
                 uploadPreset="school-mgmt"
                 options={{
                     resourceType: "auto",
-                    multiple: true,
-                    maxFiles: MAX_FILES,
+                    multiple: false,
+                    maxFiles: 1,
                     maxFileSize: MAX_FILE_SIZE,
                 }}
                 onSuccess={(result) => {
-                    setDocs((prev) => {
-                        if (prev.length >= MAX_FILES) return prev;
-                        return [...prev, result.info];
-                    });
+                    setDoc(result.info);
                 }}
             >
                 {({ open }) => {
