@@ -181,6 +181,9 @@ const MultiSelect = ({
     );
 };
 
+const MAX_FILES = 5;
+const MAX_FILE_SIZE = 10 * 1024 * 1024;
+
 const SubjectForm = ({
     type,
     data,
@@ -212,7 +215,7 @@ const SubjectForm = ({
         { success: false, error: false }
     );
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [doc, setDoc] = useState<any>();
+    const [docs, setDocs] = useState<any[]>([]);
     const router = useRouter();
 
     const teachers: FilterOption[] = relatedData?.teachers?.map((teacher: any) => ({
@@ -238,9 +241,13 @@ const SubjectForm = ({
         }
     }, [state, router, type, setOpen]);
 
+    const handleRemoveDoc = (index: number) => {
+        setDocs((prev) => prev.filter((_, i) => i !== index));
+    };
+
     const onSubmit = handleSubmit((formData) => {
-        const finalData = doc?.secure_url
-            ? { ...formData, name: `${formData.name}|${doc.secure_url}` }
+        const finalData = docs.length > 0
+            ? { ...formData, name: `${formData.name}|${docs.map((d) => d.secure_url).join(",")}` }
             : formData;
 
         startTransition(() => {
@@ -263,7 +270,6 @@ const SubjectForm = ({
                 error={errors?.name}
             />
 
-            {/* MultiSelect pentru teachers */}
             <Controller
                 name="teachers"
                 control={control}
@@ -284,13 +290,12 @@ const SubjectForm = ({
                 </p>
             )}
 
-            {/* --- Upload document materie --- */}
             <div
                 className="flex flex-col gap-1 cursor-pointer justify-center items-start"
-                onClick={() => openUploadWidget()}
+                onClick={() => docs.length < MAX_FILES && openUploadWidget()}
             >
                 <label className="text-sm font-medium text-gray-700 cursor-pointer select-none">
-                    Încarcă un document
+                    Încarcă documente (max. 5, max. 10MB fiecare)
                 </label>
                 <div className="flex items-center gap-2">
                     <img
@@ -300,9 +305,9 @@ const SubjectForm = ({
                         height={20}
                         className="relative top-[2px]"
                     />
-                    {doc ? (
-                        <span className="text-xs text-green-600 truncate max-w-[220px]">
-                            {doc.original_filename || "Document încărcat"}
+                    {docs.length > 0 ? (
+                        <span className="text-xs text-green-600">
+                            {docs.length} document{docs.length > 1 ? "e" : ""} încărcat{docs.length > 1 ? "e" : ""}
                         </span>
                     ) : (
                         <span className="text-xs text-gray-500">Click pentru a încărca</span>
@@ -310,12 +315,40 @@ const SubjectForm = ({
                 </div>
             </div>
 
+            {docs.length > 0 && (
+                <ul className="flex flex-col gap-1">
+                    {docs.map((d, i) => (
+                        <li
+                            key={d.public_id || i}
+                            className="flex items-center justify-between text-xs text-gray-600 max-w-[280px]"
+                        >
+                            <span className="truncate">{d.original_filename || `Document ${i + 1}`}</span>
+                            <button
+                                type="button"
+                                onClick={() => handleRemoveDoc(i)}
+                                className="text-red-500 ml-2"
+                                aria-label="Elimină documentul"
+                            >
+                                ✕
+                            </button>
+                        </li>
+                    ))}
+                </ul>
+            )}
+
             <CldUploadWidget
                 uploadPreset="school-mgmt"
-                options={{ resourceType: "auto" }}
-                onSuccess={(result, { widget }) => {
-                    setDoc(result.info);
-                    widget.close();
+                options={{
+                    resourceType: "auto",
+                    multiple: true,
+                    maxFiles: MAX_FILES,
+                    maxFileSize: MAX_FILE_SIZE,
+                }}
+                onSuccess={(result) => {
+                    setDocs((prev) => {
+                        if (prev.length >= MAX_FILES) return prev;
+                        return [...prev, result.info];
+                    });
                 }}
             >
                 {({ open }) => {
