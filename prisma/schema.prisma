@@ -92,6 +92,7 @@ model Class {
 model Subject {
   id       Int       @id @default(autoincrement())
   name     String    @unique
+  file     String?
   lessons  Lesson[]
   teachers Teacher[] @relation("SubjectToTeacher")
 }

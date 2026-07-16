@@ -10,6 +10,7 @@ import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import ReactDOM from "react-dom";
+import { CldUploadWidget } from "next-cloudinary";
 import dynamic from "next/dynamic";
 const LoadingPopup = dynamic(() => import("@/components/LoadingPopup"), { ssr: false });
 const InputField = dynamic(() => import("@/components/InputField"), { ssr: false });
@@ -180,6 +181,8 @@ const MultiSelect = ({
     );
 };
 
+const MAX_FILE_SIZE = 10 * 1024 * 1024;
+
 const SubjectForm = ({
     type,
     data,
@@ -211,6 +214,7 @@ const SubjectForm = ({
         { success: false, error: false }
     );
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [doc, setDoc] = useState<any | null>(null);
     const router = useRouter();
 
     const teachers: FilterOption[] = relatedData?.teachers?.map((teacher: any) => ({
@@ -219,6 +223,7 @@ const SubjectForm = ({
     })) || [];
 
     const [isPending, startTransition] = useTransition();
+    let openUploadWidget: () => void = () => { };
 
     useEffect(() => {
         if (!state) return;
@@ -235,10 +240,18 @@ const SubjectForm = ({
         }
     }, [state, router, type, setOpen]);
 
+    const handleRemoveDoc = () => {
+        setDoc(null);
+    };
+
     const onSubmit = handleSubmit((formData) => {
+        const finalData = doc
+            ? { ...formData, name: `${formData.name}|${doc.secure_url}` }
+            : formData;
+
         startTransition(() => {
             setIsSubmitting(true);
-            formAction(formData);
+            formAction(finalData);
         });
     });
 
@@ -256,7 +269,6 @@ const SubjectForm = ({
                 error={errors?.name}
             />
 
-            {/* MultiSelect pentru teachers */}
             <Controller
                 name="teachers"
                 control={control}
@@ -276,6 +288,61 @@ const SubjectForm = ({
                     {errors.teachers.message as string}
                 </p>
             )}
+
+            <div
+                className="flex flex-col gap-1 cursor-pointer justify-center items-start"
+                onClick={() => !doc && openUploadWidget()}
+            >
+                <label className="text-sm font-medium text-gray-700 cursor-pointer select-none">
+                    Încarcă document (max. 10MB)
+                </label>
+                <div className="flex items-center gap-2">
+                    <img
+                        src="/upload.svg"
+                        alt="upload icon"
+                        width={20}
+                        height={20}
+                        className="relative top-[2px]"
+                    />
+                    {doc ? (
+                        <span className="text-xs text-green-600">1 document încărcat</span>
+                    ) : (
+                        <span className="text-xs text-gray-500">Click pentru a încărca</span>
+                    )}
+                </div>
+            </div>
+
+            {doc && (
+                <div className="flex items-center justify-between text-xs text-gray-600 max-w-[280px]">
+                    <span className="truncate">{doc.original_filename || "Document"}</span>
+                    <button
+                        type="button"
+                        onClick={handleRemoveDoc}
+                        className="text-red-500 ml-2"
+                        aria-label="Elimină documentul"
+                    >
+                        ✕
+                    </button>
+                </div>
+            )}
+
+            <CldUploadWidget
+                uploadPreset="school-mgmt"
+                options={{
+                    resourceType: "auto",
+                    multiple: false,
+                    maxFiles: 1,
+                    maxFileSize: MAX_FILE_SIZE,
+                }}
+                onSuccess={(result) => {
+                    setDoc(result.info);
+                }}
+            >
+                {({ open }) => {
+                    openUploadWidget = open;
+                    return <></>;
+                }}
+            </CldUploadWidget>
 
             {state.error && (
                 <span className="text-red-500 text-center">{state.message || "Ceva nu a funcționat. Încearcă mai târziu."}</span>

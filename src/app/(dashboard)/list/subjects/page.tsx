@@ -4,6 +4,7 @@ import { Subject, Teacher, Prisma } from "@prisma/client";
 import { auth } from "@clerk/nextjs/server";
 import { TokenData } from "@/lib/utils";
 import dynamic from "next/dynamic";
+const SubjectMaterialsButton = dynamic(() => import("@/components/SubjectMaterialsButton"), { ssr: false });
 const Table = dynamic(() => import("@/components/Table"));
 const FormContainer = dynamic(() => import("@/components/FormContainer"));
 const Pagination = dynamic(() => import("@/components/Pagination"), { ssr: false });
@@ -33,6 +34,10 @@ const SubjectListPage = async ({ searchParams }: { searchParams: { [key: string]
             className: "hidden md:table-cell",
         },
         {
+            header: "Materiale",
+            accessor: "file",
+        },
+        {
             header: "Acțiuni",
             accessor: "actions",
         }
@@ -40,16 +45,22 @@ const SubjectListPage = async ({ searchParams }: { searchParams: { [key: string]
 
     const renderRow = (item: SubjectList) => (
         <tr key={item.id} className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-skyLight">
+
             <td className="flex items-center gap-4 p-4">{item.name}</td>
             <td className="hidden md:table-cell">{item.teachers.map(teacher => teacher.name).join(", ")}</td>
             <td>
+                <SubjectMaterialsButton file={item.file} />
+            </td>
+            <td>
                 <div className="flex items-center gap-2">
-                    {role === "admin" && (
-                        <>
-                            <FormContainer table="subject" type="update" data={item} />
-                            <FormContainer table="subject" type="delete" id={item.id} />
-                        </>
-                    )}
+                    {(role === "admin" ||
+                        (role === "teacher" && item.teachers.some((t) => t.id === currentUserId))
+                    ) && (
+                            <>
+                                <FormContainer table="subject" type="update" data={item} />
+                                {role === "admin" && <FormContainer table="subject" type="delete" id={item.id} />}
+                            </>
+                        )}
                 </div>
             </td>
         </tr>
