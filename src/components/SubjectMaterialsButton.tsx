@@ -4,29 +4,34 @@ const SubjectMaterialsButton = ({ file }: { file: string | null }) => {
     if (!file) {
         return <span className="text-gray-400">-</span>;
     }
+
     return (
-        <a 
+        <a
             href={file}
             target="_blank"
             rel="noopener noreferrer"
             title="Vezi material"
-            className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-skyLight hover:bg-sky transition-colors"
+            className="
+                inline-flex
+                items-center
+                justify-center
+                w-7
+                h-7
+                rounded-full
+                bg-sky
+                /* hover:bg-blue-700*/
+                transition-all
+                duration-200
+                shadow-md
+                hover:shadow-lg
+                hover:scale-105
+            "
         >
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="text-blue-600"
-            >
-                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z" />
-                <circle cx="12" cy="12" r="3" />
-            </svg>
+            <img
+                src="/viewMaterials.png"
+                alt="Vezi material"
+                className="w-5 h-5 object-contain"
+            />
         </a>
     );
 };
