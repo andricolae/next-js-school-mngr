@@ -11,6 +11,20 @@ import { Day } from "@prisma/client";
 import { translateClerkError } from "@/lib/clerkErrorMessage";
 
 type CurrentState = { success: boolean; error: boolean | string };
+type PackedMaterial = { title: string; url: string; sizeBytes: number };
+const FIELD_SEP = "^^";
+const RECORD_SEP = "||";
+
+const parseMaterials = (raw: string | null | undefined): PackedMaterial[] => {
+    if (!raw) return [];
+    return raw.split(RECORD_SEP).filter(Boolean).map((entry) => {
+        const [title, url, sizeBytesStr] = entry.split(FIELD_SEP);
+        return { title: title ?? "", url: url ?? "", sizeBytes: Number(sizeBytesStr) || 0 };
+    });
+};
+const serializeMaterials = (materials: PackedMaterial[]) =>
+    materials.map((m) => [m.title, m.url, String(m.sizeBytes)].join(FIELD_SEP)).join(RECORD_SEP);
+
 export const createSubject = async (currentState: CurrentState, data: SubjectSchema) => {
     const {sessionClaims} = await auth()
     let tokenData
@@ -27,12 +41,11 @@ export const createSubject = async (currentState: CurrentState, data: SubjectSch
         let subjectName = data.name;
         let file: string | null = null;
 
-        if (data.name.includes("|")) {
-            const [name, url] = data.name.split("|");
-            subjectName = name;
-            file = url;
-        }
-
+        const sepIndex = data.name.indexOf("|");
+         if (sepIndex !== -1) {
+             subjectName = data.name.slice(0, sepIndex);
+             file = data.name.slice(sepIndex + 1) || null;
+         }
         await prisma.subject.create({
             data: {
                 name: subjectName,
@@ -74,11 +87,11 @@ export const updateSubject = async (currentState: CurrentState, data: SubjectSch
         let subjectName = data.name;
         let file: string | null = null;
 
-        if (data.name.includes("|")) {
-            const [name, url] = data.name.split("|");
-            subjectName = name;
-            file = url;
-        } else {
+        const sepIndex = data.name.indexOf("|");
+         if (sepIndex !== -1) {
+             subjectName = data.name.slice(0, sepIndex);
+             file = data.name.slice(sepIndex + 1) || null;
+         } else {
             // No new file uploaded on this edit — keep whatever file already exists.
             const existing = await prisma.subject.findUnique({
                 where: { id: data.id },
@@ -122,6 +135,28 @@ export const deleteSubject = async (currentState: CurrentState, data: FormData) 
         return { success: false, error: true }
     }
 }
+
+export const deleteSubjectMaterial = async (subjectId: number, materialIndex: number) => {
+    const { userId, sessionClaims } = await auth();
+    let tokenData;
+    if (sessionClaims !== null) tokenData = sessionClaims as unknown as TokenData;
+    const role = tokenData?.userPblcMtdt?.role;
+
+    const subject = await prisma.subject.findUnique({ where: { id: subjectId }, include: { teachers: true } });
+    if (!subject) return { success: false, error: true, message: "Materia nu există." };
+
+    const isOwnerTeacher = role === "teacher" && subject.teachers.some((t) => t.id === userId);
+    if (role !== "admin" && !isOwnerTeacher) {
+        return { success: false, error: true, message: "Nu ai permisiunea de a șterge acest material." };
+    }
+
+    const materials = parseMaterials(subject.file);
+    materials.splice(materialIndex, 1);
+    const newFile = materials.length > 0 ? serializeMaterials(materials) : null;
+
+    await prisma.subject.update({ where: { id: subjectId }, data: { file: newFile } });
+    return { success: true, error: false };
+};
 
 export const createClass = async (currentState: CurrentState, data: ClassSchema) => {
     try {

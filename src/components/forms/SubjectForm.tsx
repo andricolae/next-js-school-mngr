@@ -223,7 +223,53 @@ const SubjectForm = ({
     { success: false, error: false },
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [doc, setDoc] = useState<any | null>(null);
+  const [activeTab, setActiveTab] = useState<"details" | "materials">(
+    "details",
+  );
+
+  type PackedMaterial = { title: string; url: string; sizeBytes: number };
+  type PendingMaterial = {
+    tempId: string;
+    title: string;
+    url: string;
+    sizeBytes: number;
+  };
+  const FIELD_SEP = "^^";
+  const RECORD_SEP = "||";
+  const MAX_MATERIALS = 5;
+
+  const parseMaterials = (raw: string | null | undefined): PackedMaterial[] => {
+    if (!raw) return [];
+    return raw
+      .split(RECORD_SEP)
+      .filter(Boolean)
+      .map((entry) => {
+        const [title, url, sizeBytesStr] = entry.split(FIELD_SEP);
+        return {
+          title: title ?? "",
+          url: url ?? "",
+          sizeBytes: Number(sizeBytesStr) || 0,
+        };
+      });
+  };
+  const serializeMaterials = (materials: PackedMaterial[]) =>
+    materials
+      .map((m) => [m.title, m.url, String(m.sizeBytes)].join(FIELD_SEP))
+      .join(RECORD_SEP);
+
+  const [existingMaterials, setExistingMaterials] = useState<PackedMaterial[]>(
+    parseMaterials(data?.file),
+  );
+  const [pendingMaterials, setPendingMaterials] = useState<PendingMaterial[]>(
+    [],
+  );
+  const totalMaterialsCount =
+    existingMaterials.length + pendingMaterials.length;
+
+  const removeExisting = (i: number) =>
+    setExistingMaterials((prev) => prev.filter((_, idx) => idx !== i));
+  const removePending = (tempId: string) =>
+    setPendingMaterials((prev) => prev.filter((m) => m.tempId !== tempId));
   const router = useRouter();
 
   const teachers: FilterOption[] =
@@ -254,15 +300,21 @@ const SubjectForm = ({
     }
   }, [state, router, type, setOpen]);
 
-  const handleRemoveDoc = () => {
-    setDoc(null);
-  };
-
   const onSubmit = handleSubmit((formData) => {
-    const finalData = doc
-      ? { ...formData, name: `${formData.name}|${doc.secure_url}` }
-      : formData;
-
+    const allMaterials: PackedMaterial[] = [
+      ...existingMaterials,
+      ...pendingMaterials.map((m) => ({
+        title: m.title,
+        url: m.url,
+        sizeBytes: m.sizeBytes,
+      })),
+    ];
+    const packed =
+      allMaterials.length > 0 ? serializeMaterials(allMaterials) : "";
+    const finalData = {
+      ...formData,
+      name: packed ? `${formData.name}|${packed}` : formData.name,
+    };
     startTransition(() => {
       setIsSubmitting(true);
       formAction(finalData);
@@ -278,86 +330,141 @@ const SubjectForm = ({
         {type === "create" ? "Adaugă o nouă materie" : "Actualizează materia"}
       </h1>
 
-      <InputField
-        label="Denumire materie"
-        name="name"
-        defaultValue={data?.name}
-        register={register}
-        error={errors?.name}
-      />
-
-      <Controller
-        name="teachers"
-        control={control}
-        render={({ field }) => (
-          <MultiSelect
-            id="teachers"
-            label="Profesori"
-            options={teachers}
-            placeholder="Alege profesori..."
-            selectedIds={field.value}
-            onSelectionChange={field.onChange}
-          />
-        )}
-      />
-      {errors.teachers && (
-        <p className="text-red-500 text-sm mt-1">
-          {errors.teachers.message as string}
-        </p>
-      )}
-
-      <div
-        className="flex flex-col gap-1 cursor-pointer justify-center items-start"
-        onClick={() => !doc && openUploadWidget()}
-      >
-        <label className="text-sm font-medium text-gray-700 cursor-pointer select-none">
-          Încarcă document (max. 10MB)
-        </label>
-        <div className="flex items-center gap-2">
-          <img
-            src="/upload.svg"
-            alt="upload icon"
-            width={20}
-            height={20}
-            className="relative top-[2px]"
-          />
-          {doc ? (
-            <span className="text-xs text-green-600">1 document încărcat</span>
-          ) : (
-            <span className="text-xs text-gray-500">
-              Click pentru a încărca
-            </span>
-          )}
-        </div>
+      <div className="flex border-b border-gray-200">
+        <button
+          type="button"
+          onClick={() => setActiveTab("details")}
+          className={`px-4 py-2 text-sm ${activeTab === "details" ? "border-b-2 border-blue-500 text-blue-600 font-medium" : "text-gray-500"}`}
+        >
+          Detalii
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab("materials")}
+          className={`px-4 py-2 text-sm ${activeTab === "materials" ? "border-b-2 border-blue-500 text-blue-600 font-medium" : "text-gray-500"}`}
+        >
+          Materiale ({totalMaterialsCount}/{MAX_MATERIALS})
+        </button>
       </div>
 
-      {doc && (
-        <div className="flex items-center justify-between text-xs text-gray-600 max-w-[280px]">
-          <span className="truncate">
-            {doc.original_filename || "Document"}
-          </span>
-          <button
-            type="button"
-            onClick={handleRemoveDoc}
-            className="text-red-500 ml-2"
-            aria-label="Elimină documentul"
-          >
-            ✕
-          </button>
+      <div
+        className={activeTab === "details" ? "flex flex-col gap-8" : "hidden"}
+      >
+        <InputField
+          label="Denumire materie"
+          name="name"
+          defaultValue={data?.name}
+          register={register}
+          error={errors?.name}
+        />
+
+        <Controller
+          name="teachers"
+          control={control}
+          render={({ field }) => (
+            <MultiSelect
+              id="teachers"
+              label="Profesori"
+              options={teachers}
+              placeholder="Alege profesori..."
+              selectedIds={field.value}
+              onSelectionChange={field.onChange}
+            />
+          )}
+        />
+        {errors.teachers && (
+          <p className="text-red-500 text-sm mt-1">
+            {errors.teachers.message as string}
+          </p>
+        )}
+      </div>
+
+      <div
+        className={activeTab === "materials" ? "flex flex-col gap-3" : "hidden"}
+      >
+        <div
+          className="flex flex-col gap-1 cursor-pointer justify-center items-start"
+          onClick={() =>
+            totalMaterialsCount < MAX_MATERIALS && openUploadWidget()
+          }
+        >
+          <label className="text-sm font-medium text-gray-700 cursor-pointer select-none">
+            Încarcă document (max. 10MB)
+          </label>
+          <div className="flex items-center gap-2">
+            <img
+              src="/upload.svg"
+              alt="upload icon"
+              width={20}
+              height={20}
+              className="relative top-[2px]"
+            />
+            <span className="text-sm text-gray-500">
+              {totalMaterialsCount >= MAX_MATERIALS
+                ? "Ai atins limita de 5 materiale"
+                : "Click pentru a încărca"}
+            </span>
+          </div>
         </div>
-      )}
+
+        {existingMaterials.map((m, i) => (
+          <div
+            key={i}
+            className="flex items-center justify-between text-xs text-gray-600 max-w-[280px]"
+          >
+            <span className="truncate">{m.title}</span>
+            <button
+              type="button"
+              onClick={() => removeExisting(i)}
+              className="text-red-500 ml-2"
+              aria-label="Elimină documentul"
+            >
+              ✕
+            </button>
+          </div>
+        ))}
+        {pendingMaterials.map((m) => (
+          <div
+            key={m.tempId}
+            className="flex items-center justify-between text-xs text-blue-600 max-w-[280px]"
+          >
+            <span className="truncate">{m.title} (nou)</span>
+            <button
+              type="button"
+              onClick={() => removePending(m.tempId)}
+              className="text-red-500 ml-2"
+              aria-label="Elimină documentul"
+            >
+              ✕
+            </button>
+          </div>
+        ))}
+      </div>
 
       <CldUploadWidget
-        uploadPreset="school-mgmt"
+        uploadPreset="school-mgmt" ///ml_default ; trebuie sa se schimbe o setare in cloudinary pentru a permite preview-ul pdf-urilor, momentan nu se poate face preview la pdf-uri
         options={{
-          resourceType: "auto",
+          resourceType: "image",
           multiple: false,
           maxFiles: 1,
           maxFileSize: MAX_FILE_SIZE,
           clientAllowedFormats: ["pdf"],
         }}
         onSuccess={(result) => {
-          setDoc(result.info);
+          const info = result.info as any;
+          if (totalMaterialsCount >= MAX_MATERIALS) {
+            toast.error(`Poți avea maxim ${MAX_MATERIALS} materiale!`);
+            return;
+          }
+          setPendingMaterials((prev) => [
+            ...prev,
+            {
+              tempId: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+              title: info.original_filename || "Document",
+              url: info.secure_url,
+              sizeBytes: info.bytes ?? 0,
+            },
+          ]);
         }}
       >
         {({ open }) => {

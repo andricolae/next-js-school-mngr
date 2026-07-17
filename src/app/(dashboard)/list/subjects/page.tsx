@@ -65,7 +65,12 @@ const SubjectListPage = async ({
         {item.teachers.map((teacher) => teacher.name).join(", ")}
       </td>
       <td>
-        <SubjectMaterialsButton file={item.file} subjectName={item.name} />
+        <SubjectMaterialsButton 
+        file={item.file} 
+        subjectName={item.name} 
+        subjectId={item.id} 
+        canManage={role === "admin" || (role === "teacher" && item.teachers.some((t) => t.id === currentUserId))}
+        />
       </td>
       <td>
         <div className="flex items-center gap-2">

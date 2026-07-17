@@ -1,15 +1,34 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
+import { deleteSubjectMaterial } from "@/lib/actions";
+import PdfPreviewModal from "@/components/PdfPreviewModal";
 
 const SubjectMaterialsButton = ({
   file,
   subjectName,
+  subjectId,
+  canManage,
 }: {
   file: string | null;
   subjectName: string;
+  subjectId: number;
+  canManage: boolean;
 }) => {
   const [open, setOpen] = useState(false);
+  const router = useRouter();
+
+  const handleDelete = async (index: number) => {
+    const result = await deleteSubjectMaterial(subjectId, index);
+    if (result.error) {
+      toast.error("Eroare la ștergerea materialului.");
+    } else {
+      toast.success("Material șters cu succes.");
+      router.refresh();
+    }
+  };
 
   return (
     <>
@@ -37,55 +56,54 @@ const SubjectMaterialsButton = ({
 
       {open && (
         <div className="w-screen h-screen absolute left-0 top-0 bg-black bg-opacity-60 z-50 flex items-center justify-center">
-          <div className="bg-white rounded-md relative w-[30%] p-5 h-fit overflow-y-auto">
+          <div className="bg-white rounded-md relative w-fit max-w-[90%] p-5 h-fit overflow-y-auto">
             <h2 className="text-sm font-semibold mb-3">
               Materiale — {subjectName}
             </h2>
 
-            {file ? (
-              <div className="flex items-center gap-2">
-                <div className="flex-1 px-3 py-2 bg-gray-50 rounded-md text-sm truncate">
-                  {file}
+            {(() => {
+              const materials = file
+                ? file
+                    .split("||")
+                    .filter(Boolean)
+                    .map((entry) => {
+                      const [title, url, sizeBytesStr] = entry.split("^^");
+                      return {
+                        title: title ?? "",
+                        url: url ?? "",
+                        sizeBytes: Number(sizeBytesStr) || 0,
+                      };
+                    })
+                : [];
+
+              if (materials.length === 0) {
+                return (
+                  <p className="text-gray-400 text-sm">
+                    Niciun material încărcat.
+                  </p>
+                );
+              }
+
+              return (
+                <div className="flex flex-wrap gap-4">
+                  {materials.map((m, i) => (
+                    <div key={i} className="relative">
+                      <PdfPreviewModal url={m.url} label={m.title} />
+                      {canManage && (
+                        <button
+                          type="button"
+                          onClick={() => handleDelete(i)}
+                          title="Șterge material"
+                          className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center shadow hover:bg-red-600"
+                        >
+                          ✕
+                        </button>
+                      )}
+                    </div>
+                  ))}
                 </div>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    navigator.clipboard.writeText(file);
-                  }}
-                  title="Copiază link-ul"
-                  className="flex-shrink-0"
-                >
-                  <img
-                    src="/copy.svg"
-                    alt="copy icon"
-                    width={18}
-                    height={18}
-                  ></img>
-                </button>
-
-                <div className="flex items-center gap-2">
-                  {/*buton de preview */}
-
-                  <a
-                    href={file}
-                    download
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    title="Descarcă documentul"
-                  >
-                    <img
-                      src="/download.svg"
-                      alt="download icon"
-                      width={18}
-                      height={18}
-                    />
-                  </a>
-                </div>
-              </div>
-            ) : (
-              <p className="text-gray-400 text-sm">Niciun material încărcat.</p>
-            )}
+              );
+            })()}
 
             <div
               className="absolute top-4 right-4 cursor-pointer"
