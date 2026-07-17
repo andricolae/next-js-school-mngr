@@ -12,6 +12,17 @@ import { translateClerkError } from "@/lib/clerkErrorMessage";
 
 type CurrentState = { success: boolean; error: boolean | string };
 export const createSubject = async (currentState: CurrentState, data: SubjectSchema) => {
+    const {sessionClaims} = await auth()
+    let tokenData
+    if (sessionClaims !== null){
+        tokenData = sessionClaims as unknown as TokenData
+    }
+    let role = tokenData?.userPblcMtdt.role
+
+    if (role !== "admin") {
+        return { success: false, error: true, message: "Doar adminii pot crea materii noi!"}
+    }
+
     try {
         let subjectName = data.name;
         let file: string | null = null;
@@ -40,6 +51,25 @@ export const createSubject = async (currentState: CurrentState, data: SubjectSch
 }
 
 export const updateSubject = async (currentState: CurrentState, data: SubjectSchema) => {
+    const {userId, sessionClaims} = await auth()
+    let tokenData
+    if( sessionClaims !== null){
+        tokenData = sessionClaims as unknown as TokenData
+    }
+    let role = tokenData?.userPblcMtdt.role
+
+    if (role === "teacher"){
+         const isTeacherOfSubject = await prisma.subject.findFirst({
+            where: {
+                id: data.id,
+                teachers: { some: { id: userId!}}
+            }
+         })
+         if(!isTeacherOfSubject){
+            return { success: false, error: true, message: "Nu ai permisiunea de a modifica această materie!"}
+         }
+    }
+
     try {
         let subjectName = data.name;
         let file: string | null = null;
